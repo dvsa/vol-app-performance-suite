@@ -1,0 +1,35 @@
+group 'gov.dvsa.vol'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'idea'
+apply plugin: 'scala'
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'io.gatling.highcharts', name: 'gatling-charts-highcharts', version: '2.3.0'
+    testCompile group: 'io.gatling', name: 'gatling-core', version: '2.3.0'
+    testCompile group: 'io.gatling', name: 'gatling-http', version: '2.3.0'
+    testCompile group: 'org.scala-lang', name: 'scala-library', version: '2.12.3'
+    testCompile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.218'
+
+}
+
+task runLoadTest(type: JavaExec){
+    dependsOn testClasses
+    systemProperty "env", java.lang.System.getProperty("env")
+    description = "Load testing with Gatling"
+    classpath = sourceSets.test.runtimeClasspath
+    main = "io.gatling.app.Gatling"
+    //Specify the simulation to run
+    args = [
+            "--simulation", "simulations.LoadSimulation",
+            "--results-folder", "${buildDir}/gatling-results",
+            "--bodies-folder", sourceSets.test.resources
+    ]
+}
