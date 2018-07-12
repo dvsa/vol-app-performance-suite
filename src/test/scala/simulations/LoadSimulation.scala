@@ -2,8 +2,9 @@ package simulations
 
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
-import scenarios.RegisterUser
+import scenarios.{LoginPage, SearchBusOperator}
 import utils.{Environment, Headers}
+
 import scala.concurrent.duration._
 
 class LoadSimulation extends Simulation {
@@ -12,16 +13,21 @@ class LoadSimulation extends Simulation {
   val httpConfiguration = http.baseURL(Environment.baseURL).headers(Headers.requestHeaders)
     .disableCaching
     .disableResponseChunksDiscarding
-    .inferHtmlResources()
+    .disableWarmUp
+    .silentResources
     .extraInfoExtractor(extraInfo => List(println(extraInfo.request), extraInfo.response, extraInfo.session))
 
-  val registerUser = List(
-    RegisterUser.registerUser.inject(
-      constantUsersPerSec(1) during (1 minute))
-      .throttle(reachRps(1) in (2 seconds),
-        holdFor(1 minute))
+  val NonValidationJourney = List(
+    SearchBusOperator.search.inject(
+      rampUsers(Integer.parseInt(Environment.user)) over (Integer.parseInt(Environment.interval) minutes))
+      .throttle(reachRps(10) in (2 minutes),
+        holdFor(Integer.parseInt(Environment.interval) minutes)),
+        LoginPage.navigateToLoginPage.inject(
+          rampUsers(Integer.parseInt(Environment.user)) over (Integer.parseInt(Environment.interval) minutes))
+          .throttle(reachRps(10) in (2 minutes),
+            holdFor(Integer.parseInt(Environment.interval) minutes))
   )
-  setUp(registerUser)
+  setUp(NonValidationJourney)
     .protocols(httpConfiguration)
     .assertions(global.failedRequests.count.is(0))
 }
