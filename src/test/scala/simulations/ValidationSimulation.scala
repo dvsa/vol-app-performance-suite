@@ -10,10 +10,8 @@ import scala.concurrent.duration._
 
 class ValidationSimulation extends Simulation {
 
-//  val user : Int  =  if (System.getProperty("users").isEmpty) System.getProperty("users").toInt else 60
-//  val interval : Int = if (System.getProperty("interval").isEmpty) System.getProperty("interval").toInt else 30
 
-  after{
+  after {
     val deleteFile = new CreateAndGrantApplication
     deleteFile.deleteFile()
   }
@@ -25,10 +23,11 @@ class ValidationSimulation extends Simulation {
     .disableWarmUp
     .strict302Handling
 
-  val ValidationJourney = List(
+  val ValidationJourney =
     ViewDetails.loginIntoExternalSite.inject(
-      rampUsers(60) over (30 minutes))
-  )
+      rampUsers(Integer.parseInt(Environment.user)) over (Integer.parseInt(Environment.interval) minutes)
+    )
+
   setUp(ValidationJourney)
     .protocols(httpConfiguration)
     .assertions(global.failedRequests.count.is(0))

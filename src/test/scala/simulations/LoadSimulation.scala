@@ -19,13 +19,13 @@ class LoadSimulation extends Simulation {
 
   val NonValidationJourney = List(
     SearchBusOperator.search.inject(
-      rampUsers(30) over (15 minutes))
+      rampUsers(Integer.parseInt(Environment.user)) over (Integer.parseInt(Environment.interval) minutes))
       .throttle(reachRps(10) in (2 minutes),
-        holdFor(15 minutes)),
+        holdFor(Integer.parseInt(Environment.interval) minutes)),
         LoginPage.navigateToLoginPage.inject(
-          rampUsers(30) over (15 minutes))
+          rampUsers(Integer.parseInt(Environment.user)) over (Integer.parseInt(Environment.interval) minutes))
           .throttle(reachRps(10) in (2 minutes),
-            holdFor(15 minutes))
+            holdFor(Integer.parseInt(Environment.interval) minutes))
   )
   setUp(NonValidationJourney)
     .protocols(httpConfiguration)

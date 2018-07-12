@@ -16,8 +16,11 @@ buildscript {
     }
 }
 
+
 task runLoadTest(type: JavaExec) {
     systemProperty "env", java.lang.System.getProperty("env")
+    systemProperty "users", java.lang.System.getProperty("users")
+    systemProperty "interval", java.lang.System.getProperty("interval")
 
     description = "Load testing with Gatling"
     classpath = sourceSets.test.runtimeClasspath
@@ -32,9 +35,6 @@ task runLoadTest(type: JavaExec) {
 
 task runSearchTest(type: JavaExec) {
     systemProperty "env", java.lang.System.getProperty("env")
-    systemProperty "users", java.lang.System.getProperty("users")
-    systemProperty "interval", java.lang.System.getProperty("interval")
-
     description = "Load testing with Gatling"
     classpath = sourceSets.test.runtimeClasspath
     main = "io.gatling.app.Gatling"
@@ -48,13 +48,16 @@ task runSearchTest(type: JavaExec) {
 
 test {
     systemProperty "env", java.lang.System.getProperty("env")
+    systemProperty "users", java.lang.System.getProperty("users")
+    systemProperty "interval", java.lang.System.getProperty("interval")
     doFirst {
         filter {
             includeTest "*CreateAndGrantApplication", "grantApp"
         }
     }
-      doLast{
+    doLast {
         runLoadTest
+        runSearchTest
     }
 }
 

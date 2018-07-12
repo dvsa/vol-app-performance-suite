@@ -11,7 +11,7 @@
  
  In a terminal window, powershell window or cmd paste the below command
  
-`gradle runLoadTest -Denv={env e.g. da}`
+`gradle test -Denv=e.g. da -Dusers=e.g. 30 -Dinterval=e.g.2`
 
  Please remove the braces when running.
  
