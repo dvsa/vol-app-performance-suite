@@ -2,7 +2,7 @@ package simulations
 
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
-import scenarios.{CreateApplication}
+import scenarios.CreateApplication
 import utils.{Configuration, Headers}
 
 

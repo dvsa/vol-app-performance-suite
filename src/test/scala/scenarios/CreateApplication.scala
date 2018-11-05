@@ -45,7 +45,8 @@ object CreateApplication {
         .pause(10)
     }
     .exec(http("Landing Page")
-      .get("/"))
+      .get("/")
+        .check(regex("${Forename}")))
     .pause(10)
     .exec(http("choose country")
       .post("application/create/")
@@ -319,5 +320,10 @@ object CreateApplication {
         .formParam("declarationsAndUndertakings[id]", "${applicationId}")
         .formParam("form-actions[submitAndPay]", "")
         .formParam("security", "${securityToken}")
-          .check(regex("PSV/SN Application Fee for application {applicationId}")))
+          .check(regex("PSV/SN Application Fee for application ${applicationId}"))
+        .check(bodyString.saveAs("login_response")))
+    .exec(session => {
+      println(session("login_response").as[String])
+      session
+    })
 }

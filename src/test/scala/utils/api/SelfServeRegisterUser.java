@@ -37,25 +37,25 @@ public class SelfServeRegisterUser {
         }
     }
 
-    private void writeToFile(String header, String userId, String password, String licenceNumber) throws Exception {
+    private void writeToFile(String header, String userId, String password, String forename) throws Exception {
         String user = userId;
         String pass = password;
-        String licence = licenceNumber;
+        String foreName = forename;
         FileWriter fileWriter = new FileWriter(LOGIN_CSV_FILE, true);
         BufferedWriter writer = new BufferedWriter(fileWriter);
         CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
 
         if (!searchForString(LOGIN_CSV_FILE, CSV_HEADERS)) {
             csvPrinter.printRecord((Object[]) header.split(","));
-            csvPrinter.printRecord(Arrays.asList(user, pass, licence));
+            csvPrinter.printRecord(Arrays.asList(user, pass, foreName));
             csvPrinter.flush();
         } else {
-            csvPrinter.printRecord(Arrays.asList(user, pass, licence));
+            csvPrinter.printRecord(Arrays.asList(user, pass, foreName));
             csvPrinter.flush();
         }
     }
 
-    private boolean searchForString(String file, String searchText) throws IOException {
+    public boolean searchForString(String file, String searchText) throws IOException {
         boolean foundIt = true;
         File f = new File(file);
         if (f.exists() && (FileUtils.readFileToString(new File(file), "UTF-8").contains(searchText)))
