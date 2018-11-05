@@ -5,57 +5,52 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
-import utils.api.External.CreateInterimGoodsLicenceAPI;
-import utils.api.Internal.GrantApplicationAPI;
+import utils.API_CreateAndGrantAPP.CreateLicenceAPI;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Arrays;
 
 
-public class CreateAndGrantApplication {
+public class SelfServeRegisterUser {
 
     final String LOGIN_CSV_FILE = "./loginId.csv";
-    final String CSV_HEADERS = "UserId,Password,Licence";
+    final String CSV_HEADERS = "Username,Password,Forename";
     String users = System.getProperty("users");
 
     @Test
-    public void grantApp() throws Exception {
-        GrantApplicationAPI grantApp = new GrantApplicationAPI();
-        CreateInterimGoodsLicenceAPI goodsApp = new CreateInterimGoodsLicenceAPI();
-        String applicationNumber = goodsApp.getApplicationNumber();
+    public void registerUser() throws Exception {
+        CreateLicenceAPI registerUser = new CreateLicenceAPI();
+        String applicationNumber = registerUser.getApplicationNumber();
         String password;
 
-        for (int i = 0; i < 60; i++) {
+        for (int i = 0; i < Integer.parseInt(users); i++) {
             if (applicationNumber == null) {
-                goodsApp.createGoodsApp();
-                String email = goodsApp.getEmailAddress();
+                registerUser.registerUser();
+                registerUser.getUserDetails();
+                String email = registerUser.getEmailAddress();
                 password = S3.getTempPassword(email);
-                writeToFile(CSV_HEADERS, goodsApp.getLoginId(), password, goodsApp.getLicenceNumber());
-                grantApp.createOverview(goodsApp.getApplicationNumber());
-                grantApp.getOutstandingFees(goodsApp.getApplicationNumber());
-                grantApp.payOutstandingFees(goodsApp.getOrganisationId(), goodsApp.getApplicationNumber());
-                grantApp.grant(goodsApp.getApplicationNumber());
-                grantApp.payGrantFees(goodsApp.getOrganisationId(), goodsApp.getApplicationNumber());
+                writeToFile(CSV_HEADERS, registerUser.getLoginId(), password, registerUser.getForeName());
             }
-
         }
     }
 
-    public void writeToFile(String header, String userId, String password, String licenceNumber) throws Exception {
+    private void writeToFile(String header, String userId, String password, String forename) throws Exception {
         String user = userId;
         String pass = password;
-        String licence = licenceNumber;
+        String foreName = forename;
         FileWriter fileWriter = new FileWriter(LOGIN_CSV_FILE, true);
         BufferedWriter writer = new BufferedWriter(fileWriter);
         CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
 
-
         if (!searchForString(LOGIN_CSV_FILE, CSV_HEADERS)) {
-            csvPrinter.printRecord(header.split(","));
-            csvPrinter.printRecord(Arrays.asList(user, pass, licence));
+            csvPrinter.printRecord((Object[]) header.split(","));
+            csvPrinter.printRecord(Arrays.asList(user, pass, foreName));
             csvPrinter.flush();
         } else {
-            csvPrinter.printRecord(Arrays.asList(user, pass, licence));
+            csvPrinter.printRecord(Arrays.asList(user, pass, foreName));
             csvPrinter.flush();
         }
     }
@@ -81,4 +76,3 @@ public class CreateAndGrantApplication {
         }
     }
 }
-

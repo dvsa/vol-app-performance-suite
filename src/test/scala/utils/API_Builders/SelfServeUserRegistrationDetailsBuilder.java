@@ -1,4 +1,4 @@
-package utils.api.builders;
+package utils.API_Builders;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -90,5 +90,3 @@ public class SelfServeUserRegistrationDetailsBuilder {
                 + ",businessType:" + getBusinessType();
     }
 }
-
-

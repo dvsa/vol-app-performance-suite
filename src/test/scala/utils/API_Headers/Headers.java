@@ -1,8 +1,8 @@
-package utils;
+package utils.API_Headers;
 
 import java.util.HashMap;
 
-public class APIHeaders {
+public class Headers{
 
     public static HashMap<String, String> headers = new HashMap<>();
 
