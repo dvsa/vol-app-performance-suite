@@ -8,11 +8,12 @@ import utils.{Configuration, Headers}
 
 class CreateApplicationSimulation extends Simulation {
 
-  val httpConfiguration = http.baseURL(Configuration.baseURL).headers(Headers.requestHeaders)
+  val httpConfiguration = http.baseUrl(Configuration.baseURL).headers(Headers.requestHeaders)
     .disableCaching
-    .disableAutoReferer
     .disableWarmUp
+    .perUserNameResolution
     .silentResources
+
 
   val loginAndCreateApp =
         CreateApplication.selfServiceApplicationRegistration.inject(atOnceUsers(Configuration.users))

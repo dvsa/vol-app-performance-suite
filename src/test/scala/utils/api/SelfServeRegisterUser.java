@@ -55,8 +55,8 @@ public class SelfServeRegisterUser {
         }
     }
 
-    public boolean searchForString(String file, String searchText) throws IOException {
-        boolean foundIt = true;
+    private boolean searchForString(String file, String searchText) throws IOException {
+        boolean foundIt;
         File f = new File(file);
         if (f.exists() && (FileUtils.readFileToString(new File(file), "UTF-8").contains(searchText)))
             foundIt = true;
@@ -67,6 +67,7 @@ public class SelfServeRegisterUser {
         return foundIt;
     }
 
+    @Test
     public void deleteFile() {
         File loginDetails = new File(LOGIN_CSV_FILE);
         if (loginDetails.exists()) {
