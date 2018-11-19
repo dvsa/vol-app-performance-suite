@@ -4,6 +4,7 @@ version '1.0-SNAPSHOT'
 apply plugin: 'idea'
 apply plugin: 'scala'
 apply plugin: 'java'
+apply plugin: 'application'
 
 sourceCompatibility = 1.8
 
@@ -12,6 +13,7 @@ repositories {
 }
 
 dependencies {
+    testCompile 'junit:junit:[4,)'
     testCompile 'io.gatling.highcharts:gatling-charts-highcharts:3.0.0'
     testCompile 'io.gatling:gatling-core:3.0.0'
     testCompile 'io.gatling:gatling-http:3.0.0'
@@ -47,6 +49,8 @@ repositories {
 task runLoadTest(type: JavaExec) {
     systemProperty "env", java.lang.System.getProperty("env")
     systemProperty "users", java.lang.System.getProperty("users")
+    systemProperty "rampUp", java.lang.System.getProperty("rampUp")
+    systemProperty "duration", java.lang.System.getProperty("duration")
 
     description = "Load testing with Gatling"
     classpath = sourceSets.test.runtimeClasspath
@@ -57,22 +61,39 @@ task runLoadTest(type: JavaExec) {
             "--results-folder", "${buildDir}/gatling-results",
             "--bodies-folder", sourceSets.test.resources
     ]
-//    doLast{
-//        println("=========================YES")
-//        includeTest "*SelfServeRegisterUser", "deleteFile"
-//        println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-//    }
 }
 
 test {
     systemProperty "env", java.lang.System.getProperty("env")
     systemProperty "users", java.lang.System.getProperty("users")
+    systemProperty "rampUp", java.lang.System.getProperty("rampUp")
+    systemProperty "duration", java.lang.System.getProperty("duration")
+
     doFirst {
         filter {
-            includeTest "*SelfServeRegisterUser", "registerUser"
+            includeTest "*SelfServeRegisterUser", "mainTest"
         }
     }
     doLast {
         runLoadTest.exec()
+
+    }
+    doLast {
+        filter {
+            println("*********deleting loginId file************")
+            sleep 2000
+            includeTest "*SelfServeRegisterUser", "deleteFile"
+            println("***********finishing deleting file**********")
+            sleep 2000
+            println("********cancel all created applications******")
+            includeTest "*SelfServeRegisterUser", "cancelApplication"
+
+        }
+    }
+}
+
+tasks.withType(Test){
+    testLogging{
+        events 'started', 'passed'
     }
 }
