@@ -79,15 +79,16 @@ test {
 
     }
     doLast {
-        filter {
-            println("*********deleting loginId file************")
-            sleep 2000
-            includeTest "*SelfServeRegisterUser", "deleteFile"
-            println("***********finishing deleting file**********")
-            sleep 2000
-            println("********cancel all created applications******")
-            includeTest "*SelfServeRegisterUser", "cancelApplication"
-
+        test {
+            filter {
+                println("*********deleting loginId file************")
+                sleep 2000
+                includeTest "*SelfServeRegisterUser", "deleteFile"
+                println("***********finishing deleting file**********")
+                sleep 2000
+                println("********cancel all created applications******")
+                includeTest "*SelfServeRegisterUser", "cancelApplication"
+            }
         }
     }
 }
