@@ -11,7 +11,7 @@
  
  In a terminal window, powershell window or cmd paste the below command
  
-`gradle test -Denv=e.g. da -Dusers=e.g. 30 -Dinterval=e.g.2`
+`gradle test -Denv=e.g.{da} -Dusers=e.g.{30} -DrampUp=e.g.2 -Dduration=e.g{10}`
 
  Please remove the braces when running.
  

@@ -4,6 +4,7 @@ version '1.0-SNAPSHOT'
 apply plugin: 'idea'
 apply plugin: 'scala'
 apply plugin: 'java'
+apply plugin: 'application'
 
 sourceCompatibility = 1.8
 
@@ -12,12 +13,11 @@ repositories {
 }
 
 dependencies {
-    testCompile 'io.gatling.highcharts:gatling-charts-highcharts:2.3.1'
-    testCompile 'io.gatling:gatling-core:2.3.1'
-    testCompile 'io.gatling:gatling-http:2.3.1'
-    testCompile 'org.scala-lang:scala-library:2.12.5'
-    testCompile 'org.assertj:assertj-core:3.9.1'
-    testCompile 'org.hamcrest:hamcrest-all:1.3'
+    testCompile 'junit:junit:[4,)'
+    testCompile 'io.gatling.highcharts:gatling-charts-highcharts:3.0.0'
+    testCompile 'io.gatling:gatling-core:3.0.0'
+    testCompile 'io.gatling:gatling-http:3.0.0'
+    testCompile 'org.scala-lang:scala-library:2.12.7'
     testCompile 'org.apache.commons:commons-csv:1.5'
     compile 'org.dvsa.testing.lib:active-support:1.2.8'
     compile 'org.dvsa.testing.lib:uri-constructor:1.4.5'
@@ -46,10 +46,11 @@ repositories {
     }
 }
 
-
 task runLoadTest(type: JavaExec) {
     systemProperty "env", java.lang.System.getProperty("env")
     systemProperty "users", java.lang.System.getProperty("users")
+    systemProperty "rampUp", java.lang.System.getProperty("rampUp")
+    systemProperty "duration", java.lang.System.getProperty("duration")
 
     description = "Load testing with Gatling"
     classpath = sourceSets.test.runtimeClasspath
@@ -65,16 +66,35 @@ task runLoadTest(type: JavaExec) {
 test {
     systemProperty "env", java.lang.System.getProperty("env")
     systemProperty "users", java.lang.System.getProperty("users")
+    systemProperty "rampUp", java.lang.System.getProperty("rampUp")
+    systemProperty "duration", java.lang.System.getProperty("duration")
+
     doFirst {
         filter {
-            includeTest "*SelfServeRegisterUser", "registerUser"
+            includeTest "*SelfServeRegisterUser", "mainTest"
         }
     }
-    doLast{
+    doLast {
         runLoadTest.exec()
-        filter{
-            includeTest "*SelfServeRegisterUser" , "deleteFile"}
+
+    }
+    doLast {
+        test {
+            filter {
+                println("*********deleting loginId file************")
+                sleep 2000
+                includeTest "*SelfServeRegisterUser", "deleteFile"
+                println("***********finishing deleting file**********")
+                sleep 2000
+                println("********cancel all created applications******")
+                includeTest "*SelfServeRegisterUser", "cancelApplication"
+            }
+        }
     }
 }
 
-
+tasks.withType(Test){
+    testLogging{
+        events 'started', 'passed'
+    }
+}
