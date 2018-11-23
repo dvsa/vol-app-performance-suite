@@ -6,3 +6,5 @@
 /out/
 /loginId.csv
 /src/test/resources/loginId.csv
+src/main/
+src/test/resources/loginId.csv
