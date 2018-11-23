@@ -14,9 +14,8 @@ class CreateApplicationSimulation extends Simulation {
   val httpConfiguration = http.baseUrl(Configuration.baseURL).headers(Headers.requestHeaders)
     .disableCaching
     .disableWarmUp
-    .perUserNameResolution
     .silentResources
-
+    .perUserNameResolution
 
   val loginAndCreateApp =
         CreateApplication.selfServiceApplicationRegistration.inject(atOnceUsers(Configuration.users),
