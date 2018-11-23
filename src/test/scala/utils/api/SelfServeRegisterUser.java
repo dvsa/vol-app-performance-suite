@@ -26,7 +26,7 @@ public class SelfServeRegisterUser {
 
     @Test
     public void mainTest() throws Exception {
-        if(Integer.parseInt(users) > 10){
+        if(Integer.parseInt(users) > 20){
             getUsersFromTable();
         }else{
             registerUser();

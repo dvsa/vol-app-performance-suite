@@ -7,7 +7,7 @@ object CreateApplication {
 
   val newPassword = "Password1"
 
-  val feeder = csv("src/test/resources/loginId.csv").circular
+  val feeder = csv("src/test/resources/loginId.csv")
   val header_ = Map("Accept" -> "*/*")
 
   val headers_0 = Map("Upgrade-Insecure-Requests" -> "1")
@@ -21,8 +21,8 @@ object CreateApplication {
       .check(
         regex("""id="security" value="([^"]*)&*""").
           find.saveAs("securityToken")))
-    .pause(10)
-    .exec(http("Change Password")
+    .pause(15)
+    .exec(http("login")
       .post("auth/login/")
       .check(regex("""name="change-password-form" action="&#x2F;auth&#x2F;expired-password&#x2F;([^"]*)&#x2F;""").find.optional.saveAs("Location"))
       .formParam("username", "${Username}")
@@ -168,7 +168,7 @@ object CreateApplication {
       .check(currentLocationRegex("""details/(\d+)""").saveAs("tmaId")))
     .pause(30)
     .exec(http("submit transport manager")
-      .post("application/${applicationId}/transport-managers/details/${tmaId}")
+      .post("application/${applicationId}/transport-managers/details/${tmaId}/")
       .formParam("details[birthDate][day]", "23")
       .formParam("details[birthDate][month]", "02")
       .formParam("details[birthDate][year]", "1948")
@@ -205,12 +205,12 @@ object CreateApplication {
       .formParam("security", "${securityToken}"))
     .pause(30)
     .exec(http("submit check your answers")
-      .post("application/${applicationId}/transport-managers/check-answer/${tmaId}/confirm")
+      .post("application/${applicationId}/transport-managers/check-answer/${tmaId}/confirm/")
       .formParam("form-actions[submit]", "")
       .formParam("security", "${securityToken}"))
     .pause(30)
     .exec(http("submit check your answers")
-      .post("application/${applicationId}/transport-managers/tm-declaration/${tmaId}")
+      .post("application/${applicationId}/transport-managers/tm-declaration/${tmaId}/")
       .formParam("content[isDigitallySigned]", "N")
       .formParam("form-actions[submit]", "")
       .formParam("version", "")
@@ -260,7 +260,7 @@ object CreateApplication {
       .formParam("security", "${securityToken}"))
     .pause(30)
     .exec(http("safety compliance")
-      .post("application/${applicationId}/safety")
+      .post("application/${applicationId}/safety/")
       .formParam("licence[version]", "6")
       .formParam("licence[safetyInsVehicles]", "10")
       .formParam("licence[safetyInsVaries]", "N")
@@ -291,7 +291,7 @@ object CreateApplication {
       .formParam("security", "${securityToken}"))
     .pause(30)
     .exec(http("licence history")
-      .post("application/${applicationId}/licence-history")
+      .post("application/${applicationId}/licence-history/")
       .formParam("data[prevHasLicence]", "N")
       .formParam("data[prevHasLicence-table][rows]", "0")
       .formParam("data[prevHadLicence]", "N")
@@ -320,17 +320,21 @@ object CreateApplication {
       .formParam("security", "${securityToken}"))
     .pause(30)
     .exec(http("undertakings")
-      .post("application/${applicationId}/undertakings")
+      .post("application/${applicationId}/undertakings/")
       .formParam("declarationsAndUndertakings[signatureOptions]", "N")
       .formParam("declarationsAndUndertakings[version]", "10")
       .formParam("declarationsAndUndertakings[id]", "${applicationId}")
       .formParam("form-actions[submitAndPay]", "")
       .formParam("security", "${securityToken}")
       .check(regex("PSV/SN Application Fee for application ${applicationId}"))
-      .check(bodyString.saveAs("login_response")))
+      .check(bodyString.saveAs("undertakings")))
     .exec(session => {
-      println(session("login_response").as[String])
+      println(session("undertakings").as[String])
       session
     })
+    .pause(20)
+    .exec(http("logout")
+        .get("auth/logout/")
+        .check(regex("Thank you")))
     .exec(flushSessionCookies)
 }

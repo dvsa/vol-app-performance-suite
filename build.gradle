@@ -13,14 +13,13 @@ repositories {
 }
 
 dependencies {
-    testCompile 'junit:junit:[4,)'
     testCompile 'io.gatling.highcharts:gatling-charts-highcharts:3.0.0'
     testCompile 'io.gatling:gatling-core:3.0.0'
     testCompile 'io.gatling:gatling-http:3.0.0'
     testCompile 'org.scala-lang:scala-library:2.12.7'
     testCompile 'org.apache.commons:commons-csv:1.5'
-    compile 'org.dvsa.testing.lib:active-support:1.2.8'
-    compile 'org.dvsa.testing.lib:uri-constructor:1.4.5'
+    testCompile 'org.dvsa.testing.lib:active-support:1.2.8'
+    testCompile 'org.dvsa.testing.lib:uri-constructor:1.4.5'
 }
 
 
@@ -51,6 +50,8 @@ task runLoadTest(type: JavaExec) {
     systemProperty "users", java.lang.System.getProperty("users")
     systemProperty "rampUp", java.lang.System.getProperty("rampUp")
     systemProperty "duration", java.lang.System.getProperty("duration")
+    systemProperty "dbUsername", java.lang.System.getProperty("dbUsername")
+    systemProperty "dbPassword", java.lang.System.getProperty("dbPassword")
 
     description = "Load testing with Gatling"
     classpath = sourceSets.test.runtimeClasspath
@@ -68,6 +69,8 @@ test {
     systemProperty "users", java.lang.System.getProperty("users")
     systemProperty "rampUp", java.lang.System.getProperty("rampUp")
     systemProperty "duration", java.lang.System.getProperty("duration")
+    systemProperty "dbUsername", java.lang.System.getProperty("dbUsername")
+    systemProperty "dbPassword", java.lang.System.getProperty("dbPassword")
 
     doFirst {
         filter {
@@ -79,22 +82,18 @@ test {
 
     }
     doLast {
-        test {
-            filter {
-                println("*********deleting loginId file************")
-                sleep 2000
-                includeTest "*SelfServeRegisterUser", "deleteFile"
-                println("***********finishing deleting file**********")
-                sleep 2000
-                println("********cancel all created applications******")
-                includeTest "*SelfServeRegisterUser", "cancelApplication"
-            }
-        }
+        cleanUp.executeTests()
     }
 }
 
-tasks.withType(Test){
-    testLogging{
-        events 'started', 'passed'
+task cleanUp(type: Test) {
+    filter {
+        println("*********deleting loginId file************")
+        sleep 2000
+        includeTest "*SelfServeRegisterUser", "deleteFile"
+        println("***********finishing deleting file**********")
+        sleep 2000
+        println("********cancel all created applications******")
+        includeTest "*SelfServeRegisterUser", "cancelApplication"
     }
 }
