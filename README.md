@@ -11,9 +11,14 @@
  
  In a terminal window, powershell window or cmd paste the below command
  
-`gradle test -Denv=e.g.{da} -Dusers=e.g.{30} -DrampUp=e.g.2 -Dduration=e.g{10}`
+`gradle test -Denv={da} -Dusers={2} -DrampUp={0} -Dduration={0}`
+
 
  Please remove the braces when running.
+ 
+ If the number of users is greater than 20, the harness will use an SQL statement to get users
+ from the DB. You'll need to pass in the following system prop `-DdbUsername= and -DbPassword=` in addition to the other 
+ properties
  
 ## Reports
  - Reports can be found in build/gatling-results/
