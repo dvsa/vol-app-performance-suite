@@ -5,3 +5,4 @@
 /gradle/
 /out/
 /loginId.csv
+/src/test/resources/loginId.csv
