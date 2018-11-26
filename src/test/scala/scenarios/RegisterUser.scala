@@ -3,6 +3,7 @@ package scenarios
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import io.gatling.core.Predef.scenario
+import utils.Configuration
 
 object RegisterUser {
 
@@ -16,7 +17,7 @@ object RegisterUser {
       .get("register/")
       .headers(imageHeader)
       .check(
-        regex("""input type="hidden" name="security" class="js-csrf-token" id="security" value="([^"]*)""").
+        regex(Configuration.securityTokenPattern).
           saveAs("securityToken")))
       .pause(5)
     .exec(http("register a new account")
