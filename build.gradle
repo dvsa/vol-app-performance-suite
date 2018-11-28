@@ -13,9 +13,9 @@ repositories {
 }
 
 dependencies {
-    testCompile 'io.gatling.highcharts:gatling-charts-highcharts:3.0.0'
-    testCompile 'io.gatling:gatling-core:3.0.0'
-    testCompile 'io.gatling:gatling-http:3.0.0'
+    testCompile 'io.gatling.highcharts:gatling-charts-highcharts:3.0.1.1'
+    testCompile 'io.gatling:gatling-core:3.0.1.1'
+    testCompile 'io.gatling:gatling-http:3.0.1.1'
     testCompile 'org.scala-lang:scala-library:2.12.7'
     testCompile 'org.apache.commons:commons-csv:1.5'
     testCompile 'org.dvsa.testing.lib:active-support:1.2.8'
