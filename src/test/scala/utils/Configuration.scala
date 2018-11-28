@@ -11,4 +11,5 @@ object Configuration {
     case "int" => scala.util.Properties.envOrElse("baseURL", s"https://ssap1.olcs.$environment.prod.dvsa.aws/")
     case _ => scala.util.Properties.envOrElse("baseURL", s"https://ssap1.olcs.$environment.nonprod.dvsa.aws/")
   }
+  val securityTokenPattern = """id="security" value="([^"]*)&*"""
 }

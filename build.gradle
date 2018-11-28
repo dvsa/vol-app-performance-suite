@@ -45,7 +45,24 @@ repositories {
     }
 }
 
-task runLoadTest(type: JavaExec) {
+task registerUser(type: JavaExec) {
+    systemProperty "env", java.lang.System.getProperty("env")
+    systemProperty "users", java.lang.System.getProperty("users")
+    systemProperty "rampUp", java.lang.System.getProperty("rampUp")
+    systemProperty "duration", java.lang.System.getProperty("duration")
+
+    description = "Load testing with Gatling"
+    classpath = sourceSets.test.runtimeClasspath
+    main = "io.gatling.app.Gatling"
+    //Specify the simulation to run
+    args = [
+            "--simulation", "simulations.RegisterUserSimulation",
+            "--results-folder", "${buildDir}/gatling-results",
+            "--bodies-folder", sourceSets.test.resources
+    ]
+}
+
+task createApplication(type: JavaExec) {
     systemProperty "env", java.lang.System.getProperty("env")
     systemProperty "users", java.lang.System.getProperty("users")
     systemProperty "rampUp", java.lang.System.getProperty("rampUp")
@@ -78,7 +95,7 @@ test {
         }
     }
     doLast {
-        runLoadTest.exec()
+        createApplication.exec()
 
     }
     doLast {

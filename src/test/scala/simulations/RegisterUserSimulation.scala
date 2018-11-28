@@ -2,14 +2,13 @@ package simulations
 
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
-
-import scenarios.CreateApplication
+import scenarios.RegisterUser
 import utils.{Configuration, Headers}
 
 import scala.concurrent.duration._
 
 
-class CreateApplicationSimulation extends Simulation {
+class RegisterUserSimulation extends Simulation {
 
   val httpConfiguration = http.baseUrl(Configuration.baseURL).headers(Headers.requestHeaders)
     .disableCaching
@@ -18,10 +17,10 @@ class CreateApplicationSimulation extends Simulation {
     .perUserNameResolution
     .maxConnectionsPerHostLikeChrome
 
-  val loginAndCreateApp =
-        CreateApplication.selfServiceApplicationRegistration.inject(atOnceUsers(Configuration.users),
+  val RegisterUsers =
+        RegisterUser.registerUser.inject(atOnceUsers(Configuration.users),
           constantUsersPerSec(Configuration.rampUp) during (Configuration.rampDurationInMin minutes))
-  setUp(loginAndCreateApp)
+  setUp(RegisterUsers)
     .protocols(httpConfiguration)
     .assertions(global.failedRequests.count.is(0))
 }
