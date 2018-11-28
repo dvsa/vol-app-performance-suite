@@ -99,7 +99,7 @@ test {
 
     }
     doLast {
-//        cleanUp.executeTests()
+        cleanUp.executeTests()
     }
 }
 
