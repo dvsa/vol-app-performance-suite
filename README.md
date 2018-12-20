@@ -7,7 +7,7 @@
 # How to Build
 `gradle clean build -x test` 
 
-## Running Create Application Test 
+## Running Create Application Script 
  
  In a terminal window, powershell window or cmd paste the below command
  
@@ -20,11 +20,18 @@
  from the DB. You'll need to pass in the following system prop `-DdbUsername= and -DbPassword=` in addition to the other 
  properties
  
-## Running Register User test
+## Running Register User Script
  
   In a terminal window, powershell window or cmd paste the below command
   
  `gradle registerUser -Denv={da} -Dusers={2} -DrampUp={0} -Dduration={0}`
 
+
+## Running External Search Script
+ 
+  In a terminal window, powershell window or cmd paste the below command
+  
+ `gradle searchOperator -Denv={da} -Dusers={2} -DrampUp={0} -Dduration={0}`
+ 
 ## Reports
  - Reports can be found in build/gatling-results/
