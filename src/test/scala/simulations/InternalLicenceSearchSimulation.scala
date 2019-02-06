@@ -2,13 +2,13 @@ package simulations
 
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
-import scenarios.ExternalOperatorSearchUser
+import scenarios.InternalSearch
 import utils.{Configuration, Headers}
 
 import scala.concurrent.duration._
 
 
-class ExternalOperatorSearchSimulation extends Simulation {
+class InternalLicenceSearchSimulation extends Simulation {
 
   val httpConfiguration = http.baseUrl(Configuration.baseURL).headers(Headers.requestHeaders)
     .disableCaching
@@ -18,7 +18,7 @@ class ExternalOperatorSearchSimulation extends Simulation {
     .maxConnectionsPerHostLikeChrome
 
   val search =
-    ExternalOperatorSearchUser.companySearch.inject(atOnceUsers(Configuration.externalUsers),
+    InternalSearch.internalWorkerLogin.inject(atOnceUsers(Configuration.internalUsers),
           constantUsersPerSec(Configuration.rampUp) during (Configuration.rampDurationInMin minutes))
   setUp(search)
     .protocols(httpConfiguration)

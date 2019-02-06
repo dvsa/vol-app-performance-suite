@@ -13,8 +13,6 @@ object CreateApplication {
   val feeder = csv("src/test/resources/loginId.csv")
   val header_ = Map("Accept" -> "*/*")
 
-  val headers_0 = Map("Upgrade-Insecure-Requests" -> "1")
-
   val selfServiceApplicationRegistration = scenario("Create and submit application")
     .feed(feeder)
     .exec(http("get login page")

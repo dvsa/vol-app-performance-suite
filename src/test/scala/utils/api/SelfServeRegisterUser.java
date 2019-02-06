@@ -20,7 +20,7 @@ import java.util.Arrays;
 public class SelfServeRegisterUser {
 
     static String LOGIN_CSV_FILE = "src/test/resources/loginId.csv";
-    static String CSV_HEADERS = "Username,Password,Forename";
+    static String CSV_HEADERS = "Username,Forename,Password";
     static String users = System.getProperty("users");
 
 
@@ -71,7 +71,7 @@ public class SelfServeRegisterUser {
         while (set.next()) {
             String username = set.getString("Username");
             String familyName = set.getString("Forename");
-            writeToFile(CSV_HEADERS, username, tempUser, familyName);
+            writeToFile(CSV_HEADERS, username,familyName,tempUser);
         }
         set.close();
     }
@@ -83,10 +83,10 @@ public class SelfServeRegisterUser {
 
         if (!searchForString(LOGIN_CSV_FILE, CSV_HEADERS)) {
             csvPrinter.printRecord((Object[]) header.split(","));
-            csvPrinter.printRecord(Arrays.asList(userId, password, forename));
+            csvPrinter.printRecord(Arrays.asList(userId,forename,password));
             csvPrinter.flush();
         } else {
-            csvPrinter.printRecord(Arrays.asList(userId, password, forename));
+            csvPrinter.printRecord(Arrays.asList(userId,forename,password));
             csvPrinter.flush();
         }
     }
