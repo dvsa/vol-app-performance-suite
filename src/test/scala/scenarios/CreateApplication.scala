@@ -13,8 +13,6 @@ object CreateApplication {
   val feeder = csv("src/test/resources/loginId.csv")
   val header_ = Map("Accept" -> "*/*")
 
-  val headers_0 = Map("Upgrade-Insecure-Requests" -> "1")
-
   val selfServiceApplicationRegistration = scenario("Create and submit application")
     .feed(feeder)
     .exec(http("get login page")
@@ -27,7 +25,7 @@ object CreateApplication {
     .pause(300 milliseconds)
     .exec(http("login")
       .post("auth/login/")
-      .check(regex("""name="change-password-form" action="&#x2F;auth&#x2F;expired-password&#x2F;([^"]*)&#x2F;""").find.optional.saveAs("Location"))
+      .check(regex(Configuration.location).find.optional.saveAs("Location"))
       .formParam("username", "${Username}")
       .formParam("password", "${Password}")
       .formParam("submit", "Sign in")
