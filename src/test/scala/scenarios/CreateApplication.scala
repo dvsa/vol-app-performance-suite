@@ -25,7 +25,7 @@ object CreateApplication {
     .pause(300 milliseconds)
     .exec(http("login")
       .post("auth/login/")
-      .check(regex("""name="change-password-form" action="&#x2F;auth&#x2F;expired-password&#x2F;([^"]*)&#x2F;""").find.optional.saveAs("Location"))
+      .check(regex(Configuration.location).find.optional.saveAs("Location"))
       .formParam("username", "${Username}")
       .formParam("password", "${Password}")
       .formParam("submit", "Sign in")

@@ -21,7 +21,8 @@ public class SelfServeRegisterUser {
 
     static String LOGIN_CSV_FILE = "src/test/resources/loginId.csv";
     static String CSV_HEADERS = "Username,Forename,Password";
-    static String users = System.getProperty("users");
+    String users = System.getProperty("users");
+    String env = System.getProperty("env").toLowerCase();
 
 
     @Test
@@ -65,13 +66,21 @@ public class SelfServeRegisterUser {
     }
 
     private void getUsersFromTable() throws Exception {
-        String tempUser = "mij7tFV75idfD4642dfUIdjs";
-        ResultSet set = DBUnit.checkResult(SQLquery.getUsersSql(users));
+        String intTempUser = "llAndudno8-to-LL0ndon11";
+        String nprodTempUser = "Password1";
+        String userDetails;
 
+        if(env.equals("int")){
+            userDetails = intTempUser;
+        } else{
+            userDetails = nprodTempUser;
+        }
+
+        ResultSet set = DBUnit.checkResult(SQLquery.getUsersSql(users));
         while (set.next()) {
             String username = set.getString("Username");
             String familyName = set.getString("Forename");
-            writeToFile(CSV_HEADERS, username,familyName,tempUser);
+            writeToFile(CSV_HEADERS, username,familyName,userDetails);
         }
         set.close();
     }
