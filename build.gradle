@@ -121,19 +121,19 @@ test {
     systemProperty "env", java.lang.System.getProperty("env")
     systemProperty "users", java.lang.System.getProperty("users")
     systemProperty "internalUsers", java.lang.System.getProperty("internalUsers")
-    systemProperty "externalUsers", java.lang.System.getProperty("externalUsers")
     systemProperty "rampUp", java.lang.System.getProperty("rampUp")
     systemProperty "duration", java.lang.System.getProperty("duration")
     systemProperty "dbUsername", java.lang.System.getProperty("dbUsername")
     systemProperty "dbPassword", java.lang.System.getProperty("dbPassword")
 
-    doFirst {
-        filter {
-            includeTest "*SelfServeRegisterUser", "mainTest"
-        }
-    }
+//    doFirst {
+//        filter {
+//            includeTest "*SelfServeRegisterUser", "mainTest"
+//        }
+//    }
     doLast {
-        createApplication.exec()
+//        createApplication.exec()
+        internalSearchLicence.exec()
 
     }
     doLast {

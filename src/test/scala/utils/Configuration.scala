@@ -4,19 +4,20 @@ import scala.annotation.switch
 
 object Configuration {
   val environment: String = System.getProperty("env")
-
-
-  val users: Int = System.getProperty("users").toInt
-  val externalUsers: Int = 0
-  val internalUsers: Int = 7
+  val users: Int = 20
+  val externalUsers: Int = 900
+  val internalUsers: Int = 30
   val rampUp: Int = 0
   val rampDurationInMin: Int =0
-  val baseURL = (environment.toLowerCase: @switch) match {
-    case "int" => scala.util.Properties.envOrElse("baseURL", s"https://ssap1.olcs.$environment.prod.dvsa.aws/")
-    case "intpp" => scala.util.Properties.envOrElse("baseURL", s"https://iuap1.olcs.int.prod.dvsa.aws/")
-    case _ => scala.util.Properties.envOrElse("baseURL", s"https://ssap1.olcs.$environment.nonprod.dvsa.aws/")
-  }
 
+  val baseURL =
+    (environment.toLowerCase: @switch) match {
+      case "int" => scala.util.Properties.envOrElse("baseURL", s"https://iuap1.olcs.int.prod.dvsa.aws/")
+      case "ints" => scala.util.Properties.envOrElse("baseURL", s"https://ssap1.olcs.int.prod.dvsa.aws/")
+      case "iqa" => scala.util.Properties.envOrElse("baseURL", s"https://iuap1.olcs.qa.nonprod.dvsa.aws/")
+      case "qa" => scala.util.Properties.envOrElse("baseURL", s"https://ssap1.olcs.qa.nonprod.dvsa.aws/")
+      case _ => scala.util.Properties.envOrElse("baseURL", s"https://ssap1.olcs.$environment.prod.dvsa.aws/")
+  }
 
   val securityTokenPattern = """id="security" value="([^"]*)&*"""
   val header_ = Map("Accept" -> "*/*")

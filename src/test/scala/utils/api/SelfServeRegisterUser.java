@@ -25,14 +25,14 @@ public class SelfServeRegisterUser {
     String env = System.getProperty("env").toLowerCase();
 
 
-    @Test
-    public void mainTest() throws Exception {
-        if(Integer.parseInt(users) > 20){
-            getUsersFromTable();
-        }else{
-            registerUser();
-        }
-    }
+//    @Test
+//    public void mainTest() throws Exception {
+//        if(Integer.parseInt(users) > 20){
+//            getUsersFromTable();
+//        }else{
+//            registerUser();
+//        }
+//    }
 
     @Test
     public void cancelApplication(){
@@ -66,7 +66,7 @@ public class SelfServeRegisterUser {
     }
 
     private void getUsersFromTable() throws Exception {
-        String intTempUser = "llAndudno8-to-LL0ndon11";
+        String intTempUser = "toaZpox2tmLLT6KQF7ib8SFzb";
         String nprodTempUser = "Password1";
         String userDetails;
 
