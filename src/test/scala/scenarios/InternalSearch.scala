@@ -25,7 +25,7 @@ object InternalSearch {
       .post("auth/login/")
       .check(regex(Configuration.location).find.optional.saveAs("Location"))
       .formParam("username", "${Username}")
-      .formParam("password", "toaZpox2tmLLT6KQF7ib8SFzb")
+      .formParam("password", "${Password}")
       .formParam("submit", "Sign in")
       .formParam("security", "${securityToken}")
       .check(bodyString.saveAs("login_response")))
