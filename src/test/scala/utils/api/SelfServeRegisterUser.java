@@ -2,6 +2,9 @@ package utils.api;
 
 import activesupport.aws.s3.S3;
 import activesupport.database.DBUnit;
+import activesupport.database.url.DbURL;
+import activesupport.ssh.SSH;
+import com.jcraft.jsch.Session;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.FileUtils;
@@ -21,22 +24,17 @@ public class SelfServeRegisterUser {
 
     static String LOGIN_CSV_FILE = "src/test/resources/loginId.csv";
     static String CSV_HEADERS = "Username,Forename,Password";
-    String users = System.getProperty("users");
-    String env = System.getProperty("env").toLowerCase();
 
-
-//    @Test
-//    public void mainTest() throws Exception {
-//        if(Integer.parseInt(users) > 20){
-//            getUsersFromTable();
-//        }else{
-//            registerUser();
-//        }
-//    }
+    private String users = "30";
+    private String env = "int";
 
     @Test
-    public void cancelApplication(){
-        SQLquery.cancelApplications(users);
+    public void mainTest() throws Exception {
+        users = String.valueOf(Integer.valueOf(System.getProperty("users")));
+        env = System.getProperty("env").toLowerCase();
+         if (env.equals("qa") && (!users.isEmpty())){
+            registerUser();
+        }
     }
 
     @Test
@@ -54,7 +52,7 @@ public class SelfServeRegisterUser {
         String applicationNumber = registerUser.getApplicationNumber();
         String password;
 
-        for (int i = 0; i < Integer.parseInt(users); i++) {
+        for (int i = 0; i < Integer.parseInt(String.valueOf(users)); i++) {
             if (applicationNumber == null) {
                 registerUser.registerUser();
                 registerUser.getUserDetails();
@@ -64,23 +62,26 @@ public class SelfServeRegisterUser {
             }
         }
     }
+   /*
+    The plan is to use KMS to manage credentials for prod
+    */
+    @Test
+    public void getUsersFromTable() throws Exception {
+        String ldapUsername = System.getProperty("ldapUser");
+        String sshKeyPath = System.getProperty("sshKeyPath");
 
-    private void getUsersFromTable() throws Exception {
+        DbURL.setPortNumber(createSSHsession(ldapUsername,"dbam.olcs.int.prod.dvsa.aws",sshKeyPath,"olcsreaddb-rds.olcs.int.prod.dvsa.aws"));
         String intTempUser = "toaZpox2tmLLT6KQF7ib8SFzb";
-        String nprodTempUser = "Password1";
-        String userDetails;
+        String userDetails = null;
 
-        if(env.equals("int")){
+        if(env.equals("int".toLowerCase())) {
             userDetails = intTempUser;
-        } else{
-            userDetails = nprodTempUser;
         }
-
-        ResultSet set = DBUnit.checkResult(SQLquery.getUsersSql(users));
+        ResultSet set = DBUnit.checkResult(SQLquery.getUsersSql(String.valueOf(users)));
         while (set.next()) {
             String username = set.getString("Username");
             String familyName = set.getString("Forename");
-            writeToFile(CSV_HEADERS, username,familyName,userDetails);
+           writeToFile(CSV_HEADERS, username,familyName,userDetails);
         }
         set.close();
     }
@@ -110,5 +111,11 @@ public class SelfServeRegisterUser {
             foundIt = false;
         }
         return foundIt;
+    }
+
+    private int createSSHsession(String username, String remoteHost, String pathToSSHKey, String destinationHost) throws Exception {
+        Session session = SSH.openTunnel(username,remoteHost,pathToSSHKey);
+        int port = SSH.portForwarding(3309,destinationHost,3306,session);
+        return port;
     }
 }

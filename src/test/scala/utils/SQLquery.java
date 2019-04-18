@@ -3,7 +3,7 @@ package utils;
 public class SQLquery {
 
     public static String getUsersSql(String users) {
-        return "SELECT\n" +
+        return "SELECT DISTINCT\n" +
                 "  u.login_id as Username, p.family_name as Forename\n" +
                 "FROM\n" +
                 "   OLCS_RDS_OLCSDB.licence l\n" +
