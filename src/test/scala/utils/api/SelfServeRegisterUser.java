@@ -34,7 +34,9 @@ public class SelfServeRegisterUser {
         env = System.getProperty("env").toLowerCase();
          if (env.equals("qa") && (!users.isEmpty())){
             registerUser();
-        }
+        }else{
+             getUsersFromTable();
+         }
     }
 
     @Test
@@ -69,19 +71,17 @@ public class SelfServeRegisterUser {
     public void getUsersFromTable() throws Exception {
         String ldapUsername = System.getProperty("ldapUser");
         String sshKeyPath = System.getProperty("sshKeyPath");
+        String intTempUser = System.getProperty("tempPass");
 
-        DbURL.setPortNumber(createSSHsession(ldapUsername,"dbam.olcs.int.prod.dvsa.aws",sshKeyPath,"olcsreaddb-rds.olcs.int.prod.dvsa.aws"));
-        String intTempUser = "toaZpox2tmLLT6KQF7ib8SFzb";
-        String userDetails = null;
-
-        if(env.equals("int".toLowerCase())) {
-            userDetails = intTempUser;
+        if(ldapUsername != null) {
+            DbURL.setPortNumber(createSSHsession(ldapUsername, "dbam.olcs.int.prod.dvsa.aws", sshKeyPath, "olcsreaddb-rds.olcs.int.prod.dvsa.aws"));
         }
+
         ResultSet set = DBUnit.checkResult(SQLquery.getUsersSql(String.valueOf(users)));
         while (set.next()) {
             String username = set.getString("Username");
             String familyName = set.getString("Forename");
-           writeToFile(CSV_HEADERS, username,familyName,userDetails);
+           writeToFile(CSV_HEADERS, username,familyName, intTempUser);
         }
         set.close();
     }
