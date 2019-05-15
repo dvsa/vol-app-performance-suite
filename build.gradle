@@ -49,10 +49,10 @@ repositories {
 
 
 task registerUser(type: JavaExec) {
-//    systemProperty "env", java.lang.System.getProperty("env")
-//    systemProperty "users", java.lang.System.getProperty("users")
-//    systemProperty "rampUp", java.lang.System.getProperty("rampUp")
-//    systemProperty "duration", java.lang.System.getProperty("duration")
+    systemProperty "env", java.lang.System.getProperty("env")
+    systemProperty "users", java.lang.System.getProperty("users")
+    systemProperty "rampUp", java.lang.System.getProperty("rampUp")
+    systemProperty "duration", java.lang.System.getProperty("duration")
 
     description = "Load testing with Gatling"
     classpath = sourceSets.test.runtimeClasspath
@@ -88,8 +88,8 @@ task createApplication(type: JavaExec) {
 task searchOperator(type: JavaExec) {
     systemProperty "env", java.lang.System.getProperty("env")
     systemProperty "externalUsers", java.lang.System.getProperty("externalUsers")
-//    systemProperty "rampUp", java.lang.System.getProperty("rampUp")
-//    systemProperty "duration", java.lang.System.getProperty("duration")
+    systemProperty "rampUp", java.lang.System.getProperty("rampUp")
+    systemProperty "duration", java.lang.System.getProperty("duration")
 
     description = "Load testing with Gatling"
     classpath = sourceSets.test.runtimeClasspath
@@ -126,8 +126,6 @@ test {
     systemProperty "externalUsers", java.lang.System.getProperty("externalUsers")
     systemProperty "rampUp", java.lang.System.getProperty("rampUp")
     systemProperty "duration", java.lang.System.getProperty("duration")
-//    systemProperty "dbUsername", java.lang.System.getProperty("dbUsername")
-//    systemProperty "dbPassword", java.lang.System.getProperty("dbPassword")
 
     doFirst {
         filter {
