@@ -10,9 +10,24 @@
 ## Running Create Application Script 
  
  In a terminal window, powershell window or cmd paste the below command
- 
-`gradle test -Denv={da} -Dusers={2} -DrampUp={0} -Dduration={0}`
 
+ These are the environments that are currently supported
+ ` int = int internal site,
+   ints = int external site,
+   iqa = qa internal site,
+   qa = qa external site`
+ 
+`gradle test -Denv={qa} -Dusers={2} -DrampUp={0} -Dduration={0}`
+
+ Default values when expected values not provided
+
+ `  Environment = QA,
+    Users = 10,
+    ExternalUsers = 300,
+    InternalUsers = 30,
+    RampUp = 0,
+    RampDurationInMin = 0
+ `
 
  Please remove the braces when running.
  

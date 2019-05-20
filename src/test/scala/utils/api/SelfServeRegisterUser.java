@@ -1,6 +1,6 @@
 package utils.api;
 
-import activesupport.aws.s3.S3;
+import activesupport.aws.s3.*;
 import activesupport.database.DBUnit;
 import activesupport.database.url.DbURL;
 import activesupport.ssh.SSH;
@@ -32,11 +32,11 @@ public class SelfServeRegisterUser {
     public void mainTest() throws Exception {
         users = String.valueOf(Integer.valueOf(System.getProperty("users")));
         env = System.getProperty("env").toLowerCase();
-         if (env.equals("qa") && (!users.isEmpty())){
+        if (env.equals("qa") && (!users.isEmpty())) {
             registerUser();
-        }else{
-             getUsersFromTable();
-         }
+        } else {
+            getUsersFromTable();
+        }
     }
 
     @Test
@@ -64,24 +64,27 @@ public class SelfServeRegisterUser {
             }
         }
     }
-   /*
-    The plan is to use KMS to manage credentials for prod
-    */
-    @Test
-    public void getUsersFromTable() throws Exception {
-        String ldapUsername = System.getProperty("ldapUser");
-        String sshKeyPath = System.getProperty("sshKeyPath");
-        String intTempUser = System.getProperty("tempPass");
 
-        if(ldapUsername != null) {
-            DbURL.setPortNumber(createSSHsession(ldapUsername, "dbam.olcs.int.prod.dvsa.aws", sshKeyPath, "olcsreaddb-rds.olcs.int.prod.dvsa.aws"));
+    private void getUsersFromTable() throws Exception {
+        String ldapUsername = System.getProperty("ldapUser");
+        String sshPrivateKeyPath = System.getProperty("sshPrivateKeyPath");
+
+        String intSSPassword = S3SecretsManager.getSecretValue("intSS", S3SecretsManager.createSecretManagerClient("secretsmanager.eu-west-1.amazonaws.com", "eu-west-1"));
+        String intDBUser = S3SecretsManager.getSecretValue("intDBUser", S3SecretsManager.createSecretManagerClient("secretsmanager.eu-west-1.amazonaws.com", "eu-west-1"));
+        String intDBPassword = S3SecretsManager.getSecretValue("intDBPass", S3SecretsManager.createSecretManagerClient("secretsmanager.eu-west-1.amazonaws.com", "eu-west-1"));
+
+        System.setProperty("dbUsername", intDBUser);
+        System.setProperty("dbPassword", intDBPassword);
+
+        if (ldapUsername != null) {
+            DbURL.setPortNumber(createSSHsession(ldapUsername, "dbam.olcs.int.prod.dvsa.aws", sshPrivateKeyPath, "olcsreaddb-rds.olcs.int.prod.dvsa.aws"));
         }
 
         ResultSet set = DBUnit.checkResult(SQLquery.getUsersSql(String.valueOf(users)));
         while (set.next()) {
             String username = set.getString("Username");
             String familyName = set.getString("Forename");
-           writeToFile(CSV_HEADERS, username,familyName, intTempUser);
+            writeToFile(CSV_HEADERS, username, familyName, intSSPassword);
         }
         set.close();
     }
@@ -93,10 +96,10 @@ public class SelfServeRegisterUser {
 
         if (!searchForString(LOGIN_CSV_FILE, CSV_HEADERS)) {
             csvPrinter.printRecord((Object[]) header.split(","));
-            csvPrinter.printRecord(Arrays.asList(userId,forename,password));
+            csvPrinter.printRecord(Arrays.asList(userId, forename, password));
             csvPrinter.flush();
         } else {
-            csvPrinter.printRecord(Arrays.asList(userId,forename,password));
+            csvPrinter.printRecord(Arrays.asList(userId, forename, password));
             csvPrinter.flush();
         }
     }
@@ -114,8 +117,8 @@ public class SelfServeRegisterUser {
     }
 
     private int createSSHsession(String username, String remoteHost, String pathToSSHKey, String destinationHost) throws Exception {
-        Session session = SSH.openTunnel(username,remoteHost,pathToSSHKey);
-        int port = SSH.portForwarding(3309,destinationHost,3306,session);
+        Session session = SSH.openTunnel(username, remoteHost, pathToSSHKey);
+        int port = SSH.portForwarding(3309, destinationHost, 3306, session);
         return port;
     }
 }
