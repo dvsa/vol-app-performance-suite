@@ -6,11 +6,11 @@ import utils.Configuration
 
 import scala.concurrent.duration._
 
-object CreateApplication {
+object CreateSubmitAndPayForApplication {
 
   val newPassword = "Password1"
-
-  val feeder = csv("src/test/resources/loginId.csv")
+//  /Users/1dson/Documents/workspace/VOLPerformanceTest/src/test/resources/loginId.csv
+  val feeder = csv("/Users/1dson/Documents/workspace/VOLPerformanceTest/src/test/resources/loginId.csv")
   val header_ = Map("Accept" -> "*/*")
 
   val selfServiceApplicationRegistration = scenario("Create and submit application")
@@ -335,8 +335,23 @@ object CreateApplication {
       session
     })
     .pause(850 milliseconds)
-    .exec(http("logout")
-        .get("auth/logout/")
-        .check(regex("Thank you")))
+    .exec(http("pay for application")
+    .post("/application/${applicationId}/pay-and-submit")
+      .formParam("version", "11")
+      .formParam("submitPay", "")
+      .formParam("security", "${securityToken}"))
+    .pause(2 seconds)
+    .exec(http("request_5")
+      .post("/application/1140418/pay-and-submit/")
+      .formParam("form-actions[pay]", "")
+      .formParam("security", "${securityToken}")
+    .check(bodyString.saveAs("pay")))
+  .exec(session => {
+    println(session("pay").as[String])
+    session
+  })
+//    .exec(http("logout")
+//        .get("auth/logout/")
+//        .check(regex("Thank you")))
     .exec(flushSessionCookies)
 }
