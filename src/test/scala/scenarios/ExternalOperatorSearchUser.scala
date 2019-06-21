@@ -9,7 +9,7 @@ import scala.concurrent.duration._
 
 object ExternalOperatorSearchUser {
 
-  val companyName = "Jones"
+  val companyName = "Eddie"
 
   val companySearch = scenario("Search for operator")
     .exec(http("get search page")
@@ -27,7 +27,7 @@ object ExternalOperatorSearchUser {
       .formParam("index", "operator")
       .formParam("security", "${securityToken}")
       .check(bodyString.saveAs("search_results"))
-      .check(regex("JONES").exists))
+      .check(regex(s"""${companyName}""").exists))
     .exec(session => {
       println(session("search_results").as[String])
       session
