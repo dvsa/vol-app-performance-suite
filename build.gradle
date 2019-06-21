@@ -83,6 +83,22 @@ task createApplication(type: JavaExec) {
 
 }
 
+task createApplicationStress(type: JavaExec) {
+    systemProperty "env", java.lang.System.getProperty("env")
+    systemProperty "users", java.lang.System.getProperty("users")
+
+    description = "Load testing with Gatling"
+    classpath = sourceSets.test.runtimeClasspath
+    main = "io.gatling.app.Gatling"
+    //Specify the simulation to run
+    args = [
+            "--simulation", "simulations.CreateApplicationStressSimulation",
+            "--results-folder", "${buildDir}/gatling-results",
+            "--bodies-folder", sourceSets.test.resources
+    ]
+
+}
+
 task searchOperator(type: JavaExec) {
     systemProperty "env", java.lang.System.getProperty("env")
     systemProperty "externalUsers", java.lang.System.getProperty("externalUsers")
@@ -115,6 +131,24 @@ task internalSearchLicence(type: JavaExec) {
             "--results-folder", "${buildDir}/gatling-results",
             "--bodies-folder", sourceSets.test.resources
     ]
+}
+
+task createApplicationStressSim(type: Test){
+    systemProperty "env", java.lang.System.getProperty("env")
+    systemProperty "users", java.lang.System.getProperty("users")
+    
+    doFirst {
+        filter {
+            includeTest "*SelfServeRegisterUser", "mainTest"
+        }
+    }
+    doLast {
+        createApplicationStress.exec()
+    }
+    doLast {
+        cleanUp.executeTests()
+    }
+
 }
 
 test {

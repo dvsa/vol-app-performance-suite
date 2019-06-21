@@ -20,4 +20,5 @@ object Configuration {
   val securityTokenPattern = """id="security" value="([^"]*)&*"""
   val header_ = Map("Accept" -> "*/*")
   val location = """name="change-password-form" action="&#x2F;auth&#x2F;expired-password&#x2F;([^"]*)&#x2F;"""
+  val cpmsRedirectURL = """action="https://sbsctest.e-paycapita.com:443/scp/scpcli?(.*)""""
 }

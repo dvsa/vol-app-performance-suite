@@ -18,6 +18,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.util.Arrays;
+import java.util.Optional;
 
 
 public class SelfServeRegisterUser {
@@ -26,20 +27,15 @@ public class SelfServeRegisterUser {
     static String CSV_HEADERS = "Username,Forename,Password";
 
     private String users = System.getProperty("users");
-//    private String users = "30";
-    private String env = "int";
-
-
-
 
     @Test
     public void mainTest() throws Exception {
         users = String.valueOf(Integer.valueOf(System.getProperty("users")));
-        env = System.getProperty("env").toLowerCase();
+        String env = System.getProperty("env").toLowerCase();
         if (env.equals("qa")) {
             registerUser();
         } else {
-//            getUsersFromTable();
+            getUsersFromTable();
         }
     }
 
@@ -70,29 +66,29 @@ public class SelfServeRegisterUser {
         }
     }
 
-//    private void getUsersFromTable() throws Exception {
-//        String ldapUsername = System.getProperty("ldapUser");
-//        String sshPrivateKeyPath = System.getProperty("sshPrivateKeyPath");
-//
-//        String intSSPassword = S3SecretsManager.getSecretValue("intSS", S3SecretsManager.createSecretManagerClient("secretsmanager.eu-west-1.amazonaws.com", "eu-west-1"));
-//        String intDBUser = S3SecretsManager.getSecretValue("intDBUser", S3SecretsManager.createSecretManagerClient("secretsmanager.eu-west-1.amazonaws.com", "eu-west-1"));
-//        String intDBPassword = S3SecretsManager.getSecretValue("intDBPass", S3SecretsManager.createSecretManagerClient("secretsmanager.eu-west-1.amazonaws.com", "eu-west-1"));
-//
-//        System.setProperty("dbUsername", intDBUser);
-//        System.setProperty("dbPassword", intDBPassword);
-//
-//        if (ldapUsername != null) {
-//            DbURL.setPortNumber(createSSHsession(ldapUsername, "dbam.olcs.int.prod.dvsa.aws", sshPrivateKeyPath, "olcsreaddb-rds.olcs.int.prod.dvsa.aws"));
-//        }
-//
-//        ResultSet set = DBUnit.checkResult(SQLquery.getUsersSql(String.valueOf(users)));
-//        while (set.next()) {
-//            String username = set.getString("Username");
-//            String familyName = set.getString("Forename");
-//            writeToFile(CSV_HEADERS, username, familyName, intSSPassword);
-//        }
-//        set.close();
-//    }
+    private void getUsersFromTable() throws Exception {
+        Optional<String> ldapUsername = Optional.ofNullable(System.getProperty("ldapUser"));
+        Optional<String> sshPrivateKeyPath = Optional.ofNullable(System.getProperty("sshPrivateKeyPath"));
+
+        Optional<String> intSSPassword = Optional.ofNullable(S3SecretsManager.getSecretValue("intSS", S3SecretsManager.createSecretManagerClient("secretsmanager.eu-west-1.amazonaws.com", "eu-west-1")));
+        Optional<String> intDBUser = Optional.ofNullable(S3SecretsManager.getSecretValue("intDBUser", S3SecretsManager.createSecretManagerClient("secretsmanager.eu-west-1.amazonaws.com", "eu-west-1")));
+        Optional<String> intDBPassword = Optional.ofNullable(S3SecretsManager.getSecretValue("intDBPass", S3SecretsManager.createSecretManagerClient("secretsmanager.eu-west-1.amazonaws.com", "eu-west-1")));
+
+        System.setProperty("dbUsername", String.valueOf(intDBUser));
+        System.setProperty("dbPassword", String.valueOf(intDBPassword));
+
+        if (ldapUsername != null) {
+            DbURL.setPortNumber(createSSHsession(ldapUsername, "dbam.olcs.int.prod.dvsa.aws", sshPrivateKeyPath, "olcsreaddb-rds.olcs.int.prod.dvsa.aws"));
+        }
+
+        ResultSet set = DBUnit.checkResult(SQLquery.getUsersSql(String.valueOf(users)));
+        while (set.next()) {
+            String username = set.getString("Username");
+            String familyName = set.getString("Forename");
+            writeToFile(CSV_HEADERS, username, familyName, String.valueOf(intSSPassword));
+        }
+        set.close();
+    }
 
     private void writeToFile(String header, String userId, String password, String forename) throws Exception {
         FileWriter fileWriter = new FileWriter(LOGIN_CSV_FILE, true);
@@ -121,8 +117,8 @@ public class SelfServeRegisterUser {
         return foundIt;
     }
 
-    private int createSSHsession(String username, String remoteHost, String pathToSSHKey, String destinationHost) throws Exception {
-        Session session = SSH.openTunnel(username, remoteHost, pathToSSHKey);
+    private int createSSHsession(Optional<String> username, String remoteHost, Optional<String> pathToSSHKey, String destinationHost) throws Exception {
+        Session session = SSH.openTunnel(String.valueOf(username), remoteHost, String.valueOf(pathToSSHKey));
         int port = SSH.portForwarding(3309, destinationHost, 3306, session);
         return port;
     }
