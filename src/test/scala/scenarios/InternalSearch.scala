@@ -1,5 +1,8 @@
 package scenarios
 
+import java.util.Optional
+
+import activesupport.aws.s3.S3SecretsManager
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import utils.Configuration
@@ -8,6 +11,7 @@ import scala.concurrent.duration._
 
 object InternalSearch {
 
+  val intSSPassword: String = S3SecretsManager.getSecretValue("intSS", S3SecretsManager.createSecretManagerClient("secretsmanager.eu-west-1.amazonaws.com", "eu-west-1"))
   val feeder = csv("src/test/resources/InternalLoginId.csv")
   val header_ = Map("Accept" -> "*/*")
 
@@ -25,7 +29,7 @@ object InternalSearch {
       .post("auth/login/")
       .check(regex(Configuration.location).find.optional.saveAs("Location"))
       .formParam("username", "${Username}")
-      .formParam("password", "${Password}")
+      .formParam("password", intSSPassword)
       .formParam("submit", "Sign in")
       .formParam("security", "${securityToken}")
       .check(bodyString.saveAs("login_response")))

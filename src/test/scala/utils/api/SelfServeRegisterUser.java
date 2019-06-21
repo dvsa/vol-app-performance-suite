@@ -35,7 +35,7 @@ public class SelfServeRegisterUser {
         if (env.equals("qa")) {
             registerUser();
         } else {
-            getUsersFromTable();
+            getExternalUsersFromTable();
         }
     }
 
@@ -66,7 +66,7 @@ public class SelfServeRegisterUser {
         }
     }
 
-    private void getUsersFromTable() throws Exception {
+    private void getExternalUsersFromTable() throws Exception {
         Optional<String> ldapUsername = Optional.ofNullable(System.getProperty("ldapUser"));
         Optional<String> sshPrivateKeyPath = Optional.ofNullable(System.getProperty("sshPrivateKeyPath"));
 
