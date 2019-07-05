@@ -9,7 +9,7 @@ import scala.concurrent.duration._
 object CreateSubmitAndPayForApplication {
 
   val newPassword = "Password1"
-  val feeder = csv("./src/test/resources/loginId.csv")
+  val feeder = csv("./src/test/resources/loginId.csv").queue
   val header_ = Map("Accept" -> "*/*")
 
   val selfServiceApplicationRegistration = scenario("Create and submit application")

@@ -25,7 +25,7 @@ class CreateApplicationStressSimulation extends Simulation {
             .times(5)
           .eachLevelLasting(10)
             .separatedByRampsLasting(10 seconds)
-            .startingFrom(5))
+            .startingFrom(10))
   setUp(loginAndCreateApp)
     .protocols(httpConfiguration)
     .assertions(global.failedRequests.count.is(0))
