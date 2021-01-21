@@ -1,15 +1,17 @@
 package simulations
 
 import io.gatling.core.Predef._
+import io.gatling.core.structure.PopulationBuilder
 import io.gatling.http.Predef._
+
 import scala.concurrent.duration._
-import scenarios.CreateSubmitAndPayForApplication
-import utils.{Configuration, Headers}
+import scenarios.CreateAndSubmitApplication
+import utils.{Headers, SetUp}
 
 
 class CreateApplicationStressSimulation extends Simulation {
 
-  val httpConfiguration = http.baseUrl(Configuration.baseURL).headers(Headers.requestHeaders)
+  val httpConfiguration = http.baseUrl(SetUp.baseURL).headers(Headers.requestHeaders)
     .disableCaching
     .disableWarmUp
     .silentResources
@@ -20,8 +22,8 @@ class CreateApplicationStressSimulation extends Simulation {
   // With levels of x arriving users per second depending on users passed in
   // Each level lasting 10 seconds
   // Separated by linear ramps lasting 10 seconds
-  val loginAndCreateApp =
-        CreateSubmitAndPayForApplication.selfServiceApplicationRegistration.inject(incrementUsersPerSec(Configuration.users)
+  val loginAndCreateApp: PopulationBuilder =
+        CreateAndSubmitApplication.selfServiceApplicationRegistration.inject(incrementUsersPerSec(SetUp.users)
             .times(5)
           .eachLevelLasting(10)
             .separatedByRampsLasting(10 seconds)

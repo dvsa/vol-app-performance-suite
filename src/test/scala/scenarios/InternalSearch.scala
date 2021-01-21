@@ -1,33 +1,36 @@
 package scenarios
 
-import java.util.Optional
-
-import activesupport.aws.s3.S3SecretsManager
+import activesupport.config.Configuration
+import com.typesafe.config.Config
 import io.gatling.core.Predef._
+import io.gatling.core.feeder.SourceFeederBuilder
+import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
-import utils.Configuration
+import utils.SetUp
 
 import scala.concurrent.duration._
 
 object InternalSearch {
 
-  val intSSPassword: String = S3SecretsManager.getSecretValue("intSS", S3SecretsManager.createSecretManagerClient("secretsmanager.eu-west-1.amazonaws.com", "eu-west-1"))
-  val feeder = csv("src/test/resources/InternalLoginId.csv")
+  val CONFIG: Config = new Configuration().getConfig
+
+  val intSSPassword: String = CONFIG.getString("password")
+  val feeder: SourceFeederBuilder[String] = csv("src/test/resources/InternalLoginId.csv")
   val header_ = Map("Accept" -> "*/*")
 
-  val internalWorkerLogin = scenario("Login as an internal case worker")
+  val internalWorkerLogin: ScenarioBuilder = scenario("Login as an internal case worker")
     .feed(feeder)
     .exec(http("Login as a case worker")
-      .get("/auth/login")
+      .get("auth/login")
       .disableFollowRedirect
       .headers(header_)
       .check(
-        regex(Configuration.securityTokenPattern).
+        regex(SetUp.securityTokenPattern).
           find.saveAs("securityToken")))
     .pause(300 milliseconds)
     .exec(http("login")
       .post("auth/login/")
-      .check(regex(Configuration.location).find.optional.saveAs("Location"))
+      .check(regex(SetUp.location).find.optional.saveAs("Location"))
       .formParam("username", "${Username}")
       .formParam("password", intSSPassword)
       .formParam("submit", "Sign in")

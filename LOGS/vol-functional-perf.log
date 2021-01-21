@@ -1,0 +1,6 @@
+INFO  | 2021-01-20 13:44:52 | [Test worker] api.SelfServeRegisterUser (SelfServeRegisterUser.java:117) - File not found or text not found
+INFO  | 2021-01-20 13:44:52 | [Test worker] generic.Utils (Utils.java:16) - ERROR CODE: 400
+INFO  | 2021-01-20 13:44:52 | [Test worker] generic.Utils (Utils.java:17) - RESPONSE MESSAGE: {"messages":{"loginId":["ERR_USERNAME_EXISTS"]}}
+INFO  | 2021-01-20 13:47:49 | [Test worker] api.SelfServeRegisterUser (SelfServeRegisterUser.java:116) - File not found or text not found
+INFO  | 2021-01-20 13:55:37 | [Test worker] api.SelfServeRegisterUser (SelfServeRegisterUser.java:116) - File not found or text not found
+INFO  | 2021-01-20 13:58:33 | [Test worker] api.SelfServeRegisterUser (SelfServeRegisterUser.java:50) - src/test/resources/loginId.csv has been deleted

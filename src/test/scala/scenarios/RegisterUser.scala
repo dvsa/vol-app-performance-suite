@@ -3,21 +3,22 @@ package scenarios
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import io.gatling.core.Predef.scenario
-import utils.Configuration
+import io.gatling.core.structure.ScenarioBuilder
+import utils.SetUp
 
 object RegisterUser {
 
   val random = new scala.util.Random
   var emailAddress = "gatling.test@gmail.com"
   val imageHeader = Map("Accept" -> "image/png,image/*;q=0.8,*/*;q=0.5")
-  def orderRef() = random.nextInt(Integer.MAX_VALUE)
+  def orderRef(): Int = random.nextInt(Integer.MAX_VALUE)
 
-  val registerUser = scenario("VOL New User Registration")
+  val registerUser: ScenarioBuilder = scenario("VOL New User Registration")
     .exec(http("get register page")
       .get("register/")
       .headers(imageHeader)
       .check(
-        regex(Configuration.securityTokenPattern).
+        regex(SetUp.securityTokenPattern).
           saveAs("securityToken")))
       .pause(5)
     .exec(http("register a new account")
@@ -25,11 +26,11 @@ object RegisterUser {
       .formParam("fields[loginId]", session => s"""GatlingUser${orderRef()}""")
       .formParam("fields[forename]", session => s"""Gatling${orderRef()}""")
       .formParam("fields[familyName]", "Tester")
-      .formParam("fields[emailAddress]", "gatling.perf@gmail.com")
-      .formParam("fields[emailConfirm]", "gatling.perf@gmail.com")
+      .formParam("fields[emailAddress]", "terry.valtech@gmail.com")
+      .formParam("fields[emailConfirm]", "terry.valtech@gmail.com")
       .formParam("fields[isLicenceHolder]", "N")
       .formParam("fields[licenceNumber]", "")
-      .formParam("fields[organisationName]", "Gatling")
+      .formParam("fields[organisationName]", "VOL-Performance-Test")
       .formParam("fields[businessType]", "org_t_rc")
       .formParam("fields[translateToWelsh]", "N")
       .formParam("fields[termsAgreed]", "N")

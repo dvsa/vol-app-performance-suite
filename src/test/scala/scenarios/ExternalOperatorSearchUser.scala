@@ -1,9 +1,10 @@
 package scenarios
 
 import io.gatling.core.Predef._
+import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
-import utils.Configuration
-import utils.Configuration.header_
+import utils.SetUp
+import utils.SetUp.header_
 
 import scala.concurrent.duration._
 
@@ -11,12 +12,12 @@ object ExternalOperatorSearchUser {
 
   val companyName = "Eddie"
 
-  val companySearch = scenario("Search for operator")
+  val companySearch: ScenarioBuilder = scenario("Search for operator")
     .exec(http("get search page")
       .get("search/find-lorry-bus-operators/")
       .headers(header_)
       .check(
-        regex(Configuration.securityTokenPattern).
+        regex(SetUp.securityTokenPattern).
           find.saveAs("securityToken")))
     .pause(300 milliseconds)
     .exec(http("Search Operator")
