@@ -8,3 +8,5 @@
 /src/test/resources/loginId.csv
 src/main/
 /src/test/resources/application.conf
+LOGS
+OLCSEfficiency.iml
