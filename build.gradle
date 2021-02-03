@@ -31,7 +31,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.amazonaws:aws-java-sdk-core:1.11.5'
+        classpath 'com.amazonaws:aws-java-sdk-core:1.11.897'
     }
 }
 
@@ -162,12 +162,8 @@ test {
     systemProperty "site", System.getProperty("site")
     systemProperty "env", System.getProperty("env")
     systemProperty "users", System.getProperty("users")
-    systemProperty "internalUsers", System.getProperty("internalUsers")
-    systemProperty "externalUsers", System.getProperty("externalUsers")
     systemProperty "rampUp", System.getProperty("rampUp")
     systemProperty "duration", System.getProperty("duration")
-    systemProperty "ldapUser", System.getProperty("ldapUser")
-    systemProperty "duration", System.getProperty("sshPrivateKeyPath")
 
     doFirst {
         filter {
