@@ -48,14 +48,16 @@ repositories {
     }
 }
 
+tasks.withType(JavaExec){
+    systemProperties = System.getProperties()
+}
+
+
+tasks.withType(Test){
+    systemProperties = System.getProperties()
+}
 
 task registerUser(type: JavaExec) {
-    systemProperty "site", System.getProperty("site")
-    systemProperty "env", System.getProperty("env")
-    systemProperty "users", System.getProperty("users")
-    systemProperty "rampUp", System.getProperty("rampUp")
-    systemProperty "duration", System.getProperty("duration")
-
     description = "Load testing with Gatling"
     classpath = sourceSets.test.runtimeClasspath
     main = "io.gatling.app.Gatling"
@@ -68,12 +70,6 @@ task registerUser(type: JavaExec) {
 }
 
 task createApplication(type: JavaExec) {
-    systemProperty "site", System.getProperty("site")
-    systemProperty "env", System.getProperty("env")
-    systemProperty "users", System.getProperty("users")
-    systemProperty "rampUp", System.getProperty("rampUp")
-    systemProperty "duration", System.getProperty("duration")
-
     description = "Load testing with Gatling"
     classpath = sourceSets.test.runtimeClasspath
     main = "io.gatling.app.Gatling"
@@ -87,10 +83,6 @@ task createApplication(type: JavaExec) {
 }
 
 task createApplicationStress(type: JavaExec) {
-    systemProperty "site", System.getProperty("site")
-    systemProperty "env", System.getProperty("env")
-    systemProperty "users", System.getProperty("users")
-
     description = "Load testing with Gatling"
     classpath = sourceSets.test.runtimeClasspath
     main = "io.gatling.app.Gatling"
@@ -104,12 +96,6 @@ task createApplicationStress(type: JavaExec) {
 }
 
 task searchOperator(type: JavaExec) {
-    systemProperty "site", System.getProperty("site")
-    systemProperty "env", System.getProperty("env")
-    systemProperty "externalUsers", System.getProperty("externalUsers")
-    systemProperty "rampUp", System.getProperty("rampUp")
-    systemProperty "duration", System.getProperty("duration")
-
     description = "Load testing with Gatling"
     classpath = sourceSets.test.runtimeClasspath
     main = "io.gatling.app.Gatling"
@@ -122,12 +108,6 @@ task searchOperator(type: JavaExec) {
 }
 
 task internalSearchLicence(type: JavaExec) {
-    systemProperty "site", System.getProperty("site")
-    systemProperty "env", System.getProperty("env")
-    systemProperty "internalUsers", System.getProperty("internalUsers")
-    systemProperty "rampUp", System.getProperty("rampUp")
-    systemProperty "duration", System.getProperty("duration")
-
     description = "Load testing with Gatling"
     classpath = sourceSets.test.runtimeClasspath
     main = "io.gatling.app.Gatling"
@@ -140,10 +120,6 @@ task internalSearchLicence(type: JavaExec) {
 }
 
 task createApplicationStressSim(type: Test){
-    systemProperty "site", System.getProperty("site")
-    systemProperty "env", System.getProperty("env")
-    systemProperty "users", System.getProperty("users")
-    
     doFirst {
         filter {
             includeTest "*SelfServeRegisterUser", "mainTest"
@@ -159,12 +135,6 @@ task createApplicationStressSim(type: Test){
 }
 
 test {
-    systemProperty "site", System.getProperty("site")
-    systemProperty "env", System.getProperty("env")
-    systemProperty "users", System.getProperty("users")
-    systemProperty "rampUp", System.getProperty("rampUp")
-    systemProperty "duration", System.getProperty("duration")
-
     doFirst {
         filter {
                 includeTest "*SelfServeRegisterUser", "mainTest"
