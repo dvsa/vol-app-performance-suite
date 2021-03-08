@@ -4,12 +4,14 @@ import activesupport.aws.s3.*;
 import activesupport.database.DBUnit;
 import activesupport.database.url.DbURL;
 import activesupport.ssh.SSH;
+import apiCalls.actions.RegisterUser;
 import com.jcraft.jsch.Session;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
-import utils.API_CreateAndGrantAPP.CreateLicenceAPI;
 import utils.SQLquery;
 
 import java.io.BufferedWriter;
@@ -23,8 +25,10 @@ import java.util.Optional;
 
 public class SelfServeRegisterUser {
 
-    static String LOGIN_CSV_FILE = "src/test/resources/loginId.csv";
-    static String CSV_HEADERS = "Username,Forename,Password";
+    private static final Logger LOGGER = LogManager.getLogger(SelfServeRegisterUser.class);
+
+    private static final String LOGIN_CSV_FILE = "src/test/resources/loginId.csv";
+    private static final String CSV_HEADERS = "Username,Forename,Password";
 
     private String users = System.getProperty("users");
 
@@ -32,7 +36,7 @@ public class SelfServeRegisterUser {
     public void mainTest() throws Exception {
         users = String.valueOf(Integer.valueOf(System.getProperty("users")));
         String env = System.getProperty("env").toLowerCase();
-        if (env.equals("qa")) {
+        if (env.equals("qa") || env.equals("da")) {
             registerUser();
         } else {
             getExternalUsersFromTable();
@@ -43,42 +47,40 @@ public class SelfServeRegisterUser {
     public void deleteFile() {
         File loginDetails = new File(LOGIN_CSV_FILE);
         if (loginDetails.delete()) {
-            System.out.println(loginDetails + " deleted");
+            LOGGER.info(loginDetails + " has been deleted");
         } else {
-            System.out.println(loginDetails + " doesn't exist");
+            LOGGER.info(loginDetails + " doesn't exist");
         }
     }
 
     @Test
     public void registerUser() throws Exception {
-        CreateLicenceAPI registerUser = new CreateLicenceAPI();
-        String applicationNumber = registerUser.getApplicationNumber();
         String password;
-
         for (int i = 0; i < Integer.parseInt(String.valueOf(users)); i++) {
-            if (applicationNumber == null) {
-                registerUser.registerUser();
-                registerUser.getUserDetails();
-                String email = registerUser.getEmailAddress();
-                password = S3.getTempPassword(email);
-                writeToFile(CSV_HEADERS, registerUser.getLoginId(), password, registerUser.getForeName());
-            }
+            RegisterUser registerUser = new RegisterUser();
+            registerUser.registerUser();
+            String email = registerUser.getEmailAddress();
+            password = S3.getTempPassword(email);
+            writeToFile(CSV_HEADERS, registerUser.getUserName(), password, registerUser.getForeName());
         }
     }
 
     private void getExternalUsersFromTable() throws Exception {
+        S3SecretsManager s3SecretsManager = new S3SecretsManager();
+        DbURL dbURL = new DbURL();
+
         Optional<String> ldapUsername = Optional.ofNullable(System.getProperty("ldapUser"));
         Optional<String> sshPrivateKeyPath = Optional.ofNullable(System.getProperty("sshPrivateKeyPath"));
 
-        Optional<String> intSSPassword = Optional.ofNullable(S3SecretsManager.getSecretValue("intSS", S3SecretsManager.createSecretManagerClient("secretsmanager.eu-west-1.amazonaws.com", "eu-west-1")));
-        Optional<String> intDBUser = Optional.ofNullable(S3SecretsManager.getSecretValue("intDBUser", S3SecretsManager.createSecretManagerClient("secretsmanager.eu-west-1.amazonaws.com", "eu-west-1")));
-        Optional<String> intDBPassword = Optional.ofNullable(S3SecretsManager.getSecretValue("intDBPass", S3SecretsManager.createSecretManagerClient("secretsmanager.eu-west-1.amazonaws.com", "eu-west-1")));
+        Optional<String> intSSPassword = Optional.ofNullable(s3SecretsManager.getSecretValue("intSS", s3SecretsManager.createSecretManagerClient("secretsmanager.eu-west-1.amazonaws.com", "eu-west-1")));
+        Optional<String> intDBUser = Optional.ofNullable(s3SecretsManager.getSecretValue("intDBUser", s3SecretsManager.createSecretManagerClient("secretsmanager.eu-west-1.amazonaws.com", "eu-west-1")));
+        Optional<String> intDBPassword = Optional.ofNullable(s3SecretsManager.getSecretValue("intDBPass", s3SecretsManager.createSecretManagerClient("secretsmanager.eu-west-1.amazonaws.com", "eu-west-1")));
 
         System.setProperty("dbUsername", String.valueOf(intDBUser));
         System.setProperty("dbPassword", String.valueOf(intDBPassword));
 
-        if (ldapUsername != null) {
-            DbURL.setPortNumber(createSSHsession(ldapUsername, "dbam.olcs.int.prod.dvsa.aws", sshPrivateKeyPath, "olcsreaddb-rds.olcs.int.prod.dvsa.aws"));
+        if (ldapUsername.isPresent()) {
+            dbURL.setPortNumber(createSSHsession(ldapUsername, "dbam.olcs.int.prod.dvsa.aws", sshPrivateKeyPath, "olcsreaddb-rds.olcs.int.prod.dvsa.aws"));
         }
 
         ResultSet set = DBUnit.checkResult(SQLquery.getUsersSql(String.valueOf(users)));
@@ -111,7 +113,7 @@ public class SelfServeRegisterUser {
         if (f.exists() && (FileUtils.readFileToString(new File(file), "UTF-8").contains(searchText)))
             foundIt = true;
         else {
-            System.out.println("File not found or text not found");
+            LOGGER.info("File not found or text not found");
             foundIt = false;
         }
         return foundIt;
@@ -119,7 +121,6 @@ public class SelfServeRegisterUser {
 
     private int createSSHsession(Optional<String> username, String remoteHost, Optional<String> pathToSSHKey, String destinationHost) throws Exception {
         Session session = SSH.openTunnel(String.valueOf(username), remoteHost, String.valueOf(pathToSSHKey));
-        int port = SSH.portForwarding(3309, destinationHost, 3306, session);
-        return port;
+        return SSH.portForwarding(3309, destinationHost, 3306, session);
     }
 }

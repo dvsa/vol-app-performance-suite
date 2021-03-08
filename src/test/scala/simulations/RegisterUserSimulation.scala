@@ -1,25 +1,28 @@
 package simulations
 
 import io.gatling.core.Predef._
+import io.gatling.core.structure.PopulationBuilder
 import io.gatling.http.Predef._
+import io.gatling.http.protocol.HttpProtocolBuilder
 import scenarios.RegisterUser
-import utils.{Configuration, Headers}
+import utils.SetUp.{rampDurationInMin, rampUp, users}
+import utils.{Headers, SetUp}
 
 import scala.concurrent.duration._
 
 
 class RegisterUserSimulation extends Simulation {
 
-  val httpConfiguration = http.baseUrl(Configuration.baseURL).headers(Headers.requestHeaders)
+  val httpConfiguration: HttpProtocolBuilder = http.baseUrl(SetUp.baseURL).headers(Headers.requestHeaders)
     .disableCaching
     .disableWarmUp
     .silentResources
     .perUserNameResolution
     .maxConnectionsPerHostLikeChrome
 
-  val RegisterUsers =
-        RegisterUser.registerUser.inject(atOnceUsers(Configuration.users),
-          constantUsersPerSec(Configuration.rampUp) during (Configuration.rampDurationInMin minutes))
+  val RegisterUsers: PopulationBuilder =
+        RegisterUser.registerUser.inject(rampUsers(users) during (rampUp minutes))
+          .throttle(reachRps(1) in (60 seconds), holdFor(rampDurationInMin minutes))
   setUp(RegisterUsers)
     .protocols(httpConfiguration)
     .assertions(global.failedRequests.count.is(0))

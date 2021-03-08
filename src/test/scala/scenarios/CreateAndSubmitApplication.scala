@@ -1,30 +1,36 @@
 package scenarios
 
+import activesupport.config.Configuration
+import com.typesafe.config.Config
 import io.gatling.core.Predef._
+import io.gatling.core.feeder.SourceFeederBuilder
+import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
-import utils.Configuration
+import utils.SetUp
 
 import scala.concurrent.duration._
 
-object CreateSubmitAndPayForApplication {
+object CreateAndSubmitApplication {
 
-  val newPassword = "Password1"
-  val feeder = csv("./src/test/resources/loginId.csv").queue
+  val CONFIG: Config = new Configuration().getConfig
+
+  val newPassword: String = CONFIG.getString("password")
+  val feeder: SourceFeederBuilder[String] = csv("./src/test/resources/loginId.csv")
   val header_ = Map("Accept" -> "*/*")
 
-  val selfServiceApplicationRegistration = scenario("Create and submit application")
+  val selfServiceApplicationRegistration: ScenarioBuilder = scenario("Create and submit application")
     .feed(feeder)
     .exec(http("get login page")
       .get("auth/login/")
       .disableFollowRedirect
       .headers(header_)
       .check(
-        regex(Configuration.securityTokenPattern).
+        regex(SetUp.securityTokenPattern).
           find.saveAs("securityToken")))
     .pause(300 milliseconds)
     .exec(http("login")
       .post("auth/login/")
-      .check(regex(Configuration.location).find.optional.saveAs("Location"))
+      .check(regex(SetUp.location).find.optional.saveAs("Location"))
       .formParam("username", "${Username}")
       .formParam("password", "${Password}")
       .formParam("submit", "Sign in")
@@ -35,8 +41,8 @@ object CreateSubmitAndPayForApplication {
       exec(http("change password")
         .post("auth/expired-password/${Location}")
         .formParam("oldPassword", "${Password}")
-        .formParam("newPassword", "Password1")
-        .formParam("confirmPassword", "Password1")
+        .formParam("newPassword", CONFIG.getString("password"))
+        .formParam("confirmPassword", CONFIG.getString("password"))
         .formParam("submit", "Save")
         .formParam("security", "${securityToken}")
         .check(bodyString.saveAs("login_response")))
@@ -332,7 +338,7 @@ object CreateSubmitAndPayForApplication {
       .formParam("form-actions[pay]", "")
       .formParam("security", "${securityToken}")
       .check(bodyString.saveAs("pay"))
-      .check(regex(Configuration.cpmsRedirectURL).find.exists))
+      .check(regex(SetUp.cpmsRedirectURL).find.exists))
     .exec(session => {
       println(session("pay").as[String])
       session
