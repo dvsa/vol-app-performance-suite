@@ -24,7 +24,6 @@ dependencies {
     testCompile 'org.dvsa.testing.framework:vol-api-calls:1.0'
 }
 
-
 buildscript {
     repositories {
         mavenLocal()
@@ -48,12 +47,12 @@ repositories {
     }
 }
 
-tasks.withType(JavaExec){
+tasks.withType(JavaExec) {
     systemProperties = System.getProperties()
 }
 
 
-tasks.withType(Test){
+tasks.withType(Test) {
     systemProperties = System.getProperties()
 }
 
@@ -70,6 +69,9 @@ task registerUser(type: JavaExec) {
 }
 
 task createApplication(type: JavaExec) {
+    doFirst {
+        registerUsersViaAPI.executeTests()
+    }
     description = "Load testing with Gatling"
     classpath = sourceSets.test.runtimeClasspath
     main = "io.gatling.app.Gatling"
@@ -79,10 +81,15 @@ task createApplication(type: JavaExec) {
             "--results-folder", "${buildDir}/gatling-results",
             "--bodies-folder", sourceSets.test.resources
     ]
-
+    doLast {
+        cleanUp.executeTests()
+    }
 }
 
 task createApplicationStress(type: JavaExec) {
+    doFirst {
+        registerUsersViaAPI.executeTests()
+    }
     description = "Load testing with Gatling"
     classpath = sourceSets.test.runtimeClasspath
     main = "io.gatling.app.Gatling"
@@ -92,7 +99,9 @@ task createApplicationStress(type: JavaExec) {
             "--results-folder", "${buildDir}/gatling-results",
             "--bodies-folder", sourceSets.test.resources
     ]
-
+    doLast {
+        cleanUp.executeTests()
+    }
 }
 
 task searchOperator(type: JavaExec) {
@@ -119,32 +128,9 @@ task internalSearchLicence(type: JavaExec) {
     ]
 }
 
-task createApplicationStressSim(type: Test){
-    doFirst {
-        filter {
-            includeTest "*SelfServeRegisterUser", "mainTest"
-        }
-    }
-    doLast {
-        createApplicationStress.exec()
-    }
-    doLast {
-        cleanUp.executeTests()
-    }
-
-}
-
-test {
-    doFirst {
-        filter {
-                includeTest "*SelfServeRegisterUser", "mainTest"
-        }
-    }
-    doLast {
-        createApplication.exec()
-    }
-    doLast {
-        cleanUp.executeTests()
+task registerUsersViaAPI(type: Test) {
+    filter {
+        includeTest "*SelfServeRegisterUser", "mainTest"
     }
 }
 
@@ -154,8 +140,5 @@ task cleanUp(type: Test) {
         sleep 2000
         includeTest "*SelfServeRegisterUser", "deleteFile"
         println("***********finishing deleting file**********")
-        sleep 2000
-        println("********cancel all created applications******")
-        includeTest "*SelfServeRegisterUser", "cancelApplication"
     }
 }
