@@ -6,12 +6,11 @@ import org.dvsa.testing.lib.url.webapp.utils.ApplicationType
 import scala.annotation.switch
 
 object SetUp {
-
   val site: String = System.getProperty("site")
   val env: String = System.getProperty("env").toLowerCase
-  val users: Int = System.getProperty("users").toInt
-  val rampUp: Int = System.getProperty("rampUp").toInt
-  val rampDurationInMin: Int = System.getProperty("duration").toInt
+  val users: Int = Integer.getInteger("users", 10).toInt
+  val rampUp: Int = Integer.getInteger("rampUp", 0).toInt
+  val rampDurationInMin: Int = Integer.getInteger("duration" ,0).toInt
   val externalURL: String = URL.build(ApplicationType.EXTERNAL, env).toString
   val internalURL: String = URL.build(ApplicationType.INTERNAL, env).toString
 
