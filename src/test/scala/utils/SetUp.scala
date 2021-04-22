@@ -14,7 +14,7 @@ object SetUp {
   val externalURL: String = URL.build(ApplicationType.EXTERNAL, env).toString
   val internalURL: String = URL.build(ApplicationType.INTERNAL, env).toString
 
-  val baseURL,SOME,ELSE: String =
+  val baseURL: String =
     (site: @switch) match {
       case "ss" => scala.util.Properties.envOrElse("baseURL", externalURL)
       case "internal" => scala.util.Properties.envOrElse("baseURL", internalURL)
