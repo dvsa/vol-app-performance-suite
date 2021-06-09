@@ -3,19 +3,19 @@ package scenarios
 import activesupport.config.Configuration
 import com.typesafe.config.Config
 import io.gatling.core.Predef._
-import io.gatling.core.feeder.SourceFeederBuilder
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 import utils.SetUp
 
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 object InternalSearch {
 
   val CONFIG: Config = new Configuration().getConfig
 
   val intSSPassword: String = CONFIG.getString("password")
-  val feeder: SourceFeederBuilder[String] = csv("src/test/resources/InternalLoginId.csv")
+  val feeder = csv("src/test/resources/InternalLoginId.csv")
   val header_ = Map("Accept" -> "*/*")
 
   val internalWorkerLogin: ScenarioBuilder = scenario("Login as an internal case worker")

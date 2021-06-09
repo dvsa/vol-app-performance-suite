@@ -3,19 +3,19 @@ package scenarios
 import activesupport.config.Configuration
 import com.typesafe.config.Config
 import io.gatling.core.Predef._
-import io.gatling.core.feeder.SourceFeederBuilder
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 import utils.SetUp
 
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 object CreateAndSubmitApplication {
 
   val CONFIG: Config = new Configuration().getConfig
 
   val newPassword: String = CONFIG.getString("password")
-  val feeder: SourceFeederBuilder[String] = csv("./src/test/resources/loginId.csv")
+  val feeder = csv("./src/test/resources/loginId.csv")
   val header_ = Map("Accept" -> "*/*")
 
   val selfServiceApplicationRegistration: ScenarioBuilder = scenario("Create and submit application")
@@ -37,7 +37,7 @@ object CreateAndSubmitApplication {
       .formParam("security", "${securityToken}"))
     .exec(session => session.set("expired-password", "${Location}"))
     .pause(450 milliseconds)
-    .doIf(session => session("expired-password").as[String].isEmpty.equals(false)) {
+    .doIf(session => session("expired-password").as[String].isEmpty == false) {
       exec(http("change password")
         .post("auth/expired-password/${Location}")
         .formParam("oldPassword", "${Password}")

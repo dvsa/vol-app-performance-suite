@@ -9,6 +9,7 @@ import utils.SetUp.{rampDurationInMin, rampUp, users}
 import utils.{Headers, SetUp}
 
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 
 class RegisterUserSimulation extends Simulation {

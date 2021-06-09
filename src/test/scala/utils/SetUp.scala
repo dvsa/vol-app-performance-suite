@@ -8,7 +8,7 @@ import scala.annotation.switch
 object SetUp {
   val site: String = System.getProperty("site")
   val env: String = System.getProperty("env").toLowerCase
-  val users: Int = Integer.getInteger("users", 10).toInt
+  val users: Int = Integer.getInteger("users", 0).toInt
   val rampUp: Int = Integer.getInteger("rampUp", 0).toInt
   val rampDurationInMin: Int = Integer.getInteger("duration" ,0).toInt
   val externalURL: String = URL.build(ApplicationType.EXTERNAL, env).toString
