@@ -22,18 +22,22 @@ dependencies {
 repositories {
     mavenLocal()
     mavenCentral()
-//    maven {
-//        url 'https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases'
-//    }
+    maven {
+        credentials {
+            username  System.getProperty("nexusUser")
+            password  System.getProperty("nexusPassword")
+        }
+        url 'https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases'
+    }
 }
 
 buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
-//        maven {
-//            url 'https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases'
-//        }
+        maven {
+            url 'https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases'
+        }
     }
 }
 
