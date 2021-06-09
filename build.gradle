@@ -10,6 +10,9 @@ sourceCompatibility = 1.8
 
 
 repositories {
+    mavenCentral()
+    mavenLocal()
+    jcenter()
     maven {
         credentials {
             username project.properties['username']
@@ -17,9 +20,6 @@ repositories {
         }
         url "https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases"
     }
-    mavenLocal()
-    mavenCentral()
-    jcenter()
 }
 
 dependencies {
