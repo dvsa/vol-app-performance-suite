@@ -15,7 +15,7 @@
  `env = qa/da/...`
 `site = ss/internal`
  
-`gradle test -Denv={qa} -Dsite={ss} -Dusers={2} -DrampUp={0} -Dduration={0}`
+`gradle createApplication -Denv={qa} -Dsite={ss} -Dusers={2} -DrampUp={0} -Dduration={0}`
 
  Please remove the braces when running.
  
