@@ -14,10 +14,6 @@ repositories {
     mavenLocal()
     jcenter()
     maven {
-        credentials {
-            username project.properties['username']
-            password project.properties['password']
-        }
         url "https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases"
     }
 }
