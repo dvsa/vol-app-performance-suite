@@ -30,7 +30,7 @@ dependencies {
     compile 'org.dvsa.testing.lib:active-support:1.5.0'
     compile 'org.dvsa.testing.lib:uri-constructor:1.5.4'
     compile 'org.dvsa.testing.framework:vol-api-calls:1.1.0'
-    implementation group: 'com.gradle', name: 'build-scan-plugin', version: '2.1'
+    compile group: 'com.gradle', name: 'build-scan-plugin', version: '2.1'
 
 }
 
