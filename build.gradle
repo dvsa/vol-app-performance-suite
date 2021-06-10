@@ -20,16 +20,29 @@ repositories {
     }
 }
 
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven {
+            url "https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases"
+            credentials {
+                username = System.getProperty("nexusUser")
+                password = System.getProperty("nexusPassword")
+            }
+        }
+    }
+}
 
 dependencies {
-    testCompile('io.gatling.highcharts:gatling-charts-highcharts:3.6.0')
-    testCompile('io.gatling:gatling-core:3.6.0')
-    testCompile('io.gatling:gatling-http:3.6.0')
-    testCompile('org.scala-lang:scala-library:2.12.7')
-    testCompile('org.apache.commons:commons-csv:1.5')
-    testCompile('org.dvsa.testing.lib:active-support:1.5.0')
-    testCompile('org.dvsa.testing.lib:uri-constructor:1.5.4')
-    testCompile('org.dvsa.testing.framework:vol-api-calls:1.1.0')
+    testCompile 'io.gatling.highcharts:gatling-charts-highcharts:3.6.0'
+    testCompile 'io.gatling:gatling-core:3.6.0'
+    testCompile 'io.gatling:gatling-http:3.6.0'
+    testCompile 'org.scala-lang:scala-library:2.12.7'
+    testCompile 'org.apache.commons:commons-csv:1.5'
+    testCompile 'org.dvsa.testing.lib:active-support:1.5.0'
+    testCompile 'org.dvsa.testing.lib:uri-constructor:1.5.4'
+    testCompile 'org.dvsa.testing.framework:vol-api-calls:1.1.0'
 }
 
 tasks.withType(JavaExec) {
