@@ -24,9 +24,8 @@ repositories {
     mavenCentral()
     maven {
         credentials {
-            systemProperties = System.getProperties()
-            username  System.getProperty("nexusUser")
-            password  System.getProperty("nexusPassword")
+            username  [System.getProperty("nexusUser")]
+            password  [System.getProperty("nexusPassword")]
         }
         url "https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases"
     }
