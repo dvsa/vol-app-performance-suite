@@ -24,10 +24,11 @@ repositories {
     mavenCentral()
     maven {
         credentials {
+            systemProperties = System.getProperties()
             username  System.getProperty("nexusUser")
             password  System.getProperty("nexusPassword")
         }
-        url 'https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases'
+        url "https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases"
     }
 }
 
@@ -35,13 +36,6 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
-        maven {
-            credentials {
-                username  System.getProperty("nexusUser")
-                password  System.getProperty("nexusPassword")
-            }
-            url 'https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases'
-        }
     }
 }
 
