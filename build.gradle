@@ -5,6 +5,7 @@ apply plugin: 'idea'
 apply plugin: 'scala'
 apply plugin: 'java'
 apply plugin: 'application'
+apply plugin: "com.gradle.build-scan"
 
 sourceCompatibility = 1.8
 
@@ -20,6 +21,17 @@ repositories {
         maven {
             url 'https://maven.yle.fi/release'
         }
+    }
+}
+
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "com.gradle:gradle-enterprise-gradle-plugin:3.6.2"
     }
 }
 
