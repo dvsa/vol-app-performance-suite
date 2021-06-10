@@ -19,7 +19,7 @@ repositories {
             password = System.getProperty("nexusPassword")
         }
         maven {
-            url "https://maven.yle.fi/release"
+            url "https://plugins.gradle.org/m2/"
         }
     }
 }
