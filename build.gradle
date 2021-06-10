@@ -13,13 +13,13 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven {
-        url 'https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases'
+        url "https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases"
         credentials {
             username = System.getProperty("nexusUser")
             password = System.getProperty("nexusPassword")
         }
         maven {
-            url 'https://maven.yle.fi/release'
+            url "https://maven.yle.fi/release"
         }
     }
 }
@@ -31,7 +31,14 @@ buildscript {
         maven {
             url "https://plugins.gradle.org/m2/"
         }
+        maven {
+            url "https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases"
+        }
+        maven {
+            url "https://maven.yle.fi/release"
+        }
     }
+
     dependencies {
         classpath "com.gradle:gradle-enterprise-gradle-plugin:2.1"
     }
