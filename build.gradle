@@ -35,6 +35,13 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
+        maven {
+            url "https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases"
+            credentials {
+                username = System.getProperty("nexusUser")
+                password = System.getProperty("nexusPassword")
+            }
+        }
     }
 }
 
