@@ -17,6 +17,9 @@ repositories {
             username = System.getProperty("nexusUser")
             password = System.getProperty("nexusPassword")
         }
+        maven {
+            url 'https://maven.yle.fi/release'
+        }
     }
 }
 
@@ -31,18 +34,6 @@ dependencies {
     compile 'org.dvsa.testing.framework:vol-api-calls:1.1.0'
 }
 
-buildscript {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        maven {
-            url 'https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases'
-        }
-        maven {
-            url 'https://maven.yle.fi/release'
-        }
-    }
-}
 
 tasks.withType(JavaExec) {
     systemProperties = System.getProperties()
