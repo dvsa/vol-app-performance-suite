@@ -48,7 +48,7 @@ task registerUser(type: JavaExec) {
     //Specify the simulation to run
     args = [
             "--simulation", "simulations.RegisterUserSimulation",
-            "--results-folder", "${buildDir}/results",
+            "--results-folder", "${buildDir}/gatling-results",
             "--bodies-folder", sourceSets.test.resources
     ]
 }
@@ -63,7 +63,7 @@ task createApplication(type: JavaExec) {
     //Specify the simulation to run
     args = [
             "--simulation", "simulations.CreateApplicationSimulation",
-            "--results-folder", "${buildDir}/results",
+            "--results-folder", "${buildDir}/gatling-results",
             "--bodies-folder", sourceSets.test.resources
     ]
     doLast {
@@ -81,7 +81,7 @@ task createApplicationStress(type: JavaExec) {
     //Specify the simulation to run
     args = [
             "--simulation", "simulations.CreateApplicationStressSimulation",
-            "--results-folder", "${buildDir}/results",
+            "--results-folder", "${buildDir}/gatling-results",
             "--bodies-folder", sourceSets.test.resources
     ]
     doLast {
@@ -96,7 +96,7 @@ task searchOperator(type: JavaExec) {
     //Specify the simulation to run
     args = [
             "--simulation", "simulations.ExternalOperatorSearchSimulation",
-            "--results-folder", "${buildDir}/results",
+            "--results-folder", "${buildDir}/gatling-results",
             "--bodies-folder", sourceSets.test.resources
     ]
 }
@@ -108,7 +108,7 @@ task internalSearchLicence(type: JavaExec) {
     //Specify the simulation to run
     args = [
             "--simulation", "simulations.InternalLicenceSearchSimulation",
-            "--results-folder", "${buildDir}/results",
+            "--results-folder", "${buildDir}/gatling-results",
             "--bodies-folder", sourceSets.test.resources
     ]
 }
