@@ -5,7 +5,6 @@ apply plugin: 'idea'
 apply plugin: 'scala'
 apply plugin: 'java'
 apply plugin: 'application'
-//apply plugin: 'com.gradle.build-scan'
 
 sourceCompatibility = 1.8
 
@@ -20,17 +19,6 @@ repositories {
         }
     }
 }
-
-//buildscript {
-//    repositories {
-//        maven {
-//            url "https://plugins.gradle.org/m2/"
-//        }
-//    }
-//    dependencies {
-//        classpath "com.gradle:build-scan-plugin:2.1"
-//    }
-//}
 
 dependencies {
     compile 'io.gatling.highcharts:gatling-charts-highcharts:3.6.0'
