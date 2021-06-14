@@ -1,5 +1,5 @@
 group 'gov.dvsa.vol'
-version '1.0-SNAPSHOT'
+version '1.0'
 
 apply plugin: 'idea'
 apply plugin: 'scala'
@@ -11,41 +11,26 @@ sourceCompatibility = 1.8
 repositories {
     mavenLocal()
     mavenCentral()
-}
-
-dependencies {
-    testCompile 'io.gatling.highcharts:gatling-charts-highcharts:3.1.2'
-    testCompile 'io.gatling:gatling-core:3.1.2'
-    testCompile 'io.gatling:gatling-http:3.1.2'
-    testCompile 'org.scala-lang:scala-library:2.12.7'
-    testCompile 'org.apache.commons:commons-csv:1.5'
-    testCompile 'org.dvsa.testing.lib:active-support:1.4.4.7'
-    testCompile 'org.dvsa.testing.lib:uri-constructor:1.5.4'
-    testCompile 'org.dvsa.testing.framework:vol-api-calls:1.0'
-}
-
-buildscript {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.amazonaws:aws-java-sdk-core:1.11.897'
-    }
-}
-
-import com.amazonaws.auth.*
-
-repositories {
     maven {
         url "https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases"
-        credentials(AwsCredentials) {
-            def awsCredentials = new DefaultAWSCredentialsProviderChain().getCredentials()
-            accessKey awsCredentials.getAWSAccessKeyId()
-            secretKey awsCredentials.getAWSSecretKey()
+        credentials {
+            username = System.getProperty("nexusUser")
+            password = System.getProperty("nexusPassword")
         }
     }
 }
+
+dependencies {
+    compile 'io.gatling.highcharts:gatling-charts-highcharts:3.6.0'
+    compile 'io.gatling:gatling-core:3.6.0'
+    compile 'io.gatling:gatling-http:3.6.0'
+    compile 'org.scala-lang:scala-library:2.12.7'
+    compile 'org.apache.commons:commons-csv:1.5'
+    compile 'org.dvsa.testing.lib:active-support:1.5.0'
+    compile 'org.dvsa.testing.lib:uri-constructor:1.5.4'
+    compile 'org.dvsa.testing.framework:vol-api-calls:1.1.0'
+}
+
 
 tasks.withType(JavaExec) {
     systemProperties = System.getProperties()

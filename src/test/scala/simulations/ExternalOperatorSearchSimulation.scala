@@ -8,6 +8,7 @@ import scenarios.ExternalOperatorSearchUser
 import utils.{Headers, SetUp}
 
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 
 class ExternalOperatorSearchSimulation extends Simulation {

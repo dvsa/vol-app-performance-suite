@@ -7,6 +7,7 @@ import io.gatling.http.Predef._
 import scala.concurrent.duration._
 import scenarios.CreateAndSubmitApplication
 import utils.{Headers, SetUp}
+import scala.language.postfixOps
 
 
 class CreateApplicationStressSimulation extends Simulation {

@@ -7,6 +7,7 @@ import utils.SetUp
 import utils.SetUp.header_
 
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 object ExternalOperatorSearchUser {
 

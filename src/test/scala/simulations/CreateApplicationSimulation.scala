@@ -8,6 +8,7 @@ import scenarios.CreateAndSubmitApplication
 import utils.{Headers, SetUp}
 
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 
 class CreateApplicationSimulation extends Simulation {
