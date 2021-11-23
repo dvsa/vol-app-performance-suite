@@ -28,7 +28,7 @@ dependencies {
     testCompile 'org.apache.commons:commons-csv:1.8'
     testCompile 'org.dvsa.testing.lib:active-support:1.5.1'
     testCompile 'org.dvsa.testing.lib:uri-constructor:1.5.4'
-    testCompile 'org.dvsa.testing.framework:vol-api-calls:1.1.1'
+    testCompile 'org.dvsa.testing.framework:vol-api-calls:1.1.4'
 }
 
 
