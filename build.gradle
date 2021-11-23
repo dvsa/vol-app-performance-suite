@@ -21,14 +21,14 @@ repositories {
 }
 
 dependencies {
-    compile 'io.gatling.highcharts:gatling-charts-highcharts:3.6.0'
-    compile 'io.gatling:gatling-core:3.6.0'
-    compile 'io.gatling:gatling-http:3.6.0'
-    compile 'org.scala-lang:scala-library:2.12.7'
-    compile 'org.apache.commons:commons-csv:1.5'
-    compile 'org.dvsa.testing.lib:active-support:1.5.0'
-    compile 'org.dvsa.testing.lib:uri-constructor:1.5.4'
-    compile 'org.dvsa.testing.framework:vol-api-calls:1.1.1'
+    testCompile 'io.gatling.highcharts:gatling-charts-highcharts:3.6.1'
+    testCompile 'io.gatling:gatling-core:3.6.1'
+    testCompile 'io.gatling:gatling-http:3.6.1'
+    testCompile 'org.scala-lang:scala-library:2.13.6'
+    testCompile 'org.apache.commons:commons-csv:1.8'
+    testCompile 'org.dvsa.testing.lib:active-support:1.5.1'
+    testCompile 'org.dvsa.testing.lib:uri-constructor:1.5.4'
+    testCompile 'org.dvsa.testing.framework:vol-api-calls:1.1.4'
 }
 
 
