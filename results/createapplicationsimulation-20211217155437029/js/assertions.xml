@@ -1,0 +1,5 @@
+<testsuite name="simulations.CreateApplicationSimulation" tests="1" errors="0" failures="1" time="0">
+<testcase name="Global: percentage of failed events is 3.0" status="false" time="0">
+  <failure type="Global">Actual value: 11.11111111111111</failure>
+</testcase>
+</testsuite>

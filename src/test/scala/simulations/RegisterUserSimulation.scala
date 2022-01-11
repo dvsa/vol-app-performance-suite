@@ -19,7 +19,6 @@ class RegisterUserSimulation extends Simulation {
     .disableWarmUp
     .silentResources
     .perUserNameResolution
-    .maxConnectionsPerHostLikeChrome
 
   val RegisterUsers: PopulationBuilder =
         RegisterUser.registerUser.inject(rampUsers(users) during (rampUp minutes))

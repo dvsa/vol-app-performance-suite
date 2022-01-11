@@ -1,0 +1,18 @@
+{
+  "simulation": "simulations.RegisterUserSimulation",
+  "simulationId": "registerusersimulation",
+  "start": 1641903899982,
+  "description": "",
+  "scenarios": ["VOL New User Registration"],
+  "assertions": [
+{
+  "path": "Global",
+  "target": "count of failed events",
+  "condition": "is",
+  "expectedValues": [0.0],
+  "result": true,
+  "message": "Global: count of failed events is 0.0",
+  "actualValue": [0.0]
+}
+  ]
+}

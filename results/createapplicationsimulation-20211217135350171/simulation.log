@@ -1,0 +1,167 @@
+ASSERTION	AAECAAMFAAAAAAAAAAhA
+RUN	simulations.CreateApplicationSimulation	createapplicationsimulation	1639749230171	 	3.7.2
+USER	Create and submit application	START	1639749231387
+USER	Create and submit application	START	1639749261365
+REQUEST		get login page	1639749290328	1639749290806	OK	 
+ERROR	login: Failed to build request: No attribute named 'Password' is defined 	1639749290847
+USER	Create and submit application	START	1639749291365
+REQUEST		get login page	1639749291328	1639749291670	OK	 
+ERROR	login: Failed to build request: No attribute named 'Password' is defined 	1639749291672
+REQUEST		login	1639749292328	1639749292646	OK	 
+REQUEST		get login page	1639749293329	1639749293706	OK	 
+ERROR	login: Failed to build request: No attribute named 'Password' is defined 	1639749293707
+REQUEST		login	1639749294329	1639749294577	OK	 
+REQUEST		login Redirect 1	1639749295329	1639749295617	OK	 
+ERROR	change password: Failed to build request: No attribute named 'Location' is defined 	1639749295619
+REQUEST		login	1639749296329	1639749296638	OK	 
+REQUEST		login Redirect 1	1639749297328	1639749297664	OK	 
+ERROR	change password: Failed to build request: No attribute named 'Location' is defined 	1639749297664
+REQUEST		choose country	1639749298328	1639749298355	OK	 
+REQUEST		login Redirect 1	1639749299327	1639749299583	OK	 
+ERROR	change password: Failed to build request: No attribute named 'Location' is defined 	1639749299583
+REQUEST		choose country	1639749300327	1639749300359	OK	 
+REQUEST		choose country Redirect 1	1639749301328	1639749301892	OK	 
+REQUEST		choose country	1639749302326	1639749302356	OK	 
+REQUEST		choose country Redirect 1	1639749303337	1639749303823	OK	 
+REQUEST		Show dashboard	1639749304393	1639749304624	OK	 
+REQUEST		choose country Redirect 1	1639749305319	1639749305585	OK	 
+REQUEST		Show dashboard	1639749306329	1639749306538	OK	 
+REQUEST		Show dashboard Redirect 1	1639749307328	1639749307598	KO	regex(href="/application/([^"]*)/").find.exists, found nothing
+ERROR	business type: Failed to build request: No attribute named 'applicationId' is defined 	1639749307612
+ERROR	business details: Failed to build request: No attribute named 'applicationId' is defined 	1639749307612
+ERROR	addresses: Failed to build request: No attribute named 'applicationId' is defined 	1639749307612
+ERROR	people: Failed to build request: No attribute named 'applicationId' is defined 	1639749307613
+ERROR	people: Failed to build request: No attribute named 'applicationId' is defined 	1639749307613
+ERROR	add operating centres: Failed to build request: No attribute named 'applicationId' is defined 	1639749307613
+ERROR	submit operating centres: Failed to build request: No attribute named 'applicationId' is defined 	1639749307613
+ERROR	submit financial evidence: Failed to build request: No attribute named 'applicationId' is defined 	1639749307613
+ERROR	add transport manager: Failed to build request: No attribute named 'applicationId' is defined 	1639749307613
+ERROR	select transport manager: Failed to build request: No attribute named 'applicationId' is defined 	1639749307613
+ERROR	submit transport manager: Failed to build request: No attribute named 'applicationId' is defined 	1639749307613
+ERROR	submit check your answers: Failed to build request: No attribute named 'applicationId' is defined 	1639749307614
+ERROR	submit check your answers: Failed to build request: No attribute named 'applicationId' is defined 	1639749307614
+ERROR	submit vehicle: Failed to build request: No attribute named 'applicationId' is defined 	1639749307614
+ERROR	add safety: Failed to build request: No attribute named 'applicationId' is defined 	1639749307614
+ERROR	safety compliance: Failed to build request: No attribute named 'applicationId' is defined 	1639749307614
+ERROR	finance history: Failed to build request: No attribute named 'applicationId' is defined 	1639749307615
+ERROR	licence history: Failed to build request: No attribute named 'applicationId' is defined 	1639749307615
+ERROR	convictions penalties: Failed to build request: No attribute named 'applicationId' is defined 	1639749307615
+ERROR	undertakings: Failed to build request: No attribute named 'applicationId' is defined 	1639749307615
+USER	Create and submit application	END	1639749307621
+REQUEST		Show dashboard	1639749308328	1639749308496	OK	 
+REQUEST		Show dashboard Redirect 1	1639749309327	1639749309589	KO	regex(href="/application/([^"]*)/").find.exists, found nothing
+ERROR	business type: Failed to build request: No attribute named 'applicationId' is defined 	1639749309591
+ERROR	business details: Failed to build request: No attribute named 'applicationId' is defined 	1639749309591
+ERROR	addresses: Failed to build request: No attribute named 'applicationId' is defined 	1639749309591
+ERROR	people: Failed to build request: No attribute named 'applicationId' is defined 	1639749309591
+ERROR	people: Failed to build request: No attribute named 'applicationId' is defined 	1639749309591
+ERROR	add operating centres: Failed to build request: No attribute named 'applicationId' is defined 	1639749309591
+ERROR	submit operating centres: Failed to build request: No attribute named 'applicationId' is defined 	1639749309591
+ERROR	submit financial evidence: Failed to build request: No attribute named 'applicationId' is defined 	1639749309591
+ERROR	add transport manager: Failed to build request: No attribute named 'applicationId' is defined 	1639749309592
+ERROR	select transport manager: Failed to build request: No attribute named 'applicationId' is defined 	1639749309592
+ERROR	submit transport manager: Failed to build request: No attribute named 'applicationId' is defined 	1639749309592
+ERROR	submit check your answers: Failed to build request: No attribute named 'applicationId' is defined 	1639749309592
+ERROR	submit check your answers: Failed to build request: No attribute named 'applicationId' is defined 	1639749309592
+ERROR	submit vehicle: Failed to build request: No attribute named 'applicationId' is defined 	1639749309592
+ERROR	add safety: Failed to build request: No attribute named 'applicationId' is defined 	1639749309592
+ERROR	safety compliance: Failed to build request: No attribute named 'applicationId' is defined 	1639749309592
+ERROR	finance history: Failed to build request: No attribute named 'applicationId' is defined 	1639749309593
+ERROR	licence history: Failed to build request: No attribute named 'applicationId' is defined 	1639749309593
+ERROR	convictions penalties: Failed to build request: No attribute named 'applicationId' is defined 	1639749309593
+ERROR	undertakings: Failed to build request: No attribute named 'applicationId' is defined 	1639749309593
+USER	Create and submit application	END	1639749309595
+REQUEST		Show dashboard Redirect 1	1639749310327	1639749310670	KO	regex(href="/application/([^"]*)/").find.exists, found nothing
+ERROR	business type: Failed to build request: No attribute named 'applicationId' is defined 	1639749310671
+ERROR	business details: Failed to build request: No attribute named 'applicationId' is defined 	1639749310672
+ERROR	addresses: Failed to build request: No attribute named 'applicationId' is defined 	1639749310672
+ERROR	people: Failed to build request: No attribute named 'applicationId' is defined 	1639749310672
+ERROR	people: Failed to build request: No attribute named 'applicationId' is defined 	1639749310672
+ERROR	add operating centres: Failed to build request: No attribute named 'applicationId' is defined 	1639749310673
+ERROR	submit operating centres: Failed to build request: No attribute named 'applicationId' is defined 	1639749310673
+ERROR	submit financial evidence: Failed to build request: No attribute named 'applicationId' is defined 	1639749310673
+ERROR	add transport manager: Failed to build request: No attribute named 'applicationId' is defined 	1639749310673
+ERROR	select transport manager: Failed to build request: No attribute named 'applicationId' is defined 	1639749310673
+ERROR	submit transport manager: Failed to build request: No attribute named 'applicationId' is defined 	1639749310674
+ERROR	submit check your answers: Failed to build request: No attribute named 'applicationId' is defined 	1639749310674
+ERROR	submit check your answers: Failed to build request: No attribute named 'applicationId' is defined 	1639749310674
+ERROR	submit vehicle: Failed to build request: No attribute named 'applicationId' is defined 	1639749310674
+ERROR	add safety: Failed to build request: No attribute named 'applicationId' is defined 	1639749310674
+ERROR	safety compliance: Failed to build request: No attribute named 'applicationId' is defined 	1639749310674
+ERROR	finance history: Failed to build request: No attribute named 'applicationId' is defined 	1639749310674
+ERROR	licence history: Failed to build request: No attribute named 'applicationId' is defined 	1639749310675
+ERROR	convictions penalties: Failed to build request: No attribute named 'applicationId' is defined 	1639749310675
+ERROR	undertakings: Failed to build request: No attribute named 'applicationId' is defined 	1639749310675
+USER	Create and submit application	END	1639749310678
+USER	Create and submit application	START	1639749321365
+REQUEST		get login page	1639749321366	1639749324919	OK	 
+ERROR	login: Failed to build request: No attribute named 'Password' is defined 	1639749324920
+REQUEST		login	1639749324921	1639749325207	OK	 
+REQUEST		login Redirect 1	1639749325327	1639749325620	OK	 
+ERROR	change password: Failed to build request: No attribute named 'Location' is defined 	1639749325621
+REQUEST		choose country	1639749326327	1639749326361	OK	 
+REQUEST		choose country Redirect 1	1639749327328	1639749327588	OK	 
+REQUEST		Show dashboard	1639749328327	1639749328492	OK	 
+REQUEST		Show dashboard Redirect 1	1639749329327	1639749329571	KO	regex(href="/application/([^"]*)/").find.exists, found nothing
+ERROR	business type: Failed to build request: No attribute named 'applicationId' is defined 	1639749329572
+ERROR	business details: Failed to build request: No attribute named 'applicationId' is defined 	1639749329572
+ERROR	addresses: Failed to build request: No attribute named 'applicationId' is defined 	1639749329572
+ERROR	people: Failed to build request: No attribute named 'applicationId' is defined 	1639749329572
+ERROR	people: Failed to build request: No attribute named 'applicationId' is defined 	1639749329572
+ERROR	add operating centres: Failed to build request: No attribute named 'applicationId' is defined 	1639749329572
+ERROR	submit operating centres: Failed to build request: No attribute named 'applicationId' is defined 	1639749329573
+ERROR	submit financial evidence: Failed to build request: No attribute named 'applicationId' is defined 	1639749329573
+ERROR	add transport manager: Failed to build request: No attribute named 'applicationId' is defined 	1639749329573
+ERROR	select transport manager: Failed to build request: No attribute named 'applicationId' is defined 	1639749329573
+ERROR	submit transport manager: Failed to build request: No attribute named 'applicationId' is defined 	1639749329573
+ERROR	submit check your answers: Failed to build request: No attribute named 'applicationId' is defined 	1639749329573
+ERROR	submit check your answers: Failed to build request: No attribute named 'applicationId' is defined 	1639749329573
+ERROR	submit vehicle: Failed to build request: No attribute named 'applicationId' is defined 	1639749329573
+ERROR	add safety: Failed to build request: No attribute named 'applicationId' is defined 	1639749329573
+ERROR	safety compliance: Failed to build request: No attribute named 'applicationId' is defined 	1639749329574
+ERROR	finance history: Failed to build request: No attribute named 'applicationId' is defined 	1639749329574
+ERROR	licence history: Failed to build request: No attribute named 'applicationId' is defined 	1639749329574
+ERROR	convictions penalties: Failed to build request: No attribute named 'applicationId' is defined 	1639749329574
+ERROR	undertakings: Failed to build request: No attribute named 'applicationId' is defined 	1639749329574
+USER	Create and submit application	END	1639749329578
+USER	Create and submit application	START	1639749351365
+REQUEST		get login page	1639749351365	1639749351767	OK	 
+ERROR	login: Failed to build request: No attribute named 'Password' is defined 	1639749351768
+REQUEST		login	1639749352327	1639749352652	OK	 
+REQUEST		login Redirect 1	1639749353329	1639749353578	OK	 
+ERROR	change password: Failed to build request: No attribute named 'Location' is defined 	1639749353578
+REQUEST		choose country	1639749354326	1639749354369	OK	 
+REQUEST		choose country Redirect 1	1639749355338	1639749355590	OK	 
+REQUEST		Show dashboard	1639749356328	1639749356510	OK	 
+REQUEST		Show dashboard Redirect 1	1639749357329	1639749357669	KO	regex(href="/application/([^"]*)/").find.exists, found nothing
+ERROR	business type: Failed to build request: No attribute named 'applicationId' is defined 	1639749357670
+ERROR	business details: Failed to build request: No attribute named 'applicationId' is defined 	1639749357670
+ERROR	addresses: Failed to build request: No attribute named 'applicationId' is defined 	1639749357670
+ERROR	people: Failed to build request: No attribute named 'applicationId' is defined 	1639749357670
+ERROR	people: Failed to build request: No attribute named 'applicationId' is defined 	1639749357671
+ERROR	add operating centres: Failed to build request: No attribute named 'applicationId' is defined 	1639749357671
+ERROR	submit operating centres: Failed to build request: No attribute named 'applicationId' is defined 	1639749357671
+ERROR	submit financial evidence: Failed to build request: No attribute named 'applicationId' is defined 	1639749357671
+ERROR	add transport manager: Failed to build request: No attribute named 'applicationId' is defined 	1639749357671
+ERROR	select transport manager: Failed to build request: No attribute named 'applicationId' is defined 	1639749357671
+ERROR	submit transport manager: Failed to build request: No attribute named 'applicationId' is defined 	1639749357671
+ERROR	submit check your answers: Failed to build request: No attribute named 'applicationId' is defined 	1639749357671
+ERROR	submit check your answers: Failed to build request: No attribute named 'applicationId' is defined 	1639749357671
+ERROR	submit vehicle: Failed to build request: No attribute named 'applicationId' is defined 	1639749357671
+ERROR	add safety: Failed to build request: No attribute named 'applicationId' is defined 	1639749357672
+ERROR	safety compliance: Failed to build request: No attribute named 'applicationId' is defined 	1639749357672
+ERROR	finance history: Failed to build request: No attribute named 'applicationId' is defined 	1639749357672
+ERROR	licence history: Failed to build request: No attribute named 'applicationId' is defined 	1639749357672
+ERROR	convictions penalties: Failed to build request: No attribute named 'applicationId' is defined 	1639749357672
+ERROR	undertakings: Failed to build request: No attribute named 'applicationId' is defined 	1639749357672
+USER	Create and submit application	END	1639749357674
+USER	Create and submit application	START	1639749381365
+REQUEST		get login page	1639749381366	1639749381764	OK	 
+ERROR	login: Failed to build request: No attribute named 'Password' is defined 	1639749381765
+REQUEST		login	1639749382329	1639749382654	OK	 
+REQUEST		login Redirect 1	1639749383329	1639749383600	OK	 
+ERROR	change password: Failed to build request: No attribute named 'Location' is defined 	1639749383601
+REQUEST		choose country	1639749384329	1639749384442	OK	 
+REQUEST		choose country Redirect 1	1639749385328	1639749385588	OK	 
+REQUEST		Show dashboard	1639749386327	1639749386505	OK	 
+REQUEST		Show dashboard Redirect 1	1639749387328	1639749387681	KO	
