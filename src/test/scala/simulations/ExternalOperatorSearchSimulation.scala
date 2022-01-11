@@ -18,7 +18,6 @@ class ExternalOperatorSearchSimulation extends Simulation {
     .disableWarmUp
     .silentResources
     .perUserNameResolution
-    .maxConnectionsPerHostLikeChrome
 
   val search: PopulationBuilder =
     ExternalOperatorSearchUser.companySearch.inject(atOnceUsers(SetUp.users),

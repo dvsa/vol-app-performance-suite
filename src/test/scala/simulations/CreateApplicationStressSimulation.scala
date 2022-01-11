@@ -17,7 +17,6 @@ class CreateApplicationStressSimulation extends Simulation {
     .disableWarmUp
     .silentResources
     .perUserNameResolution
-    .maxConnectionsPerHostLikeChrome
 
   // This is an open workload profile
   // With levels of x arriving users per second depending on users passed in

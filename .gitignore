@@ -9,5 +9,6 @@
 src/main/
 /src/test/resources/application.conf
 LOGS
-OLCSEfficiency.iml
+*.iml
 gradle.properties
+results/

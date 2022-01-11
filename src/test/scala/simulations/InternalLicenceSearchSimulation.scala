@@ -17,7 +17,6 @@ class InternalLicenceSearchSimulation extends Simulation {
     .disableWarmUp
     .silentResources
     .perUserNameResolution
-    .maxConnectionsPerHostLikeChrome
 
   val search =
     InternalSearch.internalWorkerLogin.inject(atOnceUsers(SetUp.users),
