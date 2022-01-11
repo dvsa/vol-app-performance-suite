@@ -42,7 +42,7 @@ public class SelfServeRegisterUser {
             createTunnel();
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection con = DriverManager.getConnection(
-                    "jdbc:mysql://olcsdb-rds.int.olcs.dvsacloud.uk:3306/OLCS_RDS_OLCSDB?user=olcsapi&password={password:}?useSSL=FALSE");
+                    "jdbc:mysql://olcsdb-rds.int.olcs.dvsacloud.uk:3306/OLCS_RDS_OLCSDB?user={user:}&password={password:}?useSSL=FALSE");
             Statement stmt=con.createStatement();
             ResultSet rs=stmt.executeQuery(SQLquery.getUsersSql("10"));
             while(rs.next())
