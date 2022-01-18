@@ -16,7 +16,7 @@ object CreateAndSubmitApplication {
 
 
   val newPassword: String = CONFIG.getString("password")
-  val feeder = csv("./loginId.csv").circular
+  val feeder = csv("./loginId_int.csv").circular
   val header_ = Map("Accept" -> "*/*")
   var version : String = _
 

@@ -69,6 +69,24 @@ task createApplication(type: JavaExec) {
     }
 }
 
+task createApplicationSoak(type: JavaExec) {
+    doFirst {
+        registerUsersViaAPI.executeTests()
+    }
+    description = "Load testing with Gatling"
+    classpath = sourceSets.test.runtimeClasspath
+    main = "io.gatling.app.Gatling"
+    //Specify the simulation to run
+    args = [
+            "--simulation", "simulations.CreateApplicationSimulationSoak",
+            "--results-folder", "${buildDir}/gatling-results",
+            "--bodies-folder", sourceSets.test.resources
+    ]
+    doLast {
+        cleanUp.executeTests()
+    }
+}
+
 task createApplicationStress(type: JavaExec) {
     doFirst {
         registerUsersViaAPI.executeTests()
