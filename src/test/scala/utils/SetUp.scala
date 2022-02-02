@@ -6,6 +6,7 @@ import org.dvsa.testing.lib.url.webapp.utils.ApplicationType
 import scala.annotation.switch
 
 object SetUp {
+  val typeofTest: String = System.getProperty("typeOfTest")
   val site: String = System.getProperty("site")
   val env: String = System.getProperty("env").toLowerCase
   val users: Int = Integer.getInteger("users", 0).toInt

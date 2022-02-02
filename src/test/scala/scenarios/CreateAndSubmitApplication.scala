@@ -3,9 +3,11 @@ package scenarios
 import activesupport.config.Configuration
 import com.typesafe.config.Config
 import io.gatling.core.Predef._
+import io.gatling.core.feeder.BatchableFeederBuilder
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 import utils.SetUp
+import utils.SetUp.env
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
@@ -16,7 +18,14 @@ object CreateAndSubmitApplication {
 
 
   val newPassword: String = CONFIG.getString("password")
-  val feeder = csv("./loginId_int.csv").circular
+  val feeder: BatchableFeederBuilder[String] = {
+    (env) match {
+      case "int" =>
+        csv("./loginId_int.csv").circular
+      case _=>
+        csv("./loginId.csv").circular
+    }
+  }
   val header_ = Map("Accept" -> "*/*")
   var version : String = _
 
