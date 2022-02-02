@@ -26,7 +26,7 @@ dependencies {
     compile 'org.apache.commons:commons-csv:1.8'
     compile 'org.dvsa.testing.lib:active-support:1.6.4'
     compile 'org.dvsa.testing.lib:uri-constructor:1.5.4'
-    compile 'org.dvsa.testing.framework:vol-api-calls:1.1.7'
+    compile 'org.dvsa.testing.framework:vol-api-calls:1.1.8'
 }
 
 
@@ -61,6 +61,24 @@ task createApplication(type: JavaExec) {
     //Specify the simulation to run
     args = [
             "--simulation", "simulations.CreateApplicationSimulation",
+            "--results-folder", "${buildDir}/gatling-results",
+            "--bodies-folder", sourceSets.test.resources
+    ]
+    doLast {
+        cleanUp.executeTests()
+    }
+}
+
+task createApplicationSoak(type: JavaExec) {
+    doFirst {
+        registerUsersViaAPI.executeTests()
+    }
+    description = "Load testing with Gatling"
+    classpath = sourceSets.test.runtimeClasspath
+    main = "io.gatling.app.Gatling"
+    //Specify the simulation to run
+    args = [
+            "--simulation", "simulations.CreateApplicationSimulationSoak",
             "--results-folder", "${buildDir}/gatling-results",
             "--bodies-folder", sourceSets.test.resources
     ]
