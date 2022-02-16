@@ -1,7 +1,6 @@
 package utils.api;
 
 import activesupport.aws.s3.*;
-import activesupport.database.DBUnit;
 import activesupport.database.url.DbURL;
 import activesupport.ssh.SSH;
 import apiCalls.actions.RegisterUser;
@@ -86,7 +85,7 @@ public class SelfServeRegisterUser {
             registerUser.registerUser();
             String email = registerUser.getEmailAddress();
             password = S3.getTempPassword(email, "devapp-olcs-pri-olcs-autotest-s3");
-            writeToFile(CSV_HEADERS, registerUser.getUserName(), registerUser.getForeName(),password);
+            writeToFile(registerUser.getUserName(), registerUser.getForeName(),password);
         }
     }
 
@@ -100,17 +99,17 @@ public class SelfServeRegisterUser {
         System.setProperty("dbPassword","dbPassword");
 
         if (ldapUsername.isPresent()) {
-            dbURL.setPortNumber(createSSHsession(ldapUsername, "dbam.olcs.int.prod.dvsa.aws", sshPrivateKeyPath, "localhost"));
+            dbURL.setPortNumber(createSSHsession(ldapUsername, String.valueOf(sshPrivateKeyPath)));
         }
     }
 
-    private void writeToFile(String header, String userId, String forename, String password) throws Exception {
+    private void writeToFile(String userId, String forename, String password) throws Exception {
         FileWriter fileWriter = new FileWriter(LOGIN_CSV_FILE, true);
         BufferedWriter writer = new BufferedWriter(fileWriter);
         CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
 
-        if (!searchForString(LOGIN_CSV_FILE, CSV_HEADERS)) {
-            csvPrinter.printRecord((Object[]) header.split(","));
+        if (!searchForString()) {
+            csvPrinter.printRecord((Object[]) SelfServeRegisterUser.CSV_HEADERS.split(","));
             csvPrinter.printRecord(Arrays.asList(userId, forename, password));
             csvPrinter.flush();
         } else {
@@ -119,10 +118,10 @@ public class SelfServeRegisterUser {
         }
     }
 
-    private boolean searchForString(String file, String searchText) throws IOException {
+    private boolean searchForString() throws IOException {
         boolean foundIt;
-        File f = new File(file);
-        if (f.exists() && (FileUtils.readFileToString(new File(file), "UTF-8").contains(searchText)))
+        File f = new File(SelfServeRegisterUser.LOGIN_CSV_FILE);
+        if (f.exists() && (FileUtils.readFileToString(new File(SelfServeRegisterUser.LOGIN_CSV_FILE), "UTF-8").contains(SelfServeRegisterUser.CSV_HEADERS)))
             foundIt = true;
         else {
             LOGGER.info("File not found or text not found");
@@ -131,8 +130,8 @@ public class SelfServeRegisterUser {
         return foundIt;
     }
 
-    private static int createSSHsession(Optional<String> username, String remoteHost, Optional<String> pathToSSHKey, String destinationHost) throws Exception {
-        Session session = SSH.openTunnel(String.valueOf(username), remoteHost, String.valueOf(pathToSSHKey));
-        return SSH.portForwarding(3309, destinationHost, 3306, session);
+    private static int createSSHsession(Optional<String> username, String pathToSSHKey) throws Exception {
+        Session session = SSH.openTunnel(String.valueOf(username), "dbam.olcs.int.prod.dvsa.aws", String.valueOf(pathToSSHKey));
+        return SSH.portForwarding(3309, "localhost", 3306, session);
     }
 }

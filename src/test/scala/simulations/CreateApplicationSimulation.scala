@@ -16,6 +16,7 @@ class CreateApplicationSimulation extends Simulation {
 
   val httpConfiguration: HttpProtocolBuilder = http.baseUrl(SetUp.baseURL)
     .headers(Headers.requestHeaders)
+    .disableWarmUp
     .disableCaching
     .silentResources
     .perUserNameResolution
