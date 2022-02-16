@@ -108,7 +108,7 @@ public class SelfServeRegisterUser {
         BufferedWriter writer = new BufferedWriter(fileWriter);
         CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
 
-        if (!searchForString(LOGIN_CSV_FILE, CSV_HEADERS)) {
+        if (!searchForString()) {
             csvPrinter.printRecord((Object[]) SelfServeRegisterUser.CSV_HEADERS.split(","));
             csvPrinter.printRecord(Arrays.asList(userId, forename, password));
             csvPrinter.flush();
@@ -116,13 +116,12 @@ public class SelfServeRegisterUser {
             csvPrinter.printRecord(Arrays.asList(userId, forename, password));
             csvPrinter.flush();
         }
-        Thread.sleep(2000);
     }
 
-    private boolean searchForString(String file, String searchText) throws IOException {
+    private boolean searchForString() throws IOException {
         boolean foundIt;
-        File f = new File(file);
-        if (f.exists() && (FileUtils.readFileToString(new File(file), "UTF-8").contains(searchText)))
+        File f = new File(SelfServeRegisterUser.LOGIN_CSV_FILE);
+        if (f.exists() && (FileUtils.readFileToString(new File(SelfServeRegisterUser.LOGIN_CSV_FILE), "UTF-8").contains(SelfServeRegisterUser.CSV_HEADERS)))
             foundIt = true;
         else {
             LOGGER.info("File not found or text not found");

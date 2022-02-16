@@ -1,5 +1,5 @@
 group 'gov.dvsa.vol'
-version '1.0'
+version '1.2'
 
 apply plugin: 'idea'
 apply plugin: 'scala'
@@ -64,9 +64,9 @@ task createApplication(type: JavaExec) {
             "--results-folder", "${buildDir}/gatling-results",
             "--bodies-folder", sourceSets.test.resources
     ]
-//    doLast {
-//        cleanUp.executeTests()
-//    }
+    doLast {
+        cleanUp.executeTests()
+    }
 }
 
 task searchOperator(type: JavaExec) {
