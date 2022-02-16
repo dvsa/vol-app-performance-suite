@@ -1,83 +1,69 @@
 package scenarios
 
-import activesupport.config.Configuration
-import com.typesafe.config.Config
 import io.gatling.core.Predef._
 import io.gatling.core.feeder.BatchableFeederBuilder
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 import utils.SetUp
-import utils.SetUp.env
+import utils.SetUp._
+import utils.Utilities.{CONFIG, password, randomInt}
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
 object CreateAndSubmitApplication {
 
-  val CONFIG: Config = new Configuration().getConfig
-
-
   val newPassword: String = CONFIG.getString("password")
   val feeder: BatchableFeederBuilder[String] = {
     (env) match {
       case "int" =>
-        csv("./loginId_int.csv").circular
+        csv("loginId_int.csv")
       case _=>
-        csv("./loginId.csv").circular
+        csv("loginId.csv")
     }
   }
   val header_ = Map("Accept" -> "*/*")
-  var version : String = _
 
   val selfServiceApplicationRegistration: ScenarioBuilder = scenario("Create and submit application")
     .feed(feeder)
     .exec(http("get login page")
       .get("auth/login/")
-      .disableFollowRedirect
       .headers(header_)
       .check(
         regex(SetUp.securityTokenPattern).
           find.saveAs("securityToken")))
     .pause(300 milliseconds)
-    .doIfOrElse(SetUp.env.equals("int")) {
-      exec(http("login")
-        .post("auth/login/")
-        .check(regex(SetUp.location).find.optional.saveAs("Location"))
-        .formParam("username", "${Username}")
-        .formParam("password", newPassword)
-        .formParam("submit", "Sign in")
-        .formParam("security", "${securityToken}"))
-        .exec(session => session.set("expired-password", "${Location}"))
-    }{
-      exec(http("login")
-        .post("auth/login/")
-        .check(regex(SetUp.location).find.optional.saveAs("Location"))
-        .formParam("username", "${Username}")
-        .formParam("password", "${Password}")
-        .formParam("submit", "Sign in")
-        .formParam("security", "${securityToken}"))
-        .exec(session => session.set("expired-password", "${Location}"))
-    }
     .exec(http("login")
       .post("auth/login/")
       .check(regex(SetUp.location).find.optional.saveAs("Location"))
       .formParam("username", "${Username}")
-      .formParam("password", newPassword)
+      .formParam("password", password())
       .formParam("submit", "Sign in")
-      .formParam("security", "${securityToken}"))
+      .formParam("security", "${securityToken}")
+      .check(regex("Please check your username and password").find.optional.saveAs("PasswordError")))
     .exec(session => session.set("expired-password", "${Location}"))
+    .exec(session => session.set("NotLoggedIn", "${PasswordError}"))
     .pause(450 milliseconds)
-    .doIf(session => session("expired-password").as[String].isEmpty == false) {
-      exec(http("change password")
-        .post("auth/expired-password/${Location}")
-        .formParam("oldPassword", "${Password}")
-        .formParam("newPassword", newPassword)
-        .formParam("confirmPassword", newPassword)
-        .formParam("submit", "Save")
-        .formParam("security", "${securityToken}")
-        .check(bodyString.saveAs("login_response")))
+    .doIf(session => session("expired-password").as[String].isEmpty == false){
+        exec(http("change password")
+          .post("auth/expired-password/${Location}")
+          .formParam("oldPassword", password())
+          .formParam("newPassword", newPassword)
+          .formParam("confirmPassword", newPassword)
+          .formParam("submit", "Save")
+          .formParam("security", "${securityToken}")
+          .check(bodyString.saveAs("login_response")))
     }
     .pause(700 milliseconds)
+    .exec(session => {
+      println(session("login_response").as[String])
+      session
+    })
+    .exec(http("Landing Page")
+      .get("/")
+      .check(regex("${Forename}"))
+      .check(bodyString.saveAs("login_response")))
+    .pause(650 milliseconds)
     .exec(session => {
       println(session("login_response").as[String])
       session
@@ -86,25 +72,26 @@ object CreateAndSubmitApplication {
       .post("application/create/")
       .formParam("type-of-licence[operator-location]", "N")
       .formParam("type-of-licence[operator-type]", "lcat_gv")
-      .formParam("type-of-licence[licence-type]", "ltyp_sn")
+      .formParam("type-of-licence[licence-type]", "ltyp_si")
       .formParam("form-actions[saveAndContinue]", "")
       .formParam("security", "${securityToken}"))
-    .pause(650 milliseconds)
-    .exec(http("Show dashboard")
-      .get("/")
-      .check(regex("""href="/application/([^"]*)/"""").find.saveAs("applicationId")))
-    .pause(850 milliseconds)
+      .pause(950 milliseconds)
+      .exec(http("Show dashboard")
+        .get("/")
+        .check(regex("""href="/application/([^"]*)/"""").find.saveAs("applicationId")))
+      .pause(850 milliseconds)
     .exec(http("business type")
       .post("application/${applicationId}/business-type/")
+      .disableFollowRedirect
       .formParam("data[type]", "org_t_rc")
       .formParam("form-actions[saveAndContinue]", "")
-      .formParam("version", "4")
+      .formParam("version", "1")
       .formParam("security", "${securityToken}")
-      .check(css("h1:contains('Business type')").exists))
+      .check(status.in(200,209,302,304)))
     .pause(1000 milliseconds)
     .exec(http("business details")
       .post("application/${applicationId}/business-details/")
-      .formParam("registeredAddress[version]", "2")
+      .formParam("registeredAddress[version]", "")
       .formParam("data[companyNumber][company_number]", "41078510")
       .formParam("data[natureOfBusiness]", "apiTesting")
       .formParam("registeredAddress[addressLine1]", "API+House")
@@ -113,13 +100,13 @@ object CreateAndSubmitApplication {
       .formParam("registeredAddress[postcode]", "NG23HX")
       .formParam("table[rows]", "0")
       .formParam("form-actions[saveAndContinue]", "")
-      .formParam("version", "4")
+      .formParam("version", "1")
       .formParam("security", "${securityToken}"))
     .pause(950 millisecond)
     .exec(http("addresses")
       .post("application/${applicationId}/addresses/")
-      .formParam("correspondence_address[version]", "1")
-      .formParam("correspondence[version]", "(//d+)")
+      .formParam("correspondence_address[version]", "")
+      .formParam("correspondence[version]","")
       .formParam("correspondence_address[searchPostcode][postcode]", "NG1 5FW")
       .formParam("correspondence_address[addressLine1]", "3 WOLLATON STREET")
       .formParam("correspondence_address[town]", "NOTTINGHAM")
@@ -128,11 +115,10 @@ object CreateAndSubmitApplication {
       .formParam("registeredAddress[postcode]", "NG23HX")
       .formParam("correspondence_address[countryCode]", "GB")
       .formParam("contact[phone_primary]", "07123456789")
-      .formParam("contact[phone_primary_version]", "1")
+      .formParam("contact[phone_primary_version]", "")
       .formParam("contact[email]", "test@test.com")
       .formParam("establishment_address[countryCode]", "GB")
-      .formParam("security", "${securityToken}")
-      .check(css("h1:contains('Addresses')").exists))
+      .formParam("security", "${securityToken}"))
     .pause(890 milliseconds)
     .exec(http("people")
       .post("application/${applicationId}/people/add/")
@@ -165,15 +151,16 @@ object CreateAndSubmitApplication {
       .formParam("advertisements[radio]", "adSendByPost")
       .formParam("data[permission][permission]", "Y")
       .formParam("form-actions[submit]", "")
-      .formParam("version", "")
+      .formParam("version", "1")
       .formParam("security", "${securityToken}"))
     .pause(1500 milliseconds)
     .exec(http("submit operating centres")
       .post("application/${applicationId}/operating-centres/")
       .formParam("table[rows]", "1")
-      .formParam("data[version]", "5")
+      .formParam("data[version]", "2")
       .formParam("data[totAuthHgvVehiclesFieldset][totAuthHgvVehicles]", "5")
       .formParam("data[totAuthTrailersFieldset][totAuthTrailers]", "5")
+      .formParam("data[totCommunityLicencesFieldset][totCommunityLicences]", "3")
       .formParam("form-actions[saveAndContinue]", "")
       .formParam("security", "${securityToken}"))
     .pause(3 seconds)
@@ -185,7 +172,7 @@ object CreateAndSubmitApplication {
       .formParam("evidence[files][__messages__]", "")
       .formParam("evidence[uploadNow]", "0")
       .formParam("form-actions[saveAndContinue]", "")
-      .formParam("version", "")
+      .formParam("version", "3")
       .formParam("id", "${applicationId}")
       .formParam("security", "${securityToken}"))
     .pause(850 milliseconds)
@@ -249,7 +236,7 @@ object CreateAndSubmitApplication {
       .post("application/${applicationId}/transport-managers/tm-declaration/${tmaId}")
       .formParam("content[isDigitallySigned]", "N")
       .formParam("form-actions[submit]", "")
-      .formParam("version", "")
+      .formParam("version", _=> randomInt())
       .formParam("security", "${securityToken}"))
     .pause(5)
     .exec(http("submit vehicle")
@@ -257,7 +244,7 @@ object CreateAndSubmitApplication {
       .formParam("query[vrm]", "")
       .formParam("query[disc]", "")
       .formParam("query[includeRemoved]", "")
-      .formParam("data[version]", "8")
+      .formParam("data[version]",  "4")
       .formParam("data[hasEnteredReg]", "N")
       .formParam("vehicles[rows]", "0")
       .formParam("form-actions[saveAndContinue]", "")
@@ -278,7 +265,7 @@ object CreateAndSubmitApplication {
     .pause(850 milliseconds)
     .exec(http("safety compliance")
       .post("application/${applicationId}/safety/")
-      .formParam("licence[version]", "3")
+      .formParam("licence[version]", "6")
       .formParam("licence[safetyInsVehicles]", "10")
       .formParam("licence[safetyInsTrailers]", "5")
       .formParam("licence[safetyInsVaries]", "N")
@@ -293,7 +280,7 @@ object CreateAndSubmitApplication {
     .exec(http("finance history")
       .post("application/${applicationId}/financial-history")
       .formParam("data[id]", "${applicationId}")
-      .formParam("data[version]", "2")
+      .formParam("data[version]", "6")
       .formParam("data[bankrupt]", "N")
       .formParam("data[liquidation]", "N")
       .formParam("data[receivership]", "N")
@@ -325,12 +312,12 @@ object CreateAndSubmitApplication {
       .formParam("assets[prevPurchasedAssets]", "N")
       .formParam("assets[prevPurchasedAssets-table][rows]", "0")
       .formParam("form-actions[saveAndContinue]", "")
-      .formParam("version", "3")
+      .formParam("version", "7")
       .formParam("security", "${securityToken}"))
     .pause(2 milliseconds)
     .exec(http("convictions penalties")
       .post("application/${applicationId}/convictions-penalties")
-      .formParam("data[version]", "4")
+      .formParam("data[version]", "8")
       .formParam("data[question]", "N")
       .formParam("data[table][rows]", "0")
       .formParam("convictionsConfirmation[convictionsConfirmation]", "Y")
@@ -340,13 +327,27 @@ object CreateAndSubmitApplication {
     .exec(http("undertakings")
       .post("application/${applicationId}/undertakings/")
       .formParam("declarationsAndUndertakings[signatureOptions]", "N")
-      .formParam("declarationsAndUndertakings[version]", "10")
+      .formParam("interim[goodsApplicationInterim]", "N")
+      .formParam("interim[goodsApplicationInterimReason]", "")
+      .formParam("declarationsAndUndertakings[version]", "9")
       .formParam("declarationsAndUndertakings[id]", "${applicationId}")
       .formParam("form-actions[submitAndPay]", "")
       .formParam("security", "${securityToken}")
+      .check(regex("(.*) Application Fee for application ${applicationId}"))
       .check(bodyString.saveAs("undertakings")))
     .exec(session => {
       println(session("undertakings").as[String])
+      session
+    })
+    .pause(1500 milliseconds)
+    .exec(http("navigate to cpms")
+      .post("application/${applicationId}/pay-and-submit/")
+      .formParam("form-actions[pay]", "")
+      .formParam("security", "${securityToken}")
+      .check(bodyString.saveAs("pay"))
+      .check(regex(SetUp.cpmsRedirectURL).find.exists))
+    .exec(session => {
+      println(session("pay").as[String])
       session
     })
     .pause(3 seconds)

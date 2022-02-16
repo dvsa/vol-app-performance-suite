@@ -1,4 +1,2 @@
-authToken = ""
-apiKey = ""
-qa = ""
-int = ""
+password =
+intPassword =

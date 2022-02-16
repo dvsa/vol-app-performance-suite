@@ -14,8 +14,9 @@
  These are the environments that are currently supported
  `env = qa/da/...`
 `site = ss/internal`
+ `typeOfTest = load,soak,stress`
  
-`gradle createApplication -Denv={qa} -Dsite={ss} -Dusers={2} -DrampUp={0} -Dduration={0}`
+`gradle createApplication -Denv={qa} -Dsite={ss} -Dusers={2} -DrampUp={0} -Dduration={0} -DtypeOfTest=`
 
  Please remove the braces when running.
  

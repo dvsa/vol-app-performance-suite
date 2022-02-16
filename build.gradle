@@ -19,13 +19,13 @@ repositories {
 }
 
 dependencies {
-    compile 'io.gatling.highcharts:gatling-charts-highcharts:3.7.3'
-    compile 'io.gatling:gatling-core:3.7.3'
-    compile 'io.gatling:gatling-http:3.7.3'
+    compile 'io.gatling.highcharts:gatling-charts-highcharts:3.7.4'
+    compile 'io.gatling:gatling-core:3.7.4'
+    compile 'io.gatling:gatling-http:3.7.4'
     compile 'org.scala-lang:scala-library:2.13.7'
     compile 'org.apache.commons:commons-csv:1.8'
-    compile 'org.dvsa.testing.lib:active-support:1.6.4'
-    compile 'org.dvsa.testing.lib:uri-constructor:1.5.4'
+    compile 'org.dvsa.testing.lib:active-support:1.6.5'
+    compile 'org.dvsa.testing.lib:uri-constructor:1.5.6'
     compile 'org.dvsa.testing.framework:vol-api-calls:1.1.8'
 }
 
@@ -64,45 +64,9 @@ task createApplication(type: JavaExec) {
             "--results-folder", "${buildDir}/gatling-results",
             "--bodies-folder", sourceSets.test.resources
     ]
-    doLast {
-        cleanUp.executeTests()
-    }
-}
-
-task createApplicationSoak(type: JavaExec) {
-    doFirst {
-        registerUsersViaAPI.executeTests()
-    }
-    description = "Load testing with Gatling"
-    classpath = sourceSets.test.runtimeClasspath
-    main = "io.gatling.app.Gatling"
-    //Specify the simulation to run
-    args = [
-            "--simulation", "simulations.CreateApplicationSimulationSoak",
-            "--results-folder", "${buildDir}/gatling-results",
-            "--bodies-folder", sourceSets.test.resources
-    ]
-    doLast {
-        cleanUp.executeTests()
-    }
-}
-
-task createApplicationStress(type: JavaExec) {
-    doFirst {
-        registerUsersViaAPI.executeTests()
-    }
-    description = "Load testing with Gatling"
-    classpath = sourceSets.test.runtimeClasspath
-    main = "io.gatling.app.Gatling"
-    //Specify the simulation to run
-    args = [
-            "--simulation", "simulations.CreateApplicationStressSimulation",
-            "--results-folder", "${buildDir}/gatling-results",
-            "--bodies-folder", sourceSets.test.resources
-    ]
-    doLast {
-        cleanUp.executeTests()
-    }
+//    doLast {
+//        cleanUp.executeTests()
+//    }
 }
 
 task searchOperator(type: JavaExec) {
