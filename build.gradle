@@ -8,13 +8,11 @@ apply plugin: 'application'
 
 repositories {
     mavenLocal()
-    mavenCentral()
     maven {
         url "https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases"
-        authentication {
-                         basic(BasicAuthentication)
-        }}
-    }
+
+    mavenCentral()
+}
 
 dependencies {
     implementation group: 'io.gatling.highcharts', name: 'gatling-charts-highcharts', version:'3.7.4'
