@@ -25,7 +25,7 @@ dependencies {
     compile 'org.scala-lang:scala-library:2.13.7'
     compile 'org.apache.commons:commons-csv:1.8'
     compile 'org.dvsa.testing.lib:active-support:1.6.5'
-    compile 'org.dvsa.testing.lib:uri-constructor:1.5.6'
+    compile 'org.dvsa.testing.lib:uri-constructor:1.5.7'
     compile 'org.dvsa.testing.framework:vol-api-calls:1.1.11'
 }
 
