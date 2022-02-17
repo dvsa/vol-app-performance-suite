@@ -10,7 +10,7 @@ repositories {
     mavenLocal()
     maven {
         url "https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases"
-
+    }
     mavenCentral()
 }
 
