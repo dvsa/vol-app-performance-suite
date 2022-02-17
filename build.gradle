@@ -8,7 +8,6 @@ apply plugin: 'application'
 
 repositories {
     mavenLocal()
-    mavenCentral()
     maven {
         url "https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases"
         credentials {
@@ -16,6 +15,7 @@ repositories {
             password = System.getProperty("nexusPassword")
         }
     }
+    mavenCentral()
 }
 
 dependencies {
