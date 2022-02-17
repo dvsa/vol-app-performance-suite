@@ -19,14 +19,15 @@ repositories {
 }
 
 dependencies {
-    compile 'io.gatling.highcharts:gatling-charts-highcharts:3.7.4'
-    compile 'io.gatling:gatling-core:3.7.4'
-    compile 'io.gatling:gatling-http:3.7.4'
-    compile 'org.scala-lang:scala-library:2.13.7'
-    compile 'org.apache.commons:commons-csv:1.8'
-    testCompile ("org.dvsa.testing.lib:active-support:1.6.5")
-    testCompile("org.dvsa.testing.lib:uri-constructor:1.5.7")
-    testCompile ("org.dvsa.testing.framework:vol-api-calls:1.1.11")
+    implementation group: 'io.gatling.highcharts', name: 'gatling-charts-highcharts', version:'3.7.4'
+    implementation group: 'io.gatling', name: 'gatling-core', version:'3.7.4'
+    implementation group: 'io.gatling', name: 'gatling-http', version:'3.7.4'
+    implementation group: 'org.scala-lang', name: 'scala-library', version:'2.13.7'
+    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
+
+    implementation group: 'org.dvsa.testing.lib', name: 'active-support', version:'1.6.5'
+    implementation group: 'org.dvsa.testing.lib', name: 'uri-constructor', version:'1.5.7'
+    implementation group: 'org.dvsa.testing.framework', name: 'vol-api-calls', version:'1.1.11'
 }
 
 
