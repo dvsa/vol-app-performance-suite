@@ -25,6 +25,8 @@ import java.sql.*;
 import java.util.Arrays;
 import java.util.Optional;
 
+import static java.lang.Thread.sleep;
+
 
 public class SelfServeRegisterUser {
 
@@ -36,22 +38,24 @@ public class SelfServeRegisterUser {
     private String users = System.getProperty("users");
 
 
-    public static void getExternalUsersFromTable(){
-        try{
+    public static void getExternalUsersFromTable() {
+        try {
             createTunnel();
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection con = DriverManager.getConnection(
-                    "jdbc:mysql://olcsdb-rds.int.olcs.dvsacloud.uk:3306/OLCS_RDS_OLCSDB?user={user:}&password={password:}?useSSL=FALSE");
-            Statement stmt=con.createStatement();
-            ResultSet rs=stmt.executeQuery(SQLquery.getUsersSql("10"));
-            while(rs.next())
-                System.out.println(rs.getString("Username")+"  "+rs.getString("Forename"));
+                    "jdbc:mysql://olcsdb-rds.int.olcs.dvsacloud.uk:3306/OLCS_RDS_OLCSDB?user={user}&password={password}?useSSL=FALSE");
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery(SQLquery.getUsersSql("10"));
+            while (rs.next())
+                System.out.println(rs.getString("Username") + "  " + rs.getString("Forename"));
             con.close();
-        }catch(Exception e){ System.out.println(e);}
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 
-    public String htmlTableRowCounter(String table){
-        Document document = Jsoup.parse(table, "",  Parser.xmlParser());
+    public String htmlTableRowCounter(String table) {
+        Document document = Jsoup.parse(table, "", Parser.xmlParser());
         Elements element = document.select("tr.row");
         return String.valueOf(element.size());
     }
@@ -85,7 +89,7 @@ public class SelfServeRegisterUser {
             registerUser.registerUser();
             String email = registerUser.getEmailAddress();
             password = S3.getTempPassword(email, "devapp-olcs-pri-olcs-autotest-s3");
-            writeToFile(registerUser.getUserName(), registerUser.getForeName(),password);
+            writeToFile(registerUser.getUserName(), registerUser.getForeName(), password);
         }
     }
 
@@ -96,7 +100,7 @@ public class SelfServeRegisterUser {
         Optional<String> sshPrivateKeyPath = Optional.ofNullable(System.getProperty("sshPrivateKeyPath"));
 
         System.setProperty("dbUsername", "dbUsername");
-        System.setProperty("dbPassword","dbPassword");
+        System.setProperty("dbPassword", "dbPassword");
 
         if (ldapUsername.isPresent()) {
             dbURL.setPortNumber(createSSHsession(ldapUsername, String.valueOf(sshPrivateKeyPath)));
@@ -118,12 +122,12 @@ public class SelfServeRegisterUser {
         }
     }
 
-    private boolean searchForString() throws IOException {
+    private boolean searchForString() throws IOException, InterruptedException {
         boolean foundIt;
         File f = new File(SelfServeRegisterUser.LOGIN_CSV_FILE);
-        if (f.exists() && (FileUtils.readFileToString(new File(SelfServeRegisterUser.LOGIN_CSV_FILE), "UTF-8").contains(SelfServeRegisterUser.CSV_HEADERS)))
+        if (f.exists() && (FileUtils.readFileToString(new File(SelfServeRegisterUser.LOGIN_CSV_FILE), "UTF-8").contains(SelfServeRegisterUser.CSV_HEADERS))) {
             foundIt = true;
-        else {
+        } else {
             LOGGER.info("File not found or text not found");
             foundIt = false;
         }

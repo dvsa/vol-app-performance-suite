@@ -17,9 +17,9 @@ object CreateAndSubmitApplication {
   val feeder: BatchableFeederBuilder[String] = {
     (env) match {
       case "int" =>
-        csv("loginId_int.csv")
+        csv("loginId_int.csv").eager
       case _=>
-        csv("loginId.csv")
+        csv("loginId.csv").eager
     }
   }
   val header_ = Map("Accept" -> "*/*")
@@ -32,21 +32,19 @@ object CreateAndSubmitApplication {
       .check(
         regex(SetUp.securityTokenPattern).
           find.saveAs("securityToken")))
-    .pause(300 milliseconds)
+    .pause(1 seconds)
     .exec(http("login")
       .post("auth/login/")
       .check(regex(SetUp.location).find.optional.saveAs("Location"))
       .formParam("username", "${Username}")
       .formParam("password", password())
       .formParam("submit", "Sign in")
-      .formParam("security", "${securityToken}")
-      .check(regex("Please check your username and password").find.optional.saveAs("PasswordError")))
+      .formParam("security", "${securityToken}"))
     .exec(session => session.set("expired-password", "${Location}"))
-    .exec(session => session.set("NotLoggedIn", "${PasswordError}"))
-    .pause(450 milliseconds)
+    .pause(2 seconds)
     .doIf(session => session("expired-password").as[String].isEmpty == false){
         exec(http("change password")
-          .post("auth/expired-password/${Location}")
+          .post("auth/expired-password/")
           .formParam("oldPassword", password())
           .formParam("newPassword", newPassword)
           .formParam("confirmPassword", newPassword)
