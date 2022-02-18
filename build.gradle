@@ -10,23 +10,24 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven {
-        url "https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases"
         credentials {
-            username = System.getProperty("nexusUser")
-            password = System.getProperty("nexusPassword")
+            username System.getProperty("nexusUser")
+            password System.getProperty("nexusPassword")
         }
+        url "https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases"
     }
 }
 
 dependencies {
-    compile 'io.gatling.highcharts:gatling-charts-highcharts:3.7.4'
-    compile 'io.gatling:gatling-core:3.7.4'
-    compile 'io.gatling:gatling-http:3.7.4'
-    compile 'org.scala-lang:scala-library:2.13.7'
-    compile 'org.apache.commons:commons-csv:1.8'
-    compile 'org.dvsa.testing.lib:active-support:1.6.5'
-    compile 'org.dvsa.testing.lib:uri-constructor:1.5.6'
-    compile 'org.dvsa.testing.framework:vol-api-calls:1.1.8'
+    testCompile group: 'io.gatling.highcharts', name: 'gatling-charts-highcharts', version:'3.7.4'
+    testCompile group: 'io.gatling', name: 'gatling-core', version:'3.7.4'
+    testCompile group: 'io.gatling', name: 'gatling-http', version:'3.7.4'
+    testCompile group: 'org.scala-lang', name: 'scala-library', version:'2.13.7'
+    testCompile group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
+
+    testCompile group: 'org.dvsa.testing.lib', name: 'active-support', version:'1.6.5'
+    testCompile group: 'org.dvsa.testing.lib', name: 'uri-constructor', version:'1.5.7'
+    testCompile group: 'org.dvsa.testing.framework', name: 'vol-api-calls', version:'1.1.11'
 }
 
 

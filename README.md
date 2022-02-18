@@ -28,14 +28,14 @@
  
   In a terminal window, powershell window or cmd paste the below command
   
- `gradle registerUser  -Denv={qa} -Dsite={ss} -Dusers={2} -DrampUp={0} -Dduration={0}`
+ `gradle registerUser  -Denv={qa} -Dsite={ss} -Dusers={2} -DrampUp={0} -Dduration={0} -DtypeOfTest=`
 
 
 ## Running External Search Script
  
   In a terminal window, powershell window or cmd paste the below command
   
- `gradle searchOperator  -Denv={qa} -Dsite={ss} -Dusers={2} -DrampUp={0} -Dduration={0}`
+ `gradle searchOperator  -Denv={qa} -Dsite={ss} -Dusers={2} -DrampUp={0} -Dduration={0} -DtypeOfTest=`
  
 ## Reports
  - Reports can be found in build/gatling-results/
