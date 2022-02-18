@@ -6,14 +6,12 @@ import io.gatling.core.feeder.BatchableFeederBuilder
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 import utils.SetUp._
-import utils.Utilities.CONFIG
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
 object CreateAndSubmitApplication extends ApplicationJourneySteps {
 
-  val newPassword: String = CONFIG.getString("password")
   val feeder: BatchableFeederBuilder[String] = {
     (env) match {
       case "int" =>
@@ -22,7 +20,6 @@ object CreateAndSubmitApplication extends ApplicationJourneySteps {
         csv("loginId.csv").eager
     }
   }
-  val header_ = Map("Accept" -> "*/*")
 
   val selfServiceApplicationRegistration: ScenarioBuilder = scenario("Create and submit application")
     .feed(feeder)
