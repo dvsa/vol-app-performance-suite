@@ -10,10 +10,6 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven {
-        credentials {
-            username System.getProperty("nexusUser")
-            password System.getProperty("nexusPassword")
-        }
         url "https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases"
     }
 }
