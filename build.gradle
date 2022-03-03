@@ -15,15 +15,15 @@ repositories {
 }
 
 dependencies {
-    testCompile group: 'io.gatling.highcharts', name: 'gatling-charts-highcharts', version:'3.7.4'
-    testCompile group: 'io.gatling', name: 'gatling-core', version:'3.7.4'
-    testCompile group: 'io.gatling', name: 'gatling-http', version:'3.7.4'
-    testCompile group: 'org.scala-lang', name: 'scala-library', version:'2.13.7'
-    testCompile group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
+    implementation group: 'io.gatling.highcharts', name: 'gatling-charts-highcharts', version: '3.7.5'
+    implementation group: 'io.gatling', name: 'gatling-core', version:'3.7.5'
+    implementation group: 'io.gatling', name: 'gatling-http', version:'3.7.5'
+    implementation group: 'org.scala-lang', name: 'scala-library', version:'2.13.7'
+    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
 
-    testCompile group: 'org.dvsa.testing.lib', name: 'active-support', version:'1.6.5'
-    testCompile group: 'org.dvsa.testing.lib', name: 'uri-constructor', version:'1.5.7'
-    testCompile group: 'org.dvsa.testing.framework', name: 'vol-api-calls', version:'1.1.11'
+    implementation group: 'org.dvsa.testing.lib', name: 'active-support', version:'1.6.5'
+    implementation group: 'org.dvsa.testing.lib', name: 'uri-constructor', version:'1.5.7'
+    implementation group: 'org.dvsa.testing.framework', name: 'vol-api-calls', version:'1.1.11'
 }
 
 
@@ -62,7 +62,7 @@ task createApplication(type: JavaExec) {
             "--bodies-folder", sourceSets.test.resources
     ]
     doLast {
-        cleanUp.executeTests()
+//        cleanUp.executeTests()
     }
 }
 

@@ -4,7 +4,7 @@ import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import io.gatling.http.request.builder.HttpRequestBuilder
 import utils.SetUp
-import utils.Utilities.{CONFIG, password, randomInt}
+import utils.Utilities.{CONFIG, orderRef, password, randomInt}
 
 import scala.language.postfixOps
 
@@ -12,6 +12,15 @@ class ApplicationJourneySteps {
 
   val newPassword: String = CONFIG.getString("password")
   val header_ = Map("Accept" -> "*/*")
+
+  private val headers_1 = Map(
+    "Origin" -> SetUp.baseURL,
+    "Sec-Fetch-Dest" -> "document",
+    "Sec-Fetch-Mode" -> "navigate",
+    "Sec-Fetch-Site" -> "same-origin",
+    "Sec-Fetch-User" -> "?1",
+    "content-type" -> "application/x-www-form-urlencoded"
+  )
 
   val getLoginPage: HttpRequestBuilder = http("get login page")
     .get("auth/login/")
@@ -35,50 +44,86 @@ class ApplicationJourneySteps {
     .formParam("confirmPassword", newPassword)
     .formParam("submit", "Save")
     .formParam("security", "${securityToken}")
-    .check(bodyString.saveAs("login_response"))
 
   val landingPage: HttpRequestBuilder = http("Landing Page")
     .get("/")
     .check(regex("${Forename}"))
     .check(bodyString.saveAs("login_response"))
 
-  val chooseCountry: HttpRequestBuilder = http("choose country")
+  val createNonLGVApplication: HttpRequestBuilder = http("choose country")
     .post("application/create/")
     .formParam("type-of-licence[operator-location]", "N")
     .formParam("type-of-licence[operator-type]", "lcat_gv")
-    .formParam("type-of-licence[licence-type]", "ltyp_si")
+    .formParam("type-of-licence[licence-type]", "ltyp_sn")
     .formParam("form-actions[saveAndContinue]", "")
     .formParam("security", "${securityToken}")
+
+  val getCreateApplicationPage: HttpRequestBuilder = http("get application")
+    .get("application/create/")
+
+  val createLGVApplication: HttpRequestBuilder = http("create application")
+    .post("application/create/")
+    .headers(headers_1)
+    .check(
+      regex(SetUp.securityTokenPattern).
+        find.saveAs("securityToken"))
+    .formParam("type-of-licence[operator-location]", "N")
+    .formParam("type-of-licence[operator-type]", "lcat_gv")
+    .formParam("type-of-licence[licence-type][licence-type]", "ltyp_si")
+    .formParam("type-of-licence[licence-type][ltyp_siContent][vehicle-type]", "app_veh_type_lgv")
+    .formParam("type-of-licence[licence-type][ltyp_siContent][lgv-declaration][lgv-declaration-confirmation]", "0")
+    .formParam("type-of-licence[licence-type][ltyp_siContent][lgv-declaration][lgv-declaration-confirmation]", "1")
+    .formParam("form-actions[saveAndContinue]", "")
+    .formParam("version", "")
+    .formParam("security", "${securityToken}")
+
 
   val showDashboard: HttpRequestBuilder = http("Show dashboard")
     .get("/")
-    .check(regex("""href="/application/([^"]*)/"""").find.saveAs("applicationId"))
+    .check(regex("""href="/application/(.+?)/"""").find.saveAs("applicationNumber"))
+
+  val getBusinessTypePage: HttpRequestBuilder = http("Show Business Type Page")
+    .get("application/${applicationNumber}/business-type/")
+    .check(
+      regex(SetUp.securityTokenPattern).
+        find.saveAs("securityToken"))
 
   val businessType: HttpRequestBuilder = http("business type")
-    .post("application/${applicationId}/business-type/")
-    .disableFollowRedirect
+    .post("application/${applicationNumber}/business-type/")
+    .headers(headers_1)
     .formParam("data[type]", "org_t_rc")
     .formParam("form-actions[saveAndContinue]", "")
-    .formParam("version", "1")
+    .formParam("version", "4")
     .formParam("security", "${securityToken}")
     .check(status.in(200,209,302,304))
 
+  val getBusinessDetailsPage: HttpRequestBuilder = http("Show Business Details Page")
+    .get("application/${applicationNumber}/business-details/")
+    .headers(headers_1)
+    .check(
+      regex(SetUp.securityTokenPattern).
+        find.saveAs("securityToken"))
+
   val businessDetails: HttpRequestBuilder = http("business details")
-    .post("application/${applicationId}/business-details/")
-    .formParam("registeredAddress[version]", "")
+    .post("application/${applicationNumber}/business-details/")
+    .headers(headers_1)
+    .formParam("data[tradingNames][0][name]", "")
+    .formParam("data[tradingNames][0][id]", "")
+    .formParam("data[tradingNames][0][version]", "")
+    .formParam("registeredAddress[version]", "2")
     .formParam("data[companyNumber][company_number]", "41078510")
-    .formParam("data[natureOfBusiness]", "apiTesting")
-    .formParam("registeredAddress[addressLine1]", "API+House")
-    .formParam("registeredAddress[addressLine2]", "API+House")
+    .formParam("data[natureOfBusiness]", "Performance Testing")
+    .formParam("registeredAddress[addressLine1]", "1 Gatling House")
+    .formParam("registeredAddress[addressLine2]", "VOL")
     .formParam("registeredAddress[town]", "Nottingham")
     .formParam("registeredAddress[postcode]", "NG23HX")
     .formParam("table[rows]", "0")
     .formParam("form-actions[saveAndContinue]", "")
-    .formParam("version", "1")
+    .formParam("version", "5")
     .formParam("security", "${securityToken}")
 
   val addresses: HttpRequestBuilder = http("addresses")
-    .post("application/${applicationId}/addresses/")
+    .post("application/${applicationNumber}/addresses/")
     .formParam("correspondence_address[version]", "")
     .formParam("correspondence[version]","")
     .formParam("correspondence_address[searchPostcode][postcode]", "NG1 5FW")
@@ -94,8 +139,23 @@ class ApplicationJourneySteps {
     .formParam("establishment_address[countryCode]", "GB")
     .formParam("security", "${securityToken}")
 
+  val getLicenceAuthorisationPage: HttpRequestBuilder = http("Show Licence Authorisation Page")
+    .get("application/${applicationNumber}/operating-centres/")
+    .check(
+      regex(SetUp.securityTokenPattern).
+        find.saveAs("securityToken"))
+
+  val licenceAuthorisation: HttpRequestBuilder = http("licence authorisation")
+    .post("application/${applicationNumber}/operating-centres/")
+    .headers(headers_1)
+    .formParam("data[version]", "2")
+    .formParam("data[totAuthLgvVehiclesFieldset][totAuthLgvVehicles]", "5")
+    .formParam("data[totCommunityLicencesFieldset][totCommunityLicences]","5")
+    .formParam("form-actions[saveAndContinue]", "")
+    .formParam("security", "${securityToken}")
+
   val director: HttpRequestBuilder = http("people")
-    .post("application/${applicationId}/people/add/")
+    .post("application/${applicationNumber}/people/add/")
     .formParam("data[title]", "title_mr")
     .formParam("data[forename]", "Director")
     .formParam("data[familyName]", "Gatling")
@@ -108,13 +168,13 @@ class ApplicationJourneySteps {
     .formParam("security", "${securityToken}")
 
   val saveDirectorDetails: HttpRequestBuilder = http("people")
-    .post("application/${applicationId}/people/")
+    .post("application/${applicationNumber}/people/")
     .formParam("table[rows]", "1")
     .formParam("form-actions[saveAndContinue]", "")
     .formParam("security", "${securityToken}")
 
   val operatingCentreDetails: HttpRequestBuilder = http("add operating centres")
-    .post("application/${applicationId}/operating-centres/add/")
+    .post("application/${applicationNumber}/operating-centres/add/")
     .formParam("address[searchPostcode][postcode]", "NG1 5FW")
     .formParam("address[addressLine1]", "3 WOLLATON STREET")
     .formParam("address[town]", "NOTTINGHAM")
@@ -129,7 +189,7 @@ class ApplicationJourneySteps {
     .formParam("security", "${securityToken}")
 
   val operatorCentreVehicleDetails: HttpRequestBuilder = http("submit operating centres")
-    .post("application/${applicationId}/operating-centres/")
+    .post("application/${applicationNumber}/operating-centres/")
     .formParam("table[rows]", "1")
     .formParam("data[version]", "2")
     .formParam("data[totAuthHgvVehiclesFieldset][totAuthHgvVehicles]", "5")
@@ -139,7 +199,7 @@ class ApplicationJourneySteps {
     .formParam("security", "${securityToken}")
 
   val financialEvidence: HttpRequestBuilder = http("submit financial evidence")
-    .post("application/${applicationId}/financial-evidence/")
+    .post("application/${applicationNumber}/financial-evidence/")
     .formParam("evidence[uploadedFileCount]", "0")
     .formParam("evidence[files][fileCount]", "")
     .formParam("evidence[files][file]", "(binary)")
@@ -147,25 +207,56 @@ class ApplicationJourneySteps {
     .formParam("evidence[uploadNow]", "0")
     .formParam("form-actions[saveAndContinue]", "")
     .formParam("version", "3")
-    .formParam("id", "${applicationId}")
+    .formParam("id", "${applicationNumber}")
     .formParam("security", "${securityToken}")
 
+  val getTransportManagersPage: HttpRequestBuilder = http("Show Transport Manager Page")
+    .get("application/${applicationNumber}/transport-managers/")
+    .check(
+      regex(SetUp.securityTokenPattern).
+        find.saveAs("securityToken"))
+
   val transportManagersPage: HttpRequestBuilder = http("add transport manager")
-    .post("application/${applicationId}/transport-managers/")
+    .post("application/${applicationNumber}/transport-managers/")
+    .headers(headers_1)
     .formParam("table[rows]", "0")
     .formParam("table[action]", "Add")
     .formParam("security", "${securityToken}")
-    .check(regex("""value="(\d+)""").find.saveAs("transportManagerId"))
 
-  val transportManager: HttpRequestBuilder = http("select transport manager")
-    .post("application/${applicationId}/transport-managers/add/")
+  val navigateToAddTransportManagersPage: HttpRequestBuilder = http("Navigate To Add TM Page")
+    .post("application/${applicationNumber}/transport-managers/add/")
+    .headers(headers_1)
+    .disableFollowRedirect
+    .formParam("data[registeredUser]", "")
+    .formParam("data[addUser]", "")
+    .formParam("security", "${securityToken}")
+    .check(status.in(200,209,302,304))
+
+  val transportManagersDetails: HttpRequestBuilder = http("Add Transport Manager Details")
+    .post("application/${applicationNumber}/transport-managers/addNewUser/")
+    .headers(headers_1)
+    .formParam("data[forename]", "LGV-Stefan-Andy")
+    .formParam("data[familyName]", "Gatling")
+    .formParam("data[birthDate][day]", "10")
+    .formParam("data[birthDate][month]", "10")
+    .formParam("data[birthDate][year]", "1990")
+    .formParam("data[hasEmail]", "Y")
+    .formParam("data[username]", _ => s"""GatlingUser${orderRef()}""")
+    .formParam("data[emailAddress]", "Gatling@vol.gov")
+    .formParam("data[emailConfirm]", "Gatling@vol.gov")
+    .formParam("data[translateToWelsh]", "N")
+    .formParam("form-actions[continue]", "")
+    .formParam("security", "${securityToken}")
+
+  val selectTransportManager: HttpRequestBuilder = http("select transport manager")
+    .post("application/${applicationNumber}/transport-managers/add/")
     .formParam("data[registeredUser]", "${transportManagerId}")
     .formParam("form-actions[continue]", "")
     .formParam("security", "${securityToken}")
     .check(currentLocationRegex("""details/(.*)""").saveAs("tmaId"))
 
   val transportManagerDetails: HttpRequestBuilder = http("submit transport manager")
-    .post("application/${applicationId}/transport-managers/details/${tmaId}")
+    .post("application/${applicationNumber}/transport-managers/details/${tmaId}")
     .formParam("details[birthDate][day]", "12")
     .formParam("details[birthDate][month]", "08")
     .formParam("details[birthDate][year]", "1970")
@@ -202,19 +293,19 @@ class ApplicationJourneySteps {
     .formParam("security", "${securityToken}")
 
   val transportManagerAnswers: HttpRequestBuilder =  http("submit check your answers")
-    .post("application/${applicationId}/transport-managers/check-answer/${tmaId}confirm/")
+    .post("application/${applicationNumber}/transport-managers/check-answer/${tmaId}confirm/")
     .formParam("form-actions[submit]", "")
     .formParam("security", "${securityToken}")
 
   val submitTransportManagerAnswers: HttpRequestBuilder = http("submit check your answers")
-    .post("application/${applicationId}/transport-managers/tm-declaration/${tmaId}")
+    .post("application/${applicationNumber}/transport-managers/tm-declaration/${tmaId}")
     .formParam("content[isDigitallySigned]", "N")
     .formParam("form-actions[submit]", "")
     .formParam("version", _=> randomInt())
     .formParam("security", "${securityToken}")
 
   val vehicleDetails: HttpRequestBuilder = http("submit vehicle")
-    .post("application/${applicationId}/vehicles")
+    .post("application/${applicationNumber}/vehicles")
     .formParam("query[vrm]", "")
     .formParam("query[disc]", "")
     .formParam("query[includeRemoved]", "")
@@ -225,7 +316,7 @@ class ApplicationJourneySteps {
     .formParam("security", "${securityToken}")
 
   val safetyInspector: HttpRequestBuilder = http("add safety")
-    .post("application/${applicationId}/safety/add")
+    .post("application/${applicationNumber}/safety/add")
     .formParam("data[isExternal]", "Y")
     .formParam("contactDetails[fao]", "Inspector Gadget")
     .formParam("address[searchPostcode][postcode]", "NG1 5FW")
@@ -238,7 +329,7 @@ class ApplicationJourneySteps {
     .formParam("security", "${securityToken}")
 
   val safetyCompliance: HttpRequestBuilder = http("safety compliance")
-    .post("application/${applicationId}/safety/")
+    .post("application/${applicationNumber}/safety/")
     .formParam("licence[version]", "6")
     .formParam("licence[safetyInsVehicles]", "10")
     .formParam("licence[safetyInsTrailers]", "5")
@@ -252,8 +343,8 @@ class ApplicationJourneySteps {
     .formParam("security", "${securityToken}")
 
   val financeHistory: HttpRequestBuilder = http("finance history")
-    .post("application/${applicationId}/financial-history")
-    .formParam("data[id]", "${applicationId}")
+    .post("application/${applicationNumber}/financial-history")
+    .formParam("data[id]", "${applicationNumber}")
     .formParam("data[version]", "6")
     .formParam("data[bankrupt]", "N")
     .formParam("data[liquidation]", "N")
@@ -270,7 +361,7 @@ class ApplicationJourneySteps {
     .formParam("security", "${securityToken}")
 
   val licenceHistory: HttpRequestBuilder = http("licence history")
-    .post("application/${applicationId}/licence-history/")
+    .post("application/${applicationNumber}/licence-history/")
     .formParam("data[prevHasLicence]", "N")
     .formParam("data[prevHasLicence-table][rows]", "0")
     .formParam("data[prevHadLicence]", "N")
@@ -290,7 +381,7 @@ class ApplicationJourneySteps {
     .formParam("security", "${securityToken}")
 
   val convictionsAndPenalties: HttpRequestBuilder = http("convictions penalties")
-    .post("application/${applicationId}/convictions-penalties")
+    .post("application/${applicationNumber}/convictions-penalties")
     .formParam("data[version]", "8")
     .formParam("data[question]", "N")
     .formParam("data[table][rows]", "0")
@@ -299,7 +390,7 @@ class ApplicationJourneySteps {
     .formParam("security", "${securityToken}")
 
   val undertakings: HttpRequestBuilder = http("undertakings")
-    .post("application/${applicationId}/undertakings/")
+    .post("application/${applicationNumber}/undertakings/")
     .formParam("declarationsAndUndertakings[signatureOptions]", "N")
     .formParam("interim[goodsApplicationInterim]", "N")
     .formParam("interim[goodsApplicationInterimReason]", "")
@@ -311,7 +402,7 @@ class ApplicationJourneySteps {
     .check(bodyString.saveAs("undertakings"))
 
   val cpmsRedirect: HttpRequestBuilder = http("navigate to cpms")
-    .post("application/${applicationId}/pay-and-submit/")
+    .post("application/${applicationNumber}/pay-and-submit/")
     .formParam("form-actions[pay]", "")
     .formParam("security", "${securityToken}")
     .check(bodyString.saveAs("pay"))
