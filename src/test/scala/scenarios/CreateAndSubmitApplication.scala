@@ -4,7 +4,7 @@ import `trait`.ApplicationJourneySteps
 import io.gatling.core.Predef._
 import io.gatling.core.feeder.BatchableFeederBuilder
 import io.gatling.core.structure.ScenarioBuilder
-import io.gatling.http.Predef._
+import io.gatling.http.Predef.flushSessionCookies
 import utils.SetUp._
 
 import scala.language.postfixOps
@@ -29,7 +29,7 @@ object CreateAndSubmitApplication extends ApplicationJourneySteps {
     .pause(2)
     .doIf(session => session("expired-password").as[String].isEmpty == false) {
       exec(changePassword)
-    })
+    }
     .pause(1)
     .exec(getCreateApplicationPage)
     .pause(7)
@@ -79,17 +79,6 @@ object CreateAndSubmitApplication extends ApplicationJourneySteps {
     .pause(2)
     .exec(convictionsAndPenalties)
     .pause(3)
-    //    .exec(undertakings)
-    //    .exec(session => {
-    //      println(session("undertakings").as[String])
-    //      session
-    //    })
-    //    .pause(1500 milliseconds)
-    //    .exec(cpmsRedirect)
-    //    .exec(session => {
-    //      println(session("pay").as[String])
-    //      session
-    //    })
-    //    .pause(3 seconds)
+    .pause(3)
     .exec(flushSessionCookies)
 }
