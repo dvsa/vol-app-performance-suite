@@ -30,7 +30,7 @@ class CreateApplicationSimulation extends Simulation {
     (typeofTest)match {
       case "load" =>
       CreateAndSubmitApplication.selfServiceApplicationRegistration.inject(atOnceUsers(SetUp.users),
-      constantUsersPerSec(SetUp.rampUp) during (SetUp.rampDurationInMin minutes))
+      rampUsers(SetUp.rampUp) during (SetUp.rampDurationInMin minutes))
       case "soak" =>
         CreateAndSubmitApplication.selfServiceApplicationRegistration.inject(rampUsers(users) during (rampUp minutes))
           .throttle(reachRps(3) in (60 seconds), holdFor(rampDurationInMin minutes))
