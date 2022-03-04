@@ -79,6 +79,5 @@ object CreateAndSubmitApplication extends ApplicationJourneySteps {
     .pause(2)
     .exec(convictionsAndPenalties)
     .pause(3)
-    .pause(3)
     .exec(flushSessionCookies)
 }
