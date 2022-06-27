@@ -7,5 +7,4 @@ object Headers {
     "Accept-Language" -> "en-GB,en;q=0.5",
     "User-Agent" -> "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:97.0) Gecko/20100101 Firefox/97.0"
   )
-
 }
