@@ -4,10 +4,9 @@ import `trait`.ApplicationJourneySteps
 import io.gatling.core.Predef._
 import io.gatling.core.feeder.BatchableFeederBuilder
 import io.gatling.core.structure.ScenarioBuilder
-import io.gatling.http.Predef._
+import io.gatling.http.Predef.flushSessionCookies
 import utils.SetUp._
 
-import scala.concurrent.duration._
 import scala.language.postfixOps
 
 object CreateAndSubmitApplication extends ApplicationJourneySteps {
@@ -17,84 +16,66 @@ object CreateAndSubmitApplication extends ApplicationJourneySteps {
       case "int" =>
         csv("loginId_int.csv").eager
       case _ =>
-        csv("loginId.csv").eager
+        csv("loginId.csv").circular
     }
   }
 
   val selfServiceApplicationRegistration: ScenarioBuilder = scenario("Create and submit application")
     .feed(feeder)
     .exec(getLoginPage)
-    .pause(1 seconds)
+    .pause(1)
     .exec(loginPage)
     .exec(session => session.set("expired-password", "${Location}"))
-    .pause(2 seconds)
+    .pause(2)
     .doIf(session => session("expired-password").as[String].isEmpty == false) {
       exec(changePassword)
     }
-    .pause(700 milliseconds)
-    .exec(session => {
-      println(session("login_response").as[String])
-      session
-    })
-    .exec(landingPage)
-    .pause(650 milliseconds)
-    .exec(session => {
-      println(session("login_response").as[String])
-      session
-    })
-    .exec(chooseCountry)
-    .pause(950 milliseconds)
+    .pause(1)
+    .exec(getCreateApplicationPage)
+    .pause(7)
+    .exec(createLGVApplication)
+    .pause(1)
     .exec(showDashboard)
-    .pause(850 milliseconds)
-    .exec(businessType)
-    .pause(1000 milliseconds)
-    .exec(businessDetails)
-    .pause(950 millisecond)
-    .exec(addresses)
-    .pause(890 milliseconds)
-    .exec(director)
-    .pause(850 milliseconds)
-    .exec(saveDirectorDetails)
-    .pause(2000 milliseconds)
-    .exec(operatingCentreDetails)
-    .pause(1500 milliseconds)
-    .exec(operatorCentreVehicleDetails)
-    .pause(3 seconds)
-    .exec(financialEvidence)
-    .pause(850 milliseconds)
-    .exec(transportManagersPage)
-    .pause(8)
-    .exec(transportManager)
-    .pause(8)
-    .exec(transportManagerDetails)
-    .pause(9)
-    .exec(transportManagerAnswers)
     .pause(3)
-    .exec(submitTransportManagerAnswers)
+    .exec(getBusinessTypePage)
+    .pause(4)
+    .exec(businessType)
+    .pause(5)
+    .exec(getBusinessDetailsPage)
+    .pause(1)
+    .exec(businessDetails)
+    .pause(4)
+    .exec(addresses)
+    .pause(5)
+    .exec(director)
+    .pause(4)
+    .exec(saveDirectorDetails)
+    .pause(2)
+    .exec(getLicenceAuthorisationPage)
+    .pause(1)
+    .exec(licenceAuthorisation)
+    .pause(4)
+    .exec(financialEvidence)
+    .pause(3)
+    .exec(getTransportManagersPage)
+    .pause(2)
+    .exec(transportManagersPage)
+    .pause(1)
+    .exec(navigateToAddTransportManagersPage)
+    .pause(2)
+    .exec(transportManagersDetails)
     .pause(5)
     .exec(vehicleDetails)
     .pause(7)
     .exec(safetyInspector)
-    .pause(850 milliseconds)
+    .pause(4)
     .exec(safetyCompliance)
-    .pause(2 seconds)
+    .pause(2)
     .exec(financeHistory)
-    .pause(2 seconds)
+    .pause(2)
     .exec(licenceHistory)
-    .pause(2 milliseconds)
+    .pause(2)
     .exec(convictionsAndPenalties)
-    .pause(850 milliseconds)
-    .exec(undertakings)
-    .exec(session => {
-      println(session("undertakings").as[String])
-      session
-    })
-    .pause(1500 milliseconds)
-    .exec(cpmsRedirect)
-    .exec(session => {
-      println(session("pay").as[String])
-      session
-    })
-    .pause(3 seconds)
+    .pause(3)
     .exec(flushSessionCookies)
 }

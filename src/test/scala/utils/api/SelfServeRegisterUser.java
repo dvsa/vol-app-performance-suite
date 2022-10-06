@@ -21,8 +21,6 @@ import java.sql.*;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static java.lang.Thread.sleep;
-
 
 public class SelfServeRegisterUser {
 
@@ -54,7 +52,7 @@ public class SelfServeRegisterUser {
     public void mainTest() throws Exception {
         users = String.valueOf(Integer.valueOf(System.getProperty("users")));
         String env = System.getProperty("env").toLowerCase();
-        if (env.equals("qa") || env.equals("da")) {
+        if (!env.equals("int")) {
             registerUser();
         } else {
 //            getExternalUsersFromTable();
