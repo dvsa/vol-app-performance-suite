@@ -14,7 +14,7 @@ object CreateAndSubmitApplication extends ApplicationJourneySteps {
   val feeder: BatchableFeederBuilder[String] = {
     (env) match {
       case "int" =>
-        csv("loginId_int.csv").eager
+        csv("loginId_int_old.csv").eager
       case _ =>
         csv("loginId.csv").circular
     }
@@ -25,11 +25,6 @@ object CreateAndSubmitApplication extends ApplicationJourneySteps {
     .exec(getLoginPage)
     .pause(1)
     .exec(loginPage)
-    .exec(session => session.set("expired-password", "${Location}"))
-    .pause(2)
-    .doIf(session => session("expired-password").as[String].isEmpty == false) {
-      exec(changePassword)
-    }
     .pause(1)
     .exec(getCreateApplicationPage)
     .pause(7)

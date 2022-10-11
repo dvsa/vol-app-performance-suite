@@ -1,6 +1,7 @@
 package `trait`
 
 import io.gatling.core.Predef._
+import io.gatling.core.structure.ChainBuilder
 import io.gatling.http.Predef._
 import io.gatling.http.request.builder.HttpRequestBuilder
 import utils.SetUp
@@ -22,6 +23,14 @@ class ApplicationJourneySteps {
     "content-type" -> "application/x-www-form-urlencoded"
   )
 
+  val changePassword: HttpRequestBuilder = http("change password")
+    .post("auth/expired-password/")
+    .formParam("oldPassword", password())
+    .formParam("newPassword", newPassword)
+    .formParam("confirmPassword", newPassword)
+    .formParam("submit", "Save")
+    .formParam("security", "${securityToken}")
+
   val getLoginPage: HttpRequestBuilder = http("get login page")
     .get("auth/login/")
     .headers(header_)
@@ -29,21 +38,20 @@ class ApplicationJourneySteps {
       regex(SetUp.securityTokenPattern).
         find.saveAs("securityToken"))
 
-  val loginPage: HttpRequestBuilder = http("login")
-    .post("auth/login/")
-    .check(regex(SetUp.location).find.optional.saveAs("Location"))
-    .formParam("username", "${Username}")
-    .formParam("password", password())
-    .formParam("submit", "Sign in")
-    .formParam("security", "${securityToken}")
-
-  val changePassword: HttpRequestBuilder =  http("change password")
-    .post("auth/expired-password/")
-    .formParam("oldPassword", password())
-    .formParam("newPassword", newPassword)
-    .formParam("confirmPassword", newPassword)
-    .formParam("submit", "Save")
-    .formParam("security", "${securityToken}")
+  val loginPage: ChainBuilder = exec(_.set("loggedIn", true))
+    .exec(
+      http("login")
+        .post("auth/login/")
+        .check(regex(SetUp.location).find.optional.saveAs("Location"))
+        .formParam("username", "${Username}")
+        .formParam("password", password())
+        .formParam("submit", "Sign in")
+        .formParam("security", "${securityToken}")
+    ).exec(pause(200))
+    .doIf("${expired-password.exists()}")
+    {
+       exec(changePassword)
+    }
 
   val landingPage: HttpRequestBuilder = http("Landing Page")
     .get("/")
