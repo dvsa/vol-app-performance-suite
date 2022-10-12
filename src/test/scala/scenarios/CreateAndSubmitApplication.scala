@@ -5,6 +5,7 @@ import io.gatling.core.Predef._
 import io.gatling.core.feeder.BatchableFeederBuilder
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef.flushSessionCookies
+import utils.SetUp
 import utils.SetUp._
 
 import scala.language.postfixOps
@@ -14,7 +15,7 @@ object CreateAndSubmitApplication extends ApplicationJourneySteps {
   val feeder: BatchableFeederBuilder[String] = {
     (env) match {
       case "int" =>
-        csv("loginId_int_old.csv").eager
+        csv("loginId_int.csv").eager
       case _ =>
         csv("loginId.csv").circular
     }
@@ -25,6 +26,11 @@ object CreateAndSubmitApplication extends ApplicationJourneySteps {
     .exec(getLoginPage)
     .pause(1)
     .exec(loginPage)
+    .exec(session => session.set("expired-password", SetUp.location))
+    .pause(2)
+    .doIf(session => session("expired-password").asOption[String].isEmpty == false) {
+      exec(changePassword)
+    }
     .pause(1)
     .exec(getCreateApplicationPage)
     .pause(7)
@@ -71,6 +77,8 @@ object CreateAndSubmitApplication extends ApplicationJourneySteps {
     .exec(licenceHistory)
     .pause(2)
     .exec(convictionsAndPenalties)
+    .pause(3)
+    .exec(undertakings)
     .pause(3)
     .exec(flushSessionCookies)
 }
