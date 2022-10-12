@@ -12,7 +12,7 @@ import scala.language.postfixOps
 class ApplicationJourneySteps {
 
   val newPassword: String = CONFIG.getString("password")
-  val header_ = Map("Accept" -> "*/*")
+  val header_ : Map[String, String] = Map("Accept" -> "*/*")
 
   private val headers_1 = Map(
     "Origin" -> SetUp.baseURL,
@@ -38,8 +38,7 @@ class ApplicationJourneySteps {
       regex(SetUp.securityTokenPattern).
         find.saveAs("securityToken"))
 
-  val loginPage: ChainBuilder = exec(_.set("loggedIn", true))
-    .exec(
+  val loginPage: ChainBuilder = exec(
       http("login")
         .post("auth/login/")
         .check(regex(SetUp.location).find.optional.saveAs("Location"))
@@ -47,8 +46,8 @@ class ApplicationJourneySteps {
         .formParam("password", password())
         .formParam("submit", "Sign in")
         .formParam("security", "${securityToken}")
-    ).exec(pause(200))
-    .doIf("${expired-password.exists()}")
+    )
+    .doIf("${Change your password.exists()}")
     {
        exec(changePassword)
     }
