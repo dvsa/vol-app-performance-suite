@@ -1,7 +1,6 @@
 package `trait`
 
 import io.gatling.core.Predef._
-import io.gatling.core.structure.ChainBuilder
 import io.gatling.http.Predef._
 import io.gatling.http.request.builder.HttpRequestBuilder
 import utils.SetUp
@@ -38,19 +37,13 @@ class ApplicationJourneySteps {
       regex(SetUp.securityTokenPattern).
         find.saveAs("securityToken"))
 
-  val loginPage: ChainBuilder = exec(
-      http("login")
-        .post("auth/login/")
-        .check(regex(SetUp.location).find.optional.saveAs("Location"))
-        .formParam("username", "${Username}")
-        .formParam("password", password())
-        .formParam("submit", "Sign in")
-        .formParam("security", "${securityToken}")
-    )
-    .doIf("${Change your password.exists()}")
-    {
-       exec(changePassword)
-    }
+  val loginPage: HttpRequestBuilder = http("login")
+    .post("auth/login/")
+    .check(regex(SetUp.location).find.optional.saveAs("Location"))
+    .formParam("username", "${Username}")
+    .formParam("password", password())
+    .formParam("submit", "Sign in")
+    .formParam("security", "${securityToken}")
 
   val landingPage: HttpRequestBuilder = http("Landing Page")
     .get("/")
@@ -100,9 +93,9 @@ class ApplicationJourneySteps {
     .headers(headers_1)
     .formParam("data[type]", "org_t_rc")
     .formParam("form-actions[saveAndContinue]", "")
-    .formParam("version", "6")
+    .formParam("version", "1")
     .formParam("security", "${securityToken}")
-    .check(status.in(200,209,302,304))
+    .check(status.in(200, 209, 302, 304))
 
   val getBusinessDetailsPage: HttpRequestBuilder = http("Show Business Details Page")
     .get("application/${applicationNumber}/business-details/")
@@ -117,7 +110,7 @@ class ApplicationJourneySteps {
     .formParam("data[tradingNames][0][name]", "")
     .formParam("data[tradingNames][0][id]", "")
     .formParam("data[tradingNames][0][version]", "")
-    .formParam("data[companyNumber][company_number]", "")
+    .formParam("data[companyNumber][company_number]", "07104043")
     .formParam("registeredAddress[id]", "")
     .formParam("registeredAddress[version]", "2")
     .formParam("data[natureOfBusiness]", "Performance Testing")
@@ -129,13 +122,13 @@ class ApplicationJourneySteps {
     .formParam("registeredAddress[postcode]", "NG2 3HX")
     .formParam("table[rows]", "0")
     .formParam("form-actions[saveAndContinue]", "")
-    .formParam("version", "6")
+    .formParam("version", "1")
     .formParam("security", "${securityToken}")
 
   val addresses: HttpRequestBuilder = http("addresses")
     .post("application/${applicationNumber}/addresses/")
     .formParam("correspondence_address[version]", "")
-    .formParam("correspondence[version]","")
+    .formParam("correspondence[version]", "")
     .formParam("correspondence_address[searchPostcode][postcode]", "NG1 5FW")
     .formParam("correspondence_address[addressLine1]", "3 WOLLATON STREET")
     .formParam("correspondence_address[town]", "NOTTINGHAM")
@@ -160,7 +153,7 @@ class ApplicationJourneySteps {
     .headers(headers_1)
     .formParam("data[version]", "2")
     .formParam("data[totAuthLgvVehiclesFieldset][totAuthLgvVehicles]", "5")
-    .formParam("data[totCommunityLicencesFieldset][totCommunityLicences]","5")
+    .formParam("data[totCommunityLicencesFieldset][totCommunityLicences]", "5")
     .formParam("form-actions[saveAndContinue]", "")
     .formParam("security", "${securityToken}")
 
@@ -240,7 +233,7 @@ class ApplicationJourneySteps {
     .formParam("data[registeredUser]", "")
     .formParam("data[addUser]", "")
     .formParam("security", "${securityToken}")
-    .check(status.in(200,209,302,304))
+    .check(status.in(200, 209, 302, 304))
 
   val transportManagersDetails: HttpRequestBuilder = http("Add Transport Manager Details")
     .post("application/${applicationNumber}/transport-managers/addNewUser/")
@@ -302,7 +295,7 @@ class ApplicationJourneySteps {
     .formParam("previousHistory[previousLicences][rows]", "0")
     .formParam("security", "${securityToken}")
 
-  val transportManagerAnswers: HttpRequestBuilder =  http("submit check your answers")
+  val transportManagerAnswers: HttpRequestBuilder = http("submit check your answers")
     .post("application/${applicationNumber}/transport-managers/check-answer/${tmaId}confirm/")
     .formParam("form-actions[submit]", "")
     .formParam("security", "${securityToken}")
@@ -311,7 +304,7 @@ class ApplicationJourneySteps {
     .post("application/${applicationNumber}/transport-managers/tm-declaration/${tmaId}")
     .formParam("content[isDigitallySigned]", "N")
     .formParam("form-actions[submit]", "")
-    .formParam("version", _=> randomInt())
+    .formParam("version", _ => randomInt())
     .formParam("security", "${securityToken}")
 
   val vehicleDetails: HttpRequestBuilder = http("submit vehicle")
@@ -319,7 +312,7 @@ class ApplicationJourneySteps {
     .formParam("query[vrm]", "")
     .formParam("query[disc]", "")
     .formParam("query[includeRemoved]", "")
-    .formParam("data[version]",  "4")
+    .formParam("data[version]", "4")
     .formParam("data[hasEnteredReg]", "N")
     .formParam("vehicles[rows]", "0")
     .formParam("form-actions[saveAndContinue]", "")
