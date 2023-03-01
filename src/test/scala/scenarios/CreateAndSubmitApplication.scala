@@ -25,10 +25,14 @@ object CreateAndSubmitApplication extends ApplicationJourneySteps {
     .exec(getLoginPage)
     .pause(1)
     .exec(loginPage)
-    .exec(session => session.set("expired-password", "${Location}"))
-    .pause(2)
-    .doIf(session => session("expired-password").as[String].isEmpty == false) {
-      exec(changePassword)
+    .doIfOrElse("${env}" != "int") {
+      exec(session => session.set("expired-password", "${Location}"))
+        .pause(2)
+        .doIf(session => session("expired-password").as[String].isEmpty == true) {
+          exec(changePassword)
+        }
+    } {
+      exec(session => session)
     }
     .pause(1)
     .exec(getCreateApplicationPage)
