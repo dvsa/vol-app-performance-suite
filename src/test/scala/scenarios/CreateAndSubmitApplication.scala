@@ -5,6 +5,7 @@ import io.gatling.core.Predef._
 import io.gatling.core.feeder.BatchableFeederBuilder
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef.flushSessionCookies
+import utils.SetUp
 import utils.SetUp._
 
 import scala.language.postfixOps
@@ -70,6 +71,8 @@ object CreateAndSubmitApplication extends ApplicationJourneySteps {
     .exec(licenceHistory)
     .pause(2)
     .exec(convictionsAndPenalties)
+    .pause(3)
+    .exec(undertakings)
     .pause(3)
     .exec(flushSessionCookies)
 }
