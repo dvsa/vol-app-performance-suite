@@ -21,29 +21,23 @@ object CreateAndSubmitApplication extends ApplicationJourneySteps {
     }
   }
 
-  val selfServiceApplicationRegistration: ScenarioBuilder = scenario("Create and submit application")
-    .feed(feeder)
-    .exec(getLoginPage)
-    .pause(1)
-    .exec(loginPage)
-    .exec(session => session.set("expired-password", SetUp.location))
-    .pause(2)
-    .doIf(session => session("expired-password").asOption[String].isEmpty == false) {
-      exec(changePassword)
-    }
-    .pause(1)
-    .exec(getCreateApplicationPage)
-    .pause(7)
-    .exec(createLGVApplication)
-    .pause(1)
-    .exec(showDashboard)
-    .pause(3)
-    .exec(getBusinessTypePage)
+  val selfServiceApplicationRegistration: ScenarioBuilder = scenario("Create and submit application")  .feed(feeder)
+    .exec(getLoginPage)  .pause(1)
+    .exec(loginPage)  .doIfOrElse("${env}" != "int") {
+    exec(session => session.set("expired-password", "${Location}"))      .pause(2)
+      .doIf(session => session("expired-password").as[String].isEmpty == true) {        exec(changePassword)
+      }  } {
+    exec(session => session)  }
+    .pause(1)  .exec(getCreateApplicationPage)
+    .pause(7)  .exec(session => session.set("applicationType", applicationType))
+    .doSwitch(    session => session("applicationType").as[String].toLowerCase
+    )(    "lgv" -> exec(createLGVApplication),
+      "psv" -> exec(createPSVApplication))
+    .pause(1)  .exec(showDashboard)
+    .pause(3)  .exec(getBusinessTypePage)
     .pause(4)
-    .exec(businessType)
-    .pause(5)
-    .exec(getBusinessDetailsPage)
-    .pause(1)
+    .exec(businessType)  .pause(5)
+    .exec(getBusinessDetailsPage)  .pause(1)
     .exec(businessDetails)
     .pause(4)
     .exec(addresses)
