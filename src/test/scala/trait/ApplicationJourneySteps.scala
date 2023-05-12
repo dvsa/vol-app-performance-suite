@@ -77,6 +77,17 @@ class ApplicationJourneySteps {
     .formParam("version", "")
     .formParam("security", "${securityToken}")
 
+  val createPSVApplication: HttpRequestBuilder = http("create psv application")
+    .post("application/create/")
+    .headers(headers_1)
+    .check(
+      regex(SetUp.securityTokenPattern).
+        find.saveAs("securityToken"))
+    .formParam("type-of-licence[operator-location]", "N")
+    .formParam("type-of-licence[operator-type]", "lcat_psv")
+    .formParam("type-of-licence[licence-type]", "ltyp_sn")
+    .formParam("form-actions[saveAndContinue]", "")
+    .formParam("security", "${securityToken}")
 
   val showDashboard: HttpRequestBuilder = http("Show dashboard")
     .get("/")
