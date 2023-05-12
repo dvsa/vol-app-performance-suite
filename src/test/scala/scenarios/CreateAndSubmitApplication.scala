@@ -21,7 +21,8 @@ object CreateAndSubmitApplication extends ApplicationJourneySteps {
     }
   }
 
-  val selfServiceApplicationRegistration: ScenarioBuilder = scenario("Create and submit application")  .feed(feeder)
+  val selfServiceApplicationRegistration: ScenarioBuilder = scenario("Create and submit application")
+    .feed(feeder)
     .exec(getLoginPage)  .pause(1)
     .exec(loginPage)  .doIfOrElse("${env}" != "int") {
     exec(session => session.set("expired-password", "${Location}"))      .pause(2)
