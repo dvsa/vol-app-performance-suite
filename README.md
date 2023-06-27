@@ -16,7 +16,7 @@
 `site = ss/internal`
  `typeOfTest = load,soak,stress`
  
-`gradle createApplication -Denv={qa} -Dsite={ss} -Dusers={2} -DrampUp={0} -Dduration={0} -DtypeOfTest=`
+`gradle createApplication -Denv={qa} -Dsite={ss} -Dusers={2} -DrampUp={0} -Dduration={0} -DtypeOfTest=  -DapplicationType='
 
  Please remove the braces when running.
  
