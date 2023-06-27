@@ -62,7 +62,7 @@ task createApplication(type: JavaExec) {
             "--bodies-folder", sourceSets.test.resources
     ]
     doLast {
-        cleanUp.executeTests()
+//        cleanUp.executeTests()
     }
 }
 

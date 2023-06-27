@@ -19,7 +19,6 @@ object CreateAndSubmitApplication extends ApplicationJourneySteps {
         csv("loginId.csv").circular
     }
   }
-
   val selfServiceApplicationRegistration: ScenarioBuilder = scenario("Create and submit application")
     .feed(feeder)
     .exec(getLoginPage)

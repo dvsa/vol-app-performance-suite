@@ -93,7 +93,7 @@ class ApplicationJourneySteps {
     .headers(headers_1)
     .formParam("data[type]", "org_t_rc")
     .formParam("form-actions[saveAndContinue]", "")
-    .formParam("version", "6")
+    .formParam("version", "1")
     .formParam("security", "${securityToken}")
     .check(status.in(200,209,302,304))
 
@@ -122,7 +122,7 @@ class ApplicationJourneySteps {
     .formParam("registeredAddress[postcode]", "NG2 3HX")
     .formParam("table[rows]", "0")
     .formParam("form-actions[saveAndContinue]", "")
-    .formParam("version", "6")
+    .formParam("version", _=> randomInt())
     .formParam("security", "${securityToken}")
 
   val addresses: HttpRequestBuilder = http("addresses")
