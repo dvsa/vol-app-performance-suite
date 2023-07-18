@@ -404,10 +404,10 @@ class ApplicationJourneySteps {
     .formParam("security", "${securityToken}")
 
   val undertakings: HttpRequestBuilder = http("undertakings")
-    .post("application/${applicationNumber}/undertakings/")
+    .post("application/${applicationNumber}/undertakings/").disableFollowRedirect
     .formParam("declarationsAndUndertakings[signatureOptions]", "N")
     .formParam("interim[goodsApplicationInterim]", "N")
-    .formParam("interim[goodsApplicationInterimReason]", "")
+    .formParam("interim[YContent][goodsApplicationInterimReason]", "")
     .formParam("declarationsAndUndertakings[version]", "9")
     .formParam("declarationsAndUndertakings[id]", "${applicationNumber}")
     .formParam("form-actions[submitAndPay]", "")
