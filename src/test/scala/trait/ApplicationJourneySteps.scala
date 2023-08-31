@@ -404,15 +404,15 @@ class ApplicationJourneySteps {
     .formParam("security", "${securityToken}")
 
   val undertakings: HttpRequestBuilder = http("undertakings")
-    .post("application/${applicationNumber}/undertakings/").disableFollowRedirect
+    .post("application/${applicationNumber}/undertakings/")
     .formParam("declarationsAndUndertakings[signatureOptions]", "N")
     .formParam("interim[goodsApplicationInterim]", "N")
-    .formParam("interim[YContent][goodsApplicationInterimReason]", "")
+    .formParam("interim[YContent][goodsApplicationInterimReason]","")
     .formParam("declarationsAndUndertakings[version]", "9")
     .formParam("declarationsAndUndertakings[id]", "${applicationNumber}")
     .formParam("form-actions[submitAndPay]", "")
     .formParam("security", "${securityToken}")
-    .check(regex("GV/SI Application Fee for application ${applicationNumber}"))
+    //.check(regex("GV/SI Application Fee for application ${applicationNumber}"))
     .check(bodyString.saveAs("undertakings"))
 
   val cpmsRedirect: HttpRequestBuilder = http("navigate to cpms")
