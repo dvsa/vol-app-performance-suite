@@ -32,8 +32,8 @@ object CreateAndSubmitApplication extends ApplicationJourneySteps {
       .pause(1)  .exec(getCreateApplicationPage)
       .pause(7)  .exec(session => session.set("applicationType", applicationType))
       .doSwitch(    session => session("applicationType").as[String].toLowerCase
-      )(    "lgv" -> exec(createLGVApplication),
-        "psv" -> exec(createPSVApplication))
+      )(    "lgv" -> exec(createLGVApplication).pause((1)),
+        "psv" -> exec(createPSVApplication).pause(1)
       .pause(1)  .exec(showDashboard)
       .pause(3)  .exec(getBusinessTypePage)
       .pause(4)
