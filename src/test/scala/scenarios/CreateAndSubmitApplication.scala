@@ -32,9 +32,9 @@ object CreateAndSubmitApplication extends ApplicationJourneySteps {
       .pause(1)  .exec(getCreateApplicationPage)
       .pause(7)  .exec(session => session.set("applicationType", applicationType))
       .doSwitch(    session => session("applicationType").as[String].toLowerCase
-      )(    "lgv" -> exec(createLGVApplication).pause(1),
-        "psv" -> exec(createPSVApplication).pause(1)
-      .pause(1)  .exec(showDashboard)
+      )(    "lgv" -> exec(createLGVApplication),
+        "psv" -> exec(createPSVApplication))
+      .pause(3)  .exec(showDashboard)
       .pause(3)  .exec(getBusinessTypePage)
       .pause(4)
       .exec(businessType)  .pause(5)
@@ -75,5 +75,5 @@ object CreateAndSubmitApplication extends ApplicationJourneySteps {
       .pause(3)
       .exec(undertakings)
       .pause(3)
-      .exec(flushSessionCookies))
+      .exec(flushSessionCookies)
   }
