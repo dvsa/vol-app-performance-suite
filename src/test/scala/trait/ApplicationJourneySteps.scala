@@ -412,7 +412,6 @@ class ApplicationJourneySteps {
     .formParam("declarationsAndUndertakings[id]", "${applicationNumber}")
     .formParam("form-actions[submitAndPay]", "")
     .formParam("security", "${securityToken}")
-    //.check(regex("GV/SI Application Fee for application ${applicationNumber}"))
     .check(bodyString.saveAs("undertakings"))
 
   val cpmsRedirect: HttpRequestBuilder = http("navigate to cpms")
