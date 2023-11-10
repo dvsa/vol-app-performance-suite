@@ -394,6 +394,7 @@ class ApplicationJourneySteps {
 
   val undertakings: HttpRequestBuilder = http("undertakings")
     .post("application/${applicationNumber}/undertakings/")
+    .disableFollowRedirect
     .formParam("declarationsAndUndertakings[signatureOptions]", "N")
     .formParam("interim[goodsApplicationInterim]", "N")
     .formParam("interim[goodsApplicationInterimReason]", "")

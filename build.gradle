@@ -9,9 +9,8 @@ apply plugin: 'application'
 repositories {
     mavenLocal()
     mavenCentral()
-    maven {
-        url "https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases"
-    }
+    maven { url "https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases"}
+    maven {url "https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases"}
 }
 
 dependencies {
