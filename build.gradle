@@ -22,7 +22,7 @@ dependencies {
     testImplementation group: 'org.dvsa.testing.lib', name: 'active-support', version:'2.0.1.6'
     testImplementation group: 'org.dvsa.testing.lib', name: 'uri-constructor', version:'2.0.1'
     testImplementation group: 'org.dvsa.testing.framework', name: 'vol-api-calls', version:'2.0.1'
-    implementation 'org.apache.httpcomponents:httpclient:4.3.4'
+    testImplementation 'org.apache.httpcomponents:httpclient:4.3.4'
 }
 
 test {
