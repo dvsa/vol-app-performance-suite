@@ -24,6 +24,9 @@ dependencies {
     implementation group: 'org.dvsa.testing.framework', name: 'vol-api-calls', version:'2.0.1'
 }
 
+tasks.test {
+    useJUnitPlatform()
+}
 
 tasks.withType(JavaExec) {
     systemProperties = System.getProperties() as Map<String, ?>
@@ -60,7 +63,7 @@ task createApplication(type: JavaExec) {
             "--bodies-folder", sourceSets.test.resources
     ]
     doLast {
-//        cleanUp.executeTests()
+        cleanUp.executeTests()
     }
 }
 
