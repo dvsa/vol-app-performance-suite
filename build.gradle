@@ -10,10 +10,6 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven {
-        credentials {
-            username "$mavenUser"
-            password "$mavenPassword"
-        }
         url "https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases"}
 }
 
