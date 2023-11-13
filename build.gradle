@@ -9,7 +9,12 @@ apply plugin: 'application'
 repositories {
     mavenLocal()
     mavenCentral()
-    maven { url "https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases"}
+    maven {
+        credentials {
+            username "$mavenUser"
+            password "$mavenPassword"
+        }
+        url "https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases"}
 }
 
 dependencies {
