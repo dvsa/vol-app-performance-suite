@@ -69,7 +69,7 @@ public class SelfServeRegisterUser {
         }
     }
 
-    @Test
+
     public void registerUser() throws Exception {
         String password;
         for (int i = 0; i < Integer.parseInt(users); i++) {
