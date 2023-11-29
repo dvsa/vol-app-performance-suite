@@ -17,7 +17,7 @@ dependencies {
     implementation group: 'io.gatling.highcharts', name: 'gatling-charts-highcharts', version: '3.9.5'
     implementation group: 'io.gatling', name: 'gatling-core', version:'3.9.5'
     implementation group: 'io.gatling', name: 'gatling-http', version:'3.9.5'
-    implementation group: 'org.scala-lang', name: 'scala-library', version:'2.13.10'
+    implementation group: 'org.scala-lang', name: 'scala-library', version:'2.13.12'
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.10.0'
 
     implementation group: 'org.dvsa.testing.lib', name: 'active-support', version:'2.0.1.6'
