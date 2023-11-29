@@ -5,6 +5,7 @@ import activesupport.database.url.DbURL;
 import activesupport.ssh.SSH;
 import apiCalls.actions.RegisterUser;
 import com.jcraft.jsch.Session;
+import org.apache.commons.codec.net.QuotedPrintableCodec;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.FileUtils;
@@ -72,11 +73,12 @@ public class SelfServeRegisterUser {
 
     public void registerUser() throws Exception {
         String password;
+        QuotedPrintableCodec quotedPrintableCodec = new QuotedPrintableCodec();
         for (int i = 0; i < Integer.parseInt(users); i++) {
             RegisterUser registerUser = new RegisterUser();
             registerUser.registerUser();
             String email = registerUser.getEmailAddress();
-            password = S3.getTempPassword(email, "devapp-olcs-pri-olcs-autotest-s3");
+            password = quotedPrintableCodec.decode(S3.getTempPassword(email, "devapp-olcs-pri-olcs-autotest-s3"));
             writeToFile(registerUser.getUserName(), registerUser.getForeName(), password);
         }
     }

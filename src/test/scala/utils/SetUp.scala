@@ -8,6 +8,7 @@ import scala.annotation.switch
 object SetUp {
   val typeofTest: String = System.getProperty("typeOfTest")
   val site: String = System.getProperty("site")
+  val applicationType: String = System.getProperty("applicationType")
   val env: String = System.getProperty("env").toLowerCase
   val users: Int = Integer.getInteger("users", 0).toInt
   val rampUp: Int = Integer.getInteger("rampUp", 0).toInt

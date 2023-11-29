@@ -12,3 +12,6 @@ LOGS
 *.iml
 gradle.properties
 results/
+gradlew
+gradlew.bat
+.DS_Store
