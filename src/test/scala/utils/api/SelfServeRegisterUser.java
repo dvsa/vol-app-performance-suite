@@ -52,7 +52,7 @@ public class SelfServeRegisterUser {
     public void mainTest() throws Exception {
         users = String.valueOf(Integer.valueOf(System.getProperty("users")));
         String env = System.getProperty("env").toLowerCase();
-        if (!env.equals("int")) {
+        if (!env.equalsIgnoreCase("int")) {
             registerUser();
         } else {
 //            getExternalUsersFromTable();
@@ -69,7 +69,7 @@ public class SelfServeRegisterUser {
         }
     }
 
-    @Test
+
     public void registerUser() throws Exception {
         String password;
         for (int i = 0; i < Integer.parseInt(users); i++) {
