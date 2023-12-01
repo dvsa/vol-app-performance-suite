@@ -27,9 +27,7 @@ dependencies {
     implementation group: 'org.dvsa.testing.framework', name: 'vol-api-calls', version:'2.0.1'
 }
 
-test {
-    useJUnitPlatform()
-}
+
 
 tasks.withType(JavaExec) {
     systemProperties = System.getProperties() as Map<String, ?>
@@ -38,6 +36,7 @@ tasks.withType(JavaExec) {
 
 tasks.withType(Test) {
     systemProperties = System.getProperties() as Map<String, ?>
+    useJUnitPlatform()
 }
 
 task registerUser(type: JavaExec) {
