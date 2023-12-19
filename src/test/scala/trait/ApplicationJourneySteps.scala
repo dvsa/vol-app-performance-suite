@@ -11,7 +11,7 @@ import scala.language.postfixOps
 class ApplicationJourneySteps {
 
   val newPassword: String = CONFIG.getString("password")
-  val header_ = Map("Accept" -> "*/*")
+  val header_ : Map[String, String] = Map("Accept" -> "*/*")
 
   private val headers_1 = Map(
     "Origin" -> SetUp.baseURL,
