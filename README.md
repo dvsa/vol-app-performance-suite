@@ -28,7 +28,7 @@
  
   In a terminal window, powershell window or cmd paste the below command
   
- `gradle registerUser  -Denv={qa} -Dsite={ss} -Dusers={2} -DrampUp={0} -Dduration={0} -DtypeOfTest=`
+ `gradle registerUser  -Denv=int -Dsite=ss -Dusers=40 -DrampUp=0 -Dduration=0 -DtypeOfTest=`
 
 
 ## Running External Search Script
