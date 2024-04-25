@@ -26,9 +26,7 @@ dependencies {
     implementation 'org.apache.httpcomponents:httpclient:4.5.14'
 }
 
-test {
-    useJUnitPlatform()
-}
+
 
 tasks.withType(JavaExec) {
     systemProperties = System.getProperties() as Map<String, ?>
