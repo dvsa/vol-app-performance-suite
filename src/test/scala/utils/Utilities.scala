@@ -1,8 +1,8 @@
 package utils
 
+import activesupport.aws.s3.SecretsManager
 import activesupport.config.Configuration
 import com.typesafe.config.Config
-
 import utils.SetUp.env
 
 object Utilities {
@@ -16,7 +16,7 @@ object Utilities {
   def password(): String = {
     (env) match {
       case "int" =>
-        CONFIG.getString("intPassword")
+     SecretsManager.getSecretValue(("intEnvPassword"));
       case _ =>
         "${Password}"
     }
