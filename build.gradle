@@ -14,15 +14,15 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'io.gatling.highcharts', name: 'gatling-charts-highcharts', version: '3.11.1'
-    implementation group: 'io.gatling', name: 'gatling-core', version:'3.11.1'
-    implementation group: 'io.gatling', name: 'gatling-http', version:'3.11.1'
-    implementation group: 'org.scala-lang', name: 'scala-library', version:'2.13.12'
+    implementation group: 'io.gatling.highcharts', name: 'gatling-charts-highcharts', version: '3.10.3'
+    implementation group: 'io.gatling', name: 'gatling-core', version:'3.10.3'
+    implementation group: 'io.gatling', name: 'gatling-http', version:'3.10.3'
+    implementation group: 'org.scala-lang', name: 'scala-library', version:'2.13.14'
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.10.0'
 
     implementation group: 'org.dvsa.testing.lib', name: 'active-support', version:'2.0.1.8'
     implementation group: 'org.dvsa.testing.lib', name: 'uri-constructor', version:'2.0.2'
-    implementation group: 'org.dvsa.testing.framework', name: 'vol-api-calls', version:'2.0.2'
+    implementation group: 'org.dvsa.testing.framework', name: 'vol-api-calls', version:'2.0.3'
     implementation 'org.apache.httpcomponents:httpclient:4.5.14'
 }
 
