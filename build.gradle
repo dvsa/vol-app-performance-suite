@@ -9,9 +9,14 @@ apply plugin: 'application'
 repositories {
     mavenLocal()
     mavenCentral()
-    maven {
-        url "https://nexus.olcs.dev-dvsacloud.uk/repository/maven-releases"
-    }
+        maven {
+        
+            url " https://maven.pkg.github.com/dvsa/*"
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USER")
+                password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
 }
 
 dependencies {
@@ -22,9 +27,9 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.10.0'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.1'
 
-    implementation group: 'org.dvsa.testing.lib', name: 'active-support', version:'2.0.1.6'
-    implementation group: 'org.dvsa.testing.lib', name: 'uri-constructor', version:'2.0.1'
-    implementation group: 'org.dvsa.testing.framework', name: 'vol-api-calls', version:'2.0.1'
+    implementation group: 'org.dvsa.testing.lib', name: 'active-support', version:'2.4.1'
+    implementation group: 'org.dvsa.testing.lib', name: 'vol-uri-constructor', version:'2.0.4'
+    implementation group: 'org.dvsa.testing.framework', name: 'vol-api-calls', version:'2.7.1'
 }
 
 
