@@ -6,7 +6,7 @@ import org.dvsa.testing.lib.url.webapp.utils.ApplicationType
 import scala.annotation.switch
 
 object SetUp {
-  val typeofTest: String = System.getProperty("typeOfTest")
+  val typeofTest: String = Option(System.getProperty("typeOfTest")).getOrElse("load")
   val site: String = System.getProperty("site")
   val applicationType: String = System.getProperty("applicationType")
   val env: String = System.getProperty("env").toLowerCase

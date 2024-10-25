@@ -27,24 +27,32 @@ class CreateApplicationSimulation extends Simulation {
     .perUserNameResolution
 
   val loginAndCreateApp: PopulationBuilder =
-    (typeofTest)match {
+    Option(typeofTest).getOrElse("load") match {
       case "load" =>
-      CreateAndSubmitApplication.selfServiceApplicationRegistration.inject(atOnceUsers(SetUp.users),
-      rampUsers(SetUp.rampUp) during (SetUp.rampDurationInMin minutes))
+        CreateAndSubmitApplication.selfServiceApplicationRegistration.inject(
+          atOnceUsers(SetUp.users),
+          rampUsers(SetUp.rampUp) during (SetUp.rampDurationInMin minutes)
+        )
       case "soak" =>
-        CreateAndSubmitApplication.selfServiceApplicationRegistration.inject(rampUsers(users) during (rampUp minutes))
-          .throttle(reachRps(3) in (60 seconds), holdFor(rampDurationInMin minutes))
+        CreateAndSubmitApplication.selfServiceApplicationRegistration.inject(
+          rampUsers(users) during (rampUp minutes)
+        ).throttle(
+          reachRps(3) in (60 seconds),
+          holdFor(rampDurationInMin minutes)
+        )
       case "stress" =>
-        // This is an open workload profile
-        // With levels of x arriving users per second depending on users passed in
-        // Each level lasting 10 seconds
-        // Separated by linear ramps lasting 10 seconds
-        CreateAndSubmitApplication.selfServiceApplicationRegistration.inject(incrementUsersPerSec(SetUp.users)
-          .times(5)
-          .eachLevelLasting(10)
-          .separatedByRampsLasting(10 seconds)
-          .startingFrom(10))
-  }
+        CreateAndSubmitApplication.selfServiceApplicationRegistration.inject(
+          incrementUsersPerSec(SetUp.users)
+            .times(5)
+            .eachLevelLasting(10)
+            .separatedByRampsLasting(10 seconds)
+            .startingFrom(10)
+        )
+      case _ =>
+        CreateAndSubmitApplication.selfServiceApplicationRegistration.inject(
+          atOnceUsers(SetUp.users)
+        )
+    }
   setUp(loginAndCreateApp)
     .protocols(httpConfiguration)
     .assertions(global.failedRequests.count.is(0))
