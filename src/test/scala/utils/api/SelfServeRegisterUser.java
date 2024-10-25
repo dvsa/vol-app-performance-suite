@@ -33,12 +33,12 @@ public class SelfServeRegisterUser {
     private String users = System.getProperty("users");
 
 
-    public static void getExternalUsersFromTable() {
+    public static void getExternalUsersFromTable(String environment, String username, String password) {
         try {
             createTunnel();
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection(
-                    "jdbc:mysql://olcsdb-rds.int.olcs.dvsacloud.uk:3306/OLCS_RDS_OLCSDB?user={user}&password={password}?useSSL=FALSE");
+            String connectionString = String.format("jdbc:mysql://olcsdb-rds.%s.olcs.dvsacloud.uk:3306/OLCS_RDS_OLCSDB?user=%s&password=%s?useSSL=FALSE", environment, username, password);
+            Connection con = DriverManager.getConnection(connectionString);
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(SQLquery.getUsersSql("10"));
             while (rs.next())
