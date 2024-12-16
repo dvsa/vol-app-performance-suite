@@ -4,7 +4,7 @@ import `trait`.ApplicationJourneySteps
 import io.gatling.core.Predef._
 import io.gatling.core.feeder.BatchableFeederBuilder
 import io.gatling.core.structure.ScenarioBuilder
-import io.gatling.http.Predef.flushSessionCookies
+import io.gatling.http.Predef.{flushSessionCookies, http}
 import utils.SetUp
 import utils.SetUp._
 
@@ -22,9 +22,8 @@ object CreateAndSubmitApplication extends ApplicationJourneySteps {
   }
   val selfServiceApplicationRegistration: ScenarioBuilder = scenario("Create and submit application")
     .feed(feeder)
-    .exec(getLoginPage)
-    .pause(1)
-    .exec(loginPage).doIfOrElse("${env}" != "int") {
+    .exec(loginPage)
+    .doIfOrElse("${env}" != "int") {
       exec(session => session.set("expired-password", "${Location}"))
         .pause(2)
         .doIf(session => session("expired-password").as[String].isEmpty == true) {
@@ -34,9 +33,21 @@ object CreateAndSubmitApplication extends ApplicationJourneySteps {
       exec(session => session)
     }
     .pause(1)
+    .exec(getWelcomePage)
+    .pause(2)
+    .exec(submitWelcomePage)
+    .pause(1)
+    .exec(http("get dashboard after welcome")
+      .get("/dashboard")
+      .headers(header_))
+    .pause(1)
     .exec(getCreateApplicationPage)
     .pause(7)
     .exec(createLGVApplication)
+    .exec(session => {
+      println(s"Application Number captured: ${session("applicationNumber")}")
+      session
+    })
     .pause(1)
     .exec(showDashboard)
     .pause(3)
