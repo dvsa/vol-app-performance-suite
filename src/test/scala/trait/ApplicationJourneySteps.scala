@@ -3,6 +3,7 @@ package `trait`
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import io.gatling.http.request.builder.HttpRequestBuilder
+import org.slf4j.LoggerFactory
 import utils.SetUp
 import utils.Utilities.{CONFIG, orderRef, password, randomInt}
 
@@ -12,6 +13,8 @@ class ApplicationJourneySteps {
 
   val newPassword: String = CONFIG.getString("password")
   val header_ : Map[String, String] = Map("Accept" -> "*/*")
+  private val logger = LoggerFactory.getLogger(classOf[ApplicationJourneySteps])
+
 
   private val headers_1 = Map(
     "Origin" -> SetUp.baseURL,
@@ -21,6 +24,44 @@ class ApplicationJourneySteps {
     "Sec-Fetch-User" -> "?1",
     "content-type" -> "application/x-www-form-urlencoded"
   )
+
+  private val headers_welcome = Map(
+    "accept" -> "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+    "sec-fetch-dest" -> "document",
+    "sec-fetch-mode" -> "navigate",
+    "sec-fetch-site" -> "same-origin",
+    "sec-fetch-user" -> "?1",
+    "cache-control" -> "no-store, no-cache, must-revalidate",
+    "pragma" -> "no-cache"
+  )
+
+  val getWelcomePage: HttpRequestBuilder = http("get welcome page")
+    .get("/welcome")
+    .headers(headers_welcome)
+    .check(
+      regex(SetUp.securityTokenPattern).find.saveAs("securityToken"),
+      status.in(200, 302)
+    )
+
+  val getDashboardAfterWelcome: HttpRequestBuilder = http("get dashboard after welcome")
+    .get("/dashboard")
+    .headers(header_)
+    .check(
+      regex(SetUp.securityTokenPattern).find.saveAs("securityToken")
+    )
+
+  val submitWelcomePage: HttpRequestBuilder = http("accept terms and continue")
+    .post("/welcome")
+    .headers(headers_1)
+    .formParam("main[termsAgreed]", "Y")
+    .formParam("form-actions[submit]", "")
+    .formParam("security", "${securityToken}")
+
+
+  val followWelcomeRedirect: HttpRequestBuilder = http("follow welcome redirect")
+    .get("$(redirectUrl)")
+    .headers(header_)
+    .check(status.in(200, 302))
 
   val changePassword: HttpRequestBuilder = http("change password")
     .post("auth/expired-password/")
@@ -74,8 +115,9 @@ class ApplicationJourneySteps {
     .formParam("type-of-licence[licence-type][ltyp_siContent][lgv-declaration][lgv-declaration-confirmation]", "0")
     .formParam("type-of-licence[licence-type][ltyp_siContent][lgv-declaration][lgv-declaration-confirmation]", "1")
     .formParam("form-actions[saveAndContinue]", "")
-    .formParam("version", "")
+    .formParam("version", 1)
     .formParam("security", "${securityToken}")
+
 
   val createPSVApplication: HttpRequestBuilder = http("create psv application")
     .post("application/create/")
