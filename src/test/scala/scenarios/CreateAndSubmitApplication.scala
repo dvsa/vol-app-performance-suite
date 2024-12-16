@@ -20,8 +20,12 @@ object CreateAndSubmitApplication extends ApplicationJourneySteps {
         csv("loginId.csv").circular
     }
   }
+
+
   val selfServiceApplicationRegistration: ScenarioBuilder = scenario("Create and submit application")
     .feed(feeder)
+    .exec(getLoginPage)
+    .pause(1)
     .exec(loginPage)
     .doIfOrElse("${env}" != "int") {
       exec(session => session.set("expired-password", "${Location}"))
@@ -34,23 +38,15 @@ object CreateAndSubmitApplication extends ApplicationJourneySteps {
     }
     .pause(1)
     .exec(getWelcomePage)
-    .pause(2)
+    .pause(1)
     .exec(submitWelcomePage)
     .pause(1)
-    .exec(http("get dashboard after welcome")
-      .get("/dashboard")
-      .headers(header_))
-    .pause(1)
     .exec(getCreateApplicationPage)
-    .pause(7)
+    .pause(1)
     .exec(createLGVApplication)
-    .exec(session => {
-      println(s"Application Number captured: ${session("applicationNumber")}")
-      session
-    })
     .pause(1)
     .exec(showDashboard)
-    .pause(3)
+    .pause(1)
     .exec(getBusinessTypePage)
     .pause(4)
     .exec(businessType)
