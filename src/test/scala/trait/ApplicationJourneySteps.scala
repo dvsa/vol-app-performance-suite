@@ -115,15 +115,9 @@ class ApplicationJourneySteps {
     .formParam("type-of-licence[licence-type][ltyp_siContent][lgv-declaration][lgv-declaration-confirmation]", "0")
     .formParam("type-of-licence[licence-type][ltyp_siContent][lgv-declaration][lgv-declaration-confirmation]", "1")
     .formParam("form-actions[saveAndContinue]", "")
-    .formParam("version", "")
+    .formParam("version", 1)
     .formParam("security", "${securityToken}")
 
-  val getAppFromCreation: HttpRequestBuilder = http("Get application from creation")
-    .get("/application${Location}")
-    .check(
-      currentLocation.saveAs("currentUrl"),
-      currentLocation.transform(url => url.split("/")(4)).saveAs("applicationNumber"),
-      regex(SetUp.securityTokenPattern).find.saveAs("securityToken"))
 
   val createPSVApplication: HttpRequestBuilder = http("create psv application")
     .post("application/create/")
@@ -138,11 +132,8 @@ class ApplicationJourneySteps {
     .formParam("security", "${securityToken}")
 
   val showDashboard: HttpRequestBuilder = http("Show dashboard")
-    .get("/dashboard")
-    .check(
-      status.in(200,302),
-      regex(SetUp.securityTokenPattern).find.saveAs("securityToken")
-    )
+    .get("/")
+    .check(regex("""href="/application/(.+?)/"""").find.saveAs("applicationNumber"))
 
   val getBusinessTypePage: HttpRequestBuilder = http("Show Business Type Page")
     .get("application/${applicationNumber}/business-type/")

@@ -27,26 +27,26 @@ object CreateAndSubmitApplication extends ApplicationJourneySteps {
     .exec(getLoginPage)
     .pause(1)
     .exec(loginPage)
-    .doIfOrElse("${env}" != "int") {
-      exec(session => session.set("expired-password", "${Location}"))
-        .pause(2)
-        .doIf(session => session("expired-password").as[String].isEmpty == true) {
-          exec(changePassword)
-        }
-    } {
-      exec(session => session)
+    .exec(session => session.set("expired-password", "${Location}"))
+    .pause(2)
+    .doIf(session => session("expired-password").as[String].isEmpty == false) {
+      exec(changePassword)
     }
     .pause(1)
     .exec(getWelcomePage)
-    .pause(1)
+    .pause(2)
     .exec(submitWelcomePage)
     .pause(1)
-    .exec(getCreateApplicationPage)
+    .exec(http("get dashboard after welcome")
+      .get("/dashboard")
+      .headers(header_))
     .pause(1)
+    .exec(getCreateApplicationPage)
+    .pause(7)
     .exec(createLGVApplication)
     .pause(1)
     .exec(showDashboard)
-    .pause(1)
+    .pause(3)
     .exec(getBusinessTypePage)
     .pause(4)
     .exec(businessType)
