@@ -1,6 +1,6 @@
 package scenarios
 
-import `trait`.ApplicationJourneySteps
+import journeySteps.ApplicationJourneySteps
 import io.gatling.core.Predef._
 import io.gatling.core.feeder.BatchableFeederBuilder
 import io.gatling.core.structure.ScenarioBuilder
