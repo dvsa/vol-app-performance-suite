@@ -3,7 +3,9 @@ package journeySteps;
 import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.*;
 import static utils.GenericUtils.orderRef;
+import static utils.GenericUtils.password;
 
+import activesupport.config.Configuration;
 import io.gatling.javaapi.core.*;
 import io.gatling.javaapi.http.*;
 import utils.SetUp;
@@ -12,6 +14,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ApplicationJourneyStep {
+    private static final String env = System.getProperty("env");
+    private static final String newPassword = new Configuration().getConfig().getString("password");
+
     private static final Map<String, String> acceptHeaders = new HashMap<>();
 
     static {
@@ -39,7 +44,7 @@ public class ApplicationJourneyStep {
             .get("register/")
             .headers(getAcceptHeaders())
             .check(
-                    regex(SetUp.securityTokenPattern()).
+                    regex(SetUp.securityTokenPattern()).find().
                             saveAs("securityToken"));
 
     public static HttpRequestActionBuilder setUserStatus = http("inform about your status")
@@ -92,7 +97,7 @@ public class ApplicationJourneyStep {
             .get("/welcome")
             .headers(getAcceptHeaders())
             .check(
-                    regex(SetUp.securityTokenPattern()).saveAs("securityToken"),
+                    regex(SetUp.securityTokenPattern()).find().saveAs("securityToken"),
                     status().in(200, 302)
             );
 
@@ -100,7 +105,7 @@ public class ApplicationJourneyStep {
             .get("/dashboard")
             .headers(getAcceptHeaders())
             .check(
-                    regex(SetUp.securityTokenPattern()).saveAs("securityToken")
+                    regex(SetUp.securityTokenPattern()).find().saveAs("securityToken")
             );
 
     public static HttpRequestActionBuilder submitWelcomePage = http("accept terms and continue")
@@ -117,6 +122,119 @@ public class ApplicationJourneyStep {
                     status().in(200, 302)
             );
 
-   
+    public static HttpRequestActionBuilder changePassword = http("change password")
+            .post("auth/expired-password/")
+            .formParam("oldPassword", password(env))
+            .formParam("newPassword", newPassword)
+            .formParam("confirmPassword", newPassword)
+            .formParam("submit", "Save")
+            .formParam("security", (Session session) -> session.get("securityToken"));
 
+    public static HttpRequestActionBuilder getLoginPage = http("get login page")
+            .get("auth/login/")
+            .headers(getAcceptHeaders())
+            .check(
+                    regex(SetUp.securityTokenPattern()).find().
+                            saveAs("securityToken"));
+
+    public static HttpRequestActionBuilder loginPage = http("login")
+            .post("auth/login/")
+            .formParam("username", "#{Username}")
+            .formParam("password", session -> password(env))
+            .formParam("submit", "Sign in")
+            .formParam("security", (Session session) -> session.get("securityToken"))
+            .check(regex(SetUp.location()).find().optional().saveAs("Location"));
+
+    public static HttpRequestActionBuilder landingPage = http("Landing Page")
+            .get("/")
+            .check(regex("#{Forename}"))
+            .check(bodyString().find().saveAs("login_response"));
+
+    public static HttpRequestActionBuilder createNonLGVApplication = http("choose country")
+            .post("application/create/")
+            .formParam("type-of-licence[operator-location]", "N")
+            .formParam("type-of-licence[operator-type]", "lcat_gv")
+            .formParam("type-of-licence[licence-type]", "ltyp_sn")
+            .formParam("form-actions[saveAndContinue]", "")
+            .formParam("security", (Session session) -> session.get("securityToken"));
+
+    public static HttpRequestActionBuilder getCreateApplicationPage = http("get application")
+            .get("application/create/")
+            .headers(getAcceptHeaders());
+
+    public static HttpRequestActionBuilder createLGVApplication = http("create application")
+            .post("application/create/")
+            .headers(getFormHeaders())
+            .check(
+                    regex(SetUp.securityTokenPattern()).find().
+                            saveAs("securityToken"))
+            .formParam("type-of-licence[operator-location]", "N")
+            .formParam("type-of-licence[operator-type]", "lcat_gv")
+            .formParam("type-of-licence[licence-type][licence-type]", "ltyp_si")
+            .formParam("type-of-licence[licence-type][ltyp_siContent][vehicle-type]", "app_veh_type_lgv")
+            .formParam("type-of-licence[licence-type][ltyp_siContent][lgv-declaration][lgv-declaration-confirmation]", "0")
+            .formParam("type-of-licence[licence-type][ltyp_siContent][lgv-declaration][lgv-declaration-confirmation]", "1")
+            .formParam("form-actions[saveAndContinue]", "")
+            .formParam("version", 1)
+            .formParam("security", (Session session) -> session.get("securityToken"));
+
+
+    public static HttpRequestActionBuilder createPSVApplication = http("create psv application")
+            .post("application/create/")
+            .headers(getFormHeaders())
+            .check(
+                    regex(SetUp.securityTokenPattern()).find().
+                            saveAs("securityToken"))
+            .formParam("type-of-licence[operator-location]", "N")
+            .formParam("type-of-licence[operator-type]", "lcat_psv")
+            .formParam("type-of-licence[licence-type]", "ltyp_sn")
+            .formParam("form-actions[saveAndContinue]", "")
+            .formParam("security", (Session session) -> session.get("securityToken"));
+
+    public static HttpRequestActionBuilder showDashboard = http("Show dashboard")
+            .get("/")
+            .check(regex("href=\"/application/(.+?)/").find().saveAs("applicationNumber"));
+
+    public static HttpRequestActionBuilder getBusinessTypePage = http("Show Business Type Page")
+            .get("application/${applicationNumber}/business-type/")
+            .check(
+                    regex(SetUp.securityTokenPattern()).
+                            find().saveAs("securityToken"));
+
+    public static HttpRequestActionBuilder businessType = http("business type")
+            .post("application/#{applicationNumber}/business-type/")
+            .headers(getFormHeaders())
+            .formParam("data[type]", "org_t_rc")
+            .formParam("form-actions[saveAndContinue]", "")
+            .formParam("version", "1")
+            .formParam("security", (Session session) -> session.get("securityToken"))
+            .check(status().in(200, 209, 302, 304));
+
+    public static HttpRequestActionBuilder getBusinessDetailsPage = http("Show Business Details Page")
+            .get("application/#{applicationNumber}/business-details/")
+            .headers(getAcceptHeaders())
+            .check(
+                    regex(SetUp.securityTokenPattern()).
+                            find().saveAs("securityToken"));
+
+    public static HttpRequestActionBuilder businessDetails = http("business details")
+            .post("application/#{applicationNumber}/business-details/")
+            .headers(getFormHeaders())
+            .formParam("data[tradingNames][0][name]", "")
+            .formParam("data[tradingNames][0][id]", "")
+            .formParam("data[tradingNames][0][version]", "")
+            .formParam("data[companyNumber][company_number]", "07104043")
+            .formParam("registeredAddress[id]", "")
+            .formParam("registeredAddress[version]", "2")
+            .formParam("data[natureOfBusiness]", "Performance Testing")
+            .formParam("registeredAddress[addressLine1]", "1 Gatling House")
+            .formParam("registeredAddress[addressLine2]", "VOL")
+            .formParam("registeredAddress[addressLine3]", "")
+            .formParam("registeredAddress[addressLine4]", "")
+            .formParam("registeredAddress[town]", "Nottingham")
+            .formParam("registeredAddress[postcode]", "NG2 3HX")
+            .formParam("table[rows]", "0")
+            .formParam("form-actions[saveAndContinue]", "")
+            .formParam("version", "1")
+            .formParam("security", (Session session) -> session.get("securityToken"));
 }
