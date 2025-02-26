@@ -8,12 +8,12 @@ import static utils.GenericUtils.password;
 import activesupport.config.Configuration;
 import io.gatling.javaapi.core.*;
 import io.gatling.javaapi.http.*;
-import utils.SetUp;
+import utils.SetUp_;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ApplicationJourneyStep {
+public class ApplicationJourneySteps {
     private static final String env = System.getProperty("env");
     private static final String newPassword = new Configuration().getConfig().getString("password");
 
@@ -44,7 +44,7 @@ public class ApplicationJourneyStep {
             .get("register/")
             .headers(getAcceptHeaders())
             .check(
-                    regex(SetUp.securityTokenPattern()).find().
+                    regex(SetUp_.securityTokenPattern()).find().
                             saveAs("securityToken"));
 
     public static HttpRequestActionBuilder setUserStatus = http("inform about your status")
@@ -97,7 +97,7 @@ public class ApplicationJourneyStep {
             .get("/welcome")
             .headers(getAcceptHeaders())
             .check(
-                    regex(SetUp.securityTokenPattern()).find().saveAs("securityToken"),
+                    regex(SetUp_.securityTokenPattern()).find().saveAs("securityToken"),
                     status().in(200, 302)
             );
 
@@ -105,7 +105,7 @@ public class ApplicationJourneyStep {
             .get("/dashboard")
             .headers(getAcceptHeaders())
             .check(
-                    regex(SetUp.securityTokenPattern()).find().saveAs("securityToken")
+                    regex(SetUp_.securityTokenPattern()).find().saveAs("securityToken")
             );
 
     public static HttpRequestActionBuilder submitWelcomePage = http("accept terms and continue")
@@ -134,7 +134,7 @@ public class ApplicationJourneyStep {
             .get("auth/login/")
             .headers(getAcceptHeaders())
             .check(
-                    regex(SetUp.securityTokenPattern()).find().
+                    regex(SetUp_.securityTokenPattern()).find().
                             saveAs("securityToken"));
 
     public static HttpRequestActionBuilder loginPage = http("login")
@@ -143,7 +143,7 @@ public class ApplicationJourneyStep {
             .formParam("password", session -> password(env))
             .formParam("submit", "Sign in")
             .formParam("security", (Session session) -> session.get("securityToken"))
-            .check(regex(SetUp.location()).find().optional().saveAs("Location"));
+            .check(regex(SetUp_.location()).find().optional().saveAs("Location"));
 
     public static HttpRequestActionBuilder landingPage = http("Landing Page")
             .get("/")
@@ -166,7 +166,7 @@ public class ApplicationJourneyStep {
             .post("application/create/")
             .headers(getFormHeaders())
             .check(
-                    regex(SetUp.securityTokenPattern()).find().
+                    regex(SetUp_.securityTokenPattern()).find().
                             saveAs("securityToken"))
             .formParam("type-of-licence[operator-location]", "N")
             .formParam("type-of-licence[operator-type]", "lcat_gv")
@@ -183,7 +183,7 @@ public class ApplicationJourneyStep {
             .post("application/create/")
             .headers(getFormHeaders())
             .check(
-                    regex(SetUp.securityTokenPattern()).find().
+                    regex(SetUp_.securityTokenPattern()).find().
                             saveAs("securityToken"))
             .formParam("type-of-licence[operator-location]", "N")
             .formParam("type-of-licence[operator-type]", "lcat_psv")
@@ -198,7 +198,7 @@ public class ApplicationJourneyStep {
     public static HttpRequestActionBuilder getBusinessTypePage = http("Show Business Type Page")
             .get("application/${applicationNumber}/business-type/")
             .check(
-                    regex(SetUp.securityTokenPattern()).
+                    regex(SetUp_.securityTokenPattern()).
                             find().saveAs("securityToken"));
 
     public static HttpRequestActionBuilder businessType = http("business type")
@@ -214,7 +214,7 @@ public class ApplicationJourneyStep {
             .get("application/#{applicationNumber}/business-details/")
             .headers(getAcceptHeaders())
             .check(
-                    regex(SetUp.securityTokenPattern()).
+                    regex(SetUp_.securityTokenPattern()).
                             find().saveAs("securityToken"));
 
     public static HttpRequestActionBuilder businessDetails = http("business details")
