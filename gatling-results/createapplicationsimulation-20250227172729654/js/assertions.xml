@@ -1,5 +1,0 @@
-<testsuite name="simulations.CreateApplicationSimulation" tests="1" errors="0" failures="1" time="0">
-  <testcase name="Global: count of failed events is 0.0" status="false" time="0">
-  <failure type="Global: count of failed events is 0.0">Actual value: 24.0</failure>
-</testcase>
-</testsuite>
