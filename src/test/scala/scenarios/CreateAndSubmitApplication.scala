@@ -1,9 +1,9 @@
 //package scenarios
 //
 //import io.gatling.core.Predef._
-//import io.gatling.core.feeder.BatchableFeederBuilder
 //import io.gatling.core.structure.ScenarioBuilder
 //import io.gatling.http.Predef.{flushSessionCookies, http}
+//import io.gatling.javaapi.core.FeederBuilder.Batchable
 //import utils.SetUp
 //import utils.SetUp._
 //
@@ -11,7 +11,7 @@
 //
 //object CreateAndSubmitApplication extends ApplicationJourneySteps {
 //
-//  val feeder: BatchableFeederBuilder[String] = {
+//  val feeder = {
 //    (env) match {
 //      case "int" =>
 //        csv("loginId_int.csv").eager
@@ -19,7 +19,7 @@
 //        csv("loginId.csv").circular
 //    }
 //  }
-//  
+//
 //
 //  val selfServiceApplicationRegistration: ScenarioBuilder = scenario("Create and submit application")
 //    .feed(feeder)

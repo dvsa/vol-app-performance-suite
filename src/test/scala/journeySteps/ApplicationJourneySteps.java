@@ -4,48 +4,25 @@ import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.*;
 import static utils.GenericUtils.orderRef;
 import static utils.GenericUtils.password;
+import static utils.Header.getAcceptHeaders;
+import static utils.Header.getFormHeaders;
+import static utils.SetUp.env;
 
 import activesupport.config.Configuration;
 import io.gatling.javaapi.core.*;
 import io.gatling.javaapi.http.*;
-import utils.SetUp_;
+import utils.SetUp;
 
-import java.util.HashMap;
-import java.util.Map;
+
 
 public class ApplicationJourneySteps {
-    private static final String env = System.getProperty("env");
     private static final String newPassword = new Configuration().getConfig().getString("password");
-
-    private static final Map<String, String> acceptHeaders = new HashMap<>();
-
-    static {
-        acceptHeaders.put("Accept", "*/*");
-    }
-
-    public static Map<String, String> getAcceptHeaders() {
-        return acceptHeaders;
-    }
-
-    private static final Map<String, String> formHeaders = new HashMap<>();
-
-    static {
-        formHeaders.put("Content-Type", "application/x-www-form-urlencoded");
-        formHeaders.put("Accept-Language", "en-GB,en-US;q=0.9,en;q=0.8");
-        formHeaders.put("Accept-Encoding", "gzip, deflate");
-        formHeaders.put("Accept", "*/*");
-    }
-
-    public static Map<String, String> getFormHeaders() {
-        return formHeaders;
-    }
 
     public static HttpRequestActionBuilder getUserStatus = http("do you already have a licence")
             .get("register/")
             .headers(getAcceptHeaders())
             .check(
-                    regex(SetUp_.securityTokenPattern()).find().
-                            saveAs("securityToken"));
+                    regex(SetUp.securityTokenPattern).find().saveAs("securityToken"));
 
     public static HttpRequestActionBuilder setUserStatus = http("inform about your status")
             .post("register/")
@@ -53,7 +30,6 @@ public class ApplicationJourneySteps {
             .formParam("fields[licenceContent][licenceNumber]", "N")
             .formParam("form-actions[submit]", "")
             .formParam("security", (Session session) -> session.get("securityToken"));
-
 
     public static HttpRequestActionBuilder getOperatorRepresentation = http("get operator representation")
             .get("register/operator-representation/")
@@ -97,7 +73,7 @@ public class ApplicationJourneySteps {
             .get("/welcome")
             .headers(getAcceptHeaders())
             .check(
-                    regex(SetUp_.securityTokenPattern()).find().saveAs("securityToken"),
+                    regex(SetUp.securityTokenPattern).find().saveAs("securityToken"),
                     status().in(200, 302)
             );
 
@@ -105,7 +81,7 @@ public class ApplicationJourneySteps {
             .get("/dashboard")
             .headers(getAcceptHeaders())
             .check(
-                    regex(SetUp_.securityTokenPattern()).find().saveAs("securityToken")
+                    regex(SetUp.securityTokenPattern).find().saveAs("securityToken")
             );
 
     public static HttpRequestActionBuilder submitWelcomePage = http("accept terms and continue")
@@ -134,7 +110,7 @@ public class ApplicationJourneySteps {
             .get("auth/login/")
             .headers(getAcceptHeaders())
             .check(
-                    regex(SetUp_.securityTokenPattern()).find().
+                    regex(SetUp.securityTokenPattern).find().
                             saveAs("securityToken"));
 
     public static HttpRequestActionBuilder loginPage = http("login")
@@ -143,7 +119,7 @@ public class ApplicationJourneySteps {
             .formParam("password", session -> password(env))
             .formParam("submit", "Sign in")
             .formParam("security", (Session session) -> session.get("securityToken"))
-            .check(regex(SetUp_.location()).find().optional().saveAs("Location"));
+            .check(regex(SetUp.location).find().optional().saveAs("Location"));
 
     public static HttpRequestActionBuilder landingPage = http("Landing Page")
             .get("/")
@@ -166,7 +142,7 @@ public class ApplicationJourneySteps {
             .post("application/create/")
             .headers(getFormHeaders())
             .check(
-                    regex(SetUp_.securityTokenPattern()).find().
+                    regex(SetUp.securityTokenPattern).find().
                             saveAs("securityToken"))
             .formParam("type-of-licence[operator-location]", "N")
             .formParam("type-of-licence[operator-type]", "lcat_gv")
@@ -183,7 +159,7 @@ public class ApplicationJourneySteps {
             .post("application/create/")
             .headers(getFormHeaders())
             .check(
-                    regex(SetUp_.securityTokenPattern()).find().
+                    regex(SetUp.securityTokenPattern).find().
                             saveAs("securityToken"))
             .formParam("type-of-licence[operator-location]", "N")
             .formParam("type-of-licence[operator-type]", "lcat_psv")
@@ -198,7 +174,7 @@ public class ApplicationJourneySteps {
     public static HttpRequestActionBuilder getBusinessTypePage = http("Show Business Type Page")
             .get("application/${applicationNumber}/business-type/")
             .check(
-                    regex(SetUp_.securityTokenPattern()).
+                    regex(SetUp.securityTokenPattern).
                             find().saveAs("securityToken"));
 
     public static HttpRequestActionBuilder businessType = http("business type")
@@ -214,7 +190,7 @@ public class ApplicationJourneySteps {
             .get("application/#{applicationNumber}/business-details/")
             .headers(getAcceptHeaders())
             .check(
-                    regex(SetUp_.securityTokenPattern()).
+                    regex(SetUp.securityTokenPattern).
                             find().saveAs("securityToken"));
 
     public static HttpRequestActionBuilder businessDetails = http("business details")
