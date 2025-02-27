@@ -1,6 +1,5 @@
 package scenarios;
 
-import io.gatling.core.feeder.BatchableFeederBuilder;
 import io.gatling.javaapi.core.ScenarioBuilder;
 import journeySteps.ApplicationJourneySteps;
 import utils.FeederConfig;
@@ -10,7 +9,6 @@ import java.util.Objects;
 
 import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.http;
-import static utils.SetUp.env;
 
 public class CreateApplication extends ApplicationJourneySteps {
 
@@ -20,9 +18,11 @@ public class CreateApplication extends ApplicationJourneySteps {
                 .exec(getLoginPage)
                 .pause(1)
                 .exec(loginPage)
-                .exec(session -> session.set("expired-password", "${Location}"))
+                .exec(session -> session.set("expired-password", session.getString("Location")))
                 .pause(2)
-                .doIf(session -> !Objects.requireNonNull(session.getString("expired-password")).isEmpty())
+                .doIf(session -> session.contains("expired-password") &&
+                        session.getString("expired-password") != null &&
+                        !Objects.requireNonNull(session.getString("expired-password")).isEmpty())
                 .then(exec(changePassword))
                 .pause(1)
                 .exec(getWelcomePage)
@@ -78,7 +78,7 @@ public class CreateApplication extends ApplicationJourneySteps {
                 .exec(licenceHistory)
                 .pause(2)
                 .exec(convictionsAndPenalties)
-                .pause(3)
-                .exec(flushSessionCookies);
+                .pause(2)
+                .exec(undertakings);
     }
 }
