@@ -21,8 +21,8 @@ repositories {
 dependencies {
     implementation 'io.gatling.highcharts:gatling-charts-highcharts:3.13.4'
     implementation 'org.apache.commons:commons-csv:1.13.0'
-    implementation 'org.junit.jupiter:junit-jupiter-api:5.11.4'
-    // https://mvnrepository.com/artifact/io.gatling/gatling-maven-plugin
+    testImplementation platform("org.junit:junit-bom:5.11.4") // Use latest stable JUnit 5
+    testImplementation "org.junit.jupiter:junit-jupiter"
     implementation group: 'io.gatling', name: 'gatling-maven-plugin', version: '4.15.1'
 
 
@@ -47,7 +47,7 @@ tasks.register('registerUser', JavaExec) {
 
     args = [
             "--simulation", "simulations.RegisterUserSimulation",
-            "--results-folder", file("${rootDir}/gatling-results").absolutePath,
+            "--results-folder", file("${buildDir}/gatling-results").absolutePath,
             "--bodies-folder", file(sourceSets.test.resources.srcDirs.first()).absolutePath
     ]
 }
@@ -56,7 +56,6 @@ tasks.register('createApplication', JavaExec) {
     dependsOn testClasses
     classpath = sourceSets.test.runtimeClasspath
     mainClass.set("io.gatling.app.Gatling")
-    shouldRunAfter(test)
 
     doFirst {
         tasks.named("registerUsersViaAPI").get()
@@ -68,11 +67,10 @@ tasks.register('createApplication', JavaExec) {
 
     args = [
             "--simulation", "simulations.CreateApplicationSimulation",
-            "--results-folder", file("${rootDir}/gatling-results").absolutePath,
-            "--bodies-folder", file(sourceSets.test.resources.srcDirs.first()).absolutePath
+            "--results-folder", file("${buildDir}/gatling-results").absolutePath
     ]
 
-    outputs.dir file("${rootDir}/gatling-results")
+    outputs.dir file("${buildDir}/gatling-results")
 
     doLast {
         tasks.named("cleanUp").get()
@@ -86,7 +84,7 @@ tasks.register('searchOperator', JavaExec) {
 
     args = [
             "--simulation", "simulations.ExternalOperatorSearchSimulation",
-            "--results-folder", file("${rootDir}/gatling-results").absolutePath,
+            "--results-folder", file("${buildDir}/gatling-results").absolutePath,
             "--bodies-folder", file(sourceSets.test.resources.srcDirs.first()).absolutePath
     ]
 }
@@ -98,7 +96,7 @@ tasks.register('internalSearchLicence', JavaExec) {
 
     args = [
             "--simulation", "simulations.InternalLicenceSearchSimulation",
-            "--results-folder", file("${rootDir}/gatling-results").absolutePath,
+            "--results-folder", file("${buildDir}/gatling-results").absolutePath,
             "--bodies-folder", file(sourceSets.test.resources.srcDirs.first()).absolutePath
     ]
 }
@@ -108,11 +106,13 @@ tasks.register('registerUsersViaAPI', Test) {
     doFirst {
         println "Running API User Registration Tests..."
     }
-
-    useJUnitPlatform()
-
-    filter {
-        includeTest "*SelfServeRegisterUser", "mainTest"
+    test {
+        useJUnitPlatform()
+        filter {
+            println("We are here============================")
+            includeTestsMatching("**.mainTest")
+            println("You are leaving ===================")// Use full package name
+        }
     }
 }
 
@@ -125,7 +125,6 @@ tasks.register('cleanUp', Test) {
     }
 
     filter {
-        includeTestsMatching("*.registerUser")
         includeTestsMatching("*.deleteFile")
     }
 

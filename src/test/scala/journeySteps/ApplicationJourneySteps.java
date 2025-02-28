@@ -7,6 +7,7 @@ import static utils.Header.getAcceptHeaders;
 import static utils.Header.getFormHeaders;
 import static utils.SetUp.env;
 
+import activesupport.aws.s3.SecretsManager;
 import activesupport.config.Configuration;
 import io.gatling.javaapi.core.*;
 import io.gatling.javaapi.http.*;
@@ -69,7 +70,7 @@ public class ApplicationJourneySteps {
             );
 
     public static HttpRequestActionBuilder getWelcomePage = http("get welcome page")
-            .get("/welcome")
+            .get("welcome/")
             .headers(getAcceptHeaders())
             .check(
                     regex(SetUp.securityTokenPattern).find().saveAs("securityToken"),
@@ -77,14 +78,14 @@ public class ApplicationJourneySteps {
             );
 
     public static HttpRequestActionBuilder getDashboardAfterWelcome = http("get dashboard after welcome")
-            .get("/dashboard")
+            .get("dashboard/")
             .headers(getAcceptHeaders())
             .check(
                     regex(SetUp.securityTokenPattern).find().saveAs("securityToken")
             );
 
     public static HttpRequestActionBuilder submitWelcomePage = http("accept terms and continue")
-            .post("/welcome")
+            .post("welcome/")
             .headers(getFormHeaders())
             .formParam("main[termsAgreed]", "Y")
             .formParam("form-actions[submit]", "")
@@ -100,7 +101,6 @@ public class ApplicationJourneySteps {
     public static HttpRequestActionBuilder changePassword = http("change password")
             .post("auth/expired-password/")
             .headers(Header.getFormHeaders())
-            .formParam("oldPassword", password(env))
             .formParam("newPassword", newPassword)
             .formParam("confirmPassword", newPassword)
             .formParam("submit", "Save")
@@ -117,8 +117,16 @@ public class ApplicationJourneySteps {
             .post("auth/login/")
             .headers(Header.getFormHeaders())
             .formParam("username", "#{Username}")
-            .formParam("password", session -> password(env))
-            .formParam("submit", "Sign in")
+            .formParam("password", session -> {
+                String password = session.get("Password");
+                String environment = session.getString(env);
+                if ("int".equals(environment)) {
+                    return SecretsManager.getSecretValue("intEnvPassword");
+                } else {
+                    return password;
+                }
+            })
+            .formParam("submit", "")
             .formParam("security", (Session session) -> session.get("securityToken"))
             .check(regex(SetUp.location).find().optional().saveAs("Location"));
 
@@ -250,8 +258,8 @@ public class ApplicationJourneySteps {
             .formParam("form-actions[saveAndContinue]", "")
             .formParam("security", (Session session) -> session.get("securityToken"));
 
-    public static HttpRequestActionBuilder director = http("people")
-            .post("application/${applicationNumber}/people/add/")
+    public static HttpRequestActionBuilder director = http("add director")
+            .post("application/#{applicationNumber}/people/add/")
             .headers(Header.getFormHeaders())
             .formParam("data[title]", "title_mr")
             .formParam("data[forename]", "Director")
@@ -264,11 +272,15 @@ public class ApplicationJourneySteps {
             .formParam("form-actions[saveAndContinue]", "")
             .formParam("security", (Session session) -> session.get("securityToken"));
 
-    public static HttpRequestActionBuilder saveDirectorDetails = http("people")
+    public static HttpRequestActionBuilder getDirector = http("get to directors page")
+            .get("application/#{applicationNumber}/people/")
+            .headers(Header.getAcceptHeaders());
+
+    public static HttpRequestActionBuilder saveDirectorDetails = http("add a director")
             .post("application/#{applicationNumber}/people/")
             .headers(Header.getFormHeaders())
-            .formParam("table[rows]", "1")
-            .formParam("form-actions[saveAndContinue]", "")
+            .formParam("table[rows]", "0")
+            .formParam("form-actions[saveAndContinue]", "Add")
             .formParam("security", (Session session) -> session.get("securityToken"));
 
     public static HttpRequestActionBuilder operatingCentreDetails = http("add operating centres")

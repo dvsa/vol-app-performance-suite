@@ -1,5 +1,3 @@
-package utils.api;
-
 import activesupport.database.url.DbURL;
 import activesupport.mailPit.MailPit;
 import activesupport.ssh.SSH;
@@ -12,7 +10,6 @@ import com.jcraft.jsch.Session;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
-import utils.SQLquery;
 
 import javax.naming.ConfigurationException;
 import java.io.*;
@@ -60,15 +57,15 @@ public class SelfServeRegisterUserTest {
         }
     }
 
-    @Test
-    public void deleteFile() {
-        File loginDetails = new File(LOGIN_CSV_FILE);
-        if (loginDetails.exists() && loginDetails.delete()) {
-            LOGGER.info("{} has been deleted", loginDetails);
-        } else {
-            LOGGER.warn("{} does not exist", loginDetails);
-        }
-    }
+//    @Test
+//    public void deleteFile() {
+//        File loginDetails = new File(LOGIN_CSV_FILE);
+//        if (loginDetails.exists() && loginDetails.delete()) {
+//            LOGGER.info("{} has been deleted", loginDetails);
+//        } else {
+//            LOGGER.warn("{} does not exist", loginDetails);
+//        }
+//    }
 
     public void registerUser() {
         MailPit mailPit = new MailPit();

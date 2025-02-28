@@ -24,6 +24,7 @@ public class Header {
         formHeaders.put("Accept-Language", "en-GB,en-US;q=0.9,en;q=0.8");
         formHeaders.put("Accept-Encoding", "gzip, deflate");
         formHeaders.put("Accept", "*/*");
+        formHeaders.put("Origin", "*/*");
     }
 
     public static Map<String, String> getFormHeaders() {

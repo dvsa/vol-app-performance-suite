@@ -18,8 +18,7 @@ public class SetUp {
 
     public static final String baseURL;
     public static final String securityTokenPattern = "id=\"security\" value=\"([^\"]*)&*";
-    public static final String header_ = "Accept: */*";
-    public static final String location = "name=\"change-password-form\" action=\"&#x2F;auth&#x2F;expired-password&#x2F;([^\"]*)&#x2F;";
+    public static final String location = "name=\"change-password-form\"";
     public static final String cpmsRedirectURL = "action=\"https://sbsctest.e-paycapita.com:443/scp/scpcli?(.*)\"";
 
     static {
