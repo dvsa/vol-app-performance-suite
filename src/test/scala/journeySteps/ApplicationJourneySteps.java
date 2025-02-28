@@ -73,7 +73,6 @@ public class ApplicationJourneySteps {
             .get("welcome/")
             .headers(getAcceptHeaders())
             .check(
-                    regex(SetUp.securityTokenPattern).find().saveAs("securityToken"),
                     status().in(200, 302)
             );
 
@@ -161,7 +160,7 @@ public class ApplicationJourneySteps {
             .formParam("type-of-licence[licence-type][ltyp_siContent][lgv-declaration][lgv-declaration-confirmation]", "0")
             .formParam("type-of-licence[licence-type][ltyp_siContent][lgv-declaration][lgv-declaration-confirmation]", "1")
             .formParam("form-actions[saveAndContinue]", "")
-            .formParam("version", String.valueOf(String.valueOf(randomInt())))
+            .formParam("version", String.valueOf(randomInt()))
             .formParam("security", (Session session) -> session.get("securityToken"));
 
 
@@ -182,7 +181,7 @@ public class ApplicationJourneySteps {
             .check(regex("href=\"/application/(.+?)/").find().saveAs("applicationNumber"));
 
     public static HttpRequestActionBuilder getBusinessTypePage = http("Show Business Type Page")
-            .get("application/${applicationNumber}/business-type/")
+            .get("application/#{applicationNumber}/business-type/")
             .check(
                     regex(SetUp.securityTokenPattern).
                             find().saveAs("securityToken"));
@@ -211,7 +210,7 @@ public class ApplicationJourneySteps {
             .formParam("data[tradingNames][0][version]", "")
             .formParam("data[companyNumber][company_number]", "07104043")
             .formParam("registeredAddress[id]", "")
-            .formParam("registeredAddress[version]", "2")
+            .formParam("registeredAddress[version]", randomInt())
             .formParam("data[natureOfBusiness]", "Performance Testing")
             .formParam("registeredAddress[addressLine1]", "1 Gatling House")
             .formParam("registeredAddress[addressLine2]", "VOL")
@@ -243,16 +242,14 @@ public class ApplicationJourneySteps {
             .formParam("security", (Session session) -> session.get("securityToken"));
 
     public static HttpRequestActionBuilder getLicenceAuthorisationPage = http("Show Licence Authorisation Page")
-            .get("application/${applicationNumber}/operating-centres/")
-            .check(
-                    regex(SetUp.securityTokenPattern).
-                            find().saveAs("securityToken"));
+            .get("application/#{applicationNumber}/operating-centres/")
+            .headers(getAcceptHeaders());
 
 
     public static HttpRequestActionBuilder licenceAuthorisation = http("licence authorisation")
-            .post("application/${applicationNumber}/operating-centres/")
+            .post("application/#{applicationNumber}/operating-centres/")
             .headers(Header.getFormHeaders())
-            .formParam("data[version]", String.valueOf(randomInt()))
+            .formParam("data[version]", "2")
             .formParam("data[totAuthLgvVehiclesFieldset][totAuthLgvVehicles]", "5")
             .formParam("data[totCommunityLicencesFieldset][totCommunityLicences]", "5")
             .formParam("form-actions[saveAndContinue]", "")
@@ -284,7 +281,7 @@ public class ApplicationJourneySteps {
             .formParam("security", (Session session) -> session.get("securityToken"));
 
     public static HttpRequestActionBuilder operatingCentreDetails = http("add operating centres")
-            .post("application/${applicationNumber}/operating-centres/add/")
+            .post("application/#{applicationNumber}/operating-centres/add/")
             .headers(Header.getFormHeaders())
             .formParam("address[searchPostcode][postcode]", "NG1 5FW")
             .formParam("address[addressLine1]", "3 WOLLATON STREET")
@@ -300,10 +297,10 @@ public class ApplicationJourneySteps {
             .formParam("security", (Session session) -> session.get("securityToken"));
 
     public static HttpRequestActionBuilder operatorCentreVehicleDetails = http("submit operating centres")
-            .post("application/${applicationNumber}/operating-centres/")
+            .post("application/#{applicationNumber}/operating-centres/")
             .headers(Header.getFormHeaders())
             .formParam("table[rows]", "1")
-            .formParam("data[version]", "2")
+            .formParam("data[version]", randomInt())
             .formParam("data[totAuthHgvVehiclesFieldset][totAuthHgvVehicles]", "5")
             .formParam("data[totAuthTrailersFieldset][totAuthTrailers]", "5")
             .formParam("data[totCommunityLicencesFieldset][totCommunityLicences]", "3")
@@ -313,14 +310,14 @@ public class ApplicationJourneySteps {
     public static HttpRequestActionBuilder financialEvidence = http("submit financial evidence")
             .post("application/#{applicationNumber}/financial-evidence/")
             .headers(Header.getFormHeaders())
+            .formParam("version", "3")
+            .formParam("id", "#{applicationNumber}")
             .formParam("evidence[uploadedFileCount]", "0")
+            .formParam("evidence[uploadNow]", "2")
             .formParam("evidence[files][fileCount]", "")
             .formParam("evidence[files][file]", "(binary)")
             .formParam("evidence[files][__messages__]", "")
-            .formParam("evidence[uploadNow]", "0")
             .formParam("form-actions[saveAndContinue]", "")
-            .formParam("version", "3")
-            .formParam("id", "#{applicationNumber}")
             .formParam("security", (Session session) -> session.get("securityToken"));
 
     public static HttpRequestActionBuilder getTransportManagersPage = http("Show Transport Manager Page")
@@ -342,7 +339,7 @@ public class ApplicationJourneySteps {
             .disableFollowRedirect()
             .formParam("data[registeredUser]", "")
             .formParam("data[addUser]", "")
-            .formParam("security", "${securityToken}")
+            .formParam("security", (Session session) -> session.get("securityToken"))
             .check(status().in(200, 209, 302, 304));
 
     public static HttpRequestActionBuilder transportManagersDetails = http("Add Transport Manager Details")
@@ -426,7 +423,7 @@ public class ApplicationJourneySteps {
             .formParam("query[vrm]", "")
             .formParam("query[disc]", "")
             .formParam("query[includeRemoved]", "")
-            .formParam("data[version]", String.valueOf(randomInt()))
+            .formParam("data[version]", "4")
             .formParam("data[hasEnteredReg]", "N")
             .formParam("vehicles[rows]", "0")
             .formParam("form-actions[saveAndContinue]", "")
@@ -449,14 +446,14 @@ public class ApplicationJourneySteps {
     public static HttpRequestActionBuilder safetyCompliance = http("safety compliance")
             .post("application/#{applicationNumber}/safety/")
             .headers(Header.getFormHeaders())
-            .formParam("licence[version]", "6")
+            .formParam("licence[version]", "7")
             .formParam("licence[safetyInsVehicles]", "10")
             .formParam("licence[safetyInsTrailers]", "5")
             .formParam("licence[safetyInsVaries]", "N")
             .formParam("licence[tachographIns]", "tach_internal")
             .formParam("licence[tachographInsName]", "")
             .formParam("table[rows]", "1")
-            .formParam("application[version]", String.valueOf(randomInt()))
+            .formParam("application[version]", "5")
             .formParam("application[safetyConfirmation]", "Y")
             .formParam("form-actions[saveAndContinue]", "")
             .formParam("security", (Session session) -> session.get("securityToken"));
@@ -465,7 +462,7 @@ public class ApplicationJourneySteps {
             .post("application/#{applicationNumber}/financial-history")
             .headers(Header.getFormHeaders())
             .formParam("data[id]", "#{applicationNumber}")
-            .formParam("data[version]", "6")
+            .formParam("data[version]", "7")
             .formParam("data[bankrupt]", "N")
             .formParam("data[liquidation]", "N")
             .formParam("data[receivership]", "N")
@@ -502,9 +499,9 @@ public class ApplicationJourneySteps {
             .formParam("security", (Session session) -> session.get("securityToken"));
 
     public static HttpRequestActionBuilder convictionsAndPenalties = http("convictions penalties")
-            .post("application/${applicationNumber}/convictions-penalties")
+            .post("application/#{applicationNumber}/convictions-penalties")
             .headers(Header.getFormHeaders())
-            .formParam("data[version]", "8")
+            .formParam("data[version]", randomInt())
             .formParam("data[question]", "N")
             .formParam("data[table][rows]", "0")
             .formParam("convictionsConfirmation[convictionsConfirmation]", "Y")
@@ -519,17 +516,17 @@ public class ApplicationJourneySteps {
             .formParam("interim[goodsApplicationInterim]", "N")
             .formParam("interim[YContent][goodsApplicationInterimReason]", "")
             .formParam("declarationsAndUndertakings[version]", String.valueOf(randomInt()))
-            .formParam("declarationsAndUndertakings[id]", "${applicationNumber}")
+            .formParam("declarationsAndUndertakings[id]", "#{applicationNumber}")
             .formParam("form-actions[submitAndPay]", "")
             .formParam("security", (Session session) -> session.get("securityToken"))
             .check(regex("(.*) Application Fee for application #{applicationNumber}"))
             .check(bodyString().saveAs("undertakings"));
 
     public static HttpRequestActionBuilder cpmsRedirect = http("navigate to cpms")
-            .post("application/${applicationNumber}/pay-and-submit/")
+            .post("application/#{applicationNumber}/pay-and-submit/")
             .headers(Header.getFormHeaders())
             .formParam("form-actions[pay]", "")
-            .formParam("security", "${securityToken}")
+            .formParam("security", (Session session) -> session.get("securityToken"))
             .check(bodyString().saveAs("pay"))
             .check(regex(SetUp.cpmsRedirectURL).find().exists());
 }

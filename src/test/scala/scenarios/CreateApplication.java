@@ -50,7 +50,6 @@ public class CreateApplication extends ApplicationJourneySteps {
                 .pause(4)
                 .exec(director)
                 .pause(4)
-                .pause(2)
                 .exec(getLicenceAuthorisationPage)
                 .pause(1)
                 .exec(licenceAuthorisation)
