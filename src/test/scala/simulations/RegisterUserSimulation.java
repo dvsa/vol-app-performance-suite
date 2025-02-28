@@ -1,5 +1,6 @@
 package simulations;
 
+
 import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.*;
 import static utils.Header.getAcceptHeaders;
@@ -12,24 +13,20 @@ import scenarios.RegisterUser;
 public class RegisterUserSimulation extends Simulation {
 
     private final String baseURL = utils.SetUp.baseURL;
-    private final int users = utils.SetUp.users; // Assuming SetUp_ has been converted accordingly
-    private final int rampUp = utils.SetUp.rampUp; // Assuming SetUp_ has been converted accordingly
-    private final int rampDurationInMin = utils.SetUp.rampDurationInMin; // Assuming SetUp_ has been converted accordingly
-
-    // HTTP Configuration
+    private final int users = utils.SetUp.users;
+    private final int rampUp = utils.SetUp.rampUp; 
+    private final int rampDurationInMin = utils.SetUp.rampDurationInMin; 
     HttpProtocolBuilder httpConfiguration = http.baseUrl(baseURL)
-            .headers(getAcceptHeaders()) // Assuming Headers.requestHeaders has been converted accordingly
+            .headers(getAcceptHeaders()) 
             .disableCaching()
             .disableWarmUp()
             .silentResources()
             .perUserNameResolution();
-
-    // Register Users Population
-
+    
     PopulationBuilder registerUsers = RegisterUser.registerUser()
-            .injectOpen(rampUsers(users).during(rampUp));// Injecting users with ramp-up time
-
-    // Setting up the simulation
+            .injectOpen(rampUsers(users).during(rampUp)).throttle(reachRps(1).in(60), 
+                    holdFor(rampDurationInMin));
+    
     {
         setUp(registerUsers)
                 .protocols(httpConfiguration)

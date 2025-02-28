@@ -109,10 +109,10 @@ tasks.register('registerUsersViaAPI', Test) {
         println "Running API User Registration Tests..."
     }
 
-    useJUnitPlatform() // Ensure JUnit 5 is enabled
+    useJUnitPlatform()
 
     filter {
-        includeTestsMatching("*.registerUser") // Use full package name
+        includeTest "*SelfServeRegisterUser", "mainTest"
     }
 }
 

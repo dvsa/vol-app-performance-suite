@@ -70,7 +70,6 @@ public class SelfServeRegisterUserTest {
         }
     }
 
-    @Test
     public void registerUser() {
         MailPit mailPit = new MailPit();
         QuotedPrintableCodec codec = new QuotedPrintableCodec();
