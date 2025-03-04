@@ -10,6 +10,7 @@ import com.jcraft.jsch.Session;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.StaleElementReferenceException;
 
 import javax.naming.ConfigurationException;
 import java.io.*;
@@ -86,6 +87,38 @@ public class SelfServeRegisterUserTest {
             }
         }
     }
+
+//    public void cancelAndWithdrawExistingApplications() {
+//        if (isElementPresent("//table", SelectorType.XPATH)) {
+//            applications = findElements("//table/tbody/tr", SelectorType.XPATH);
+//            int attempts = 0;
+//
+//            while (attempts < applications.size()) {
+//                try {
+//                    //Need to repopulate list after removing values
+//                    applications = findElements("//table/tbody/tr", SelectorType.XPATH);
+//                    String applicationId = applications.get(applications.size() - 1).getText().split(" ")[0];
+//
+//                    if (applications.get(applications.size() - 1).getText().contains("Not Yet Submitted")) {
+//                        clickByLinkText(applicationId);
+//                        waitAndClick("Cancel application", SelectorType.LINKTEXT);
+//                        UniversalActions.clickSubmit();
+//                    } else if (applications.get(applications.size() - 1).getText().contains("Under Consideration")) {
+//                        clickByLinkText(applicationId);
+//                        waitAndClick("Withdraw application", SelectorType.LINKTEXT);
+//                        UniversalActions.clickSubmit();
+//                    }
+//                } catch (StaleElementReferenceException e) {
+//                    LOGGER.error(e.getMessage(), e);
+//                }
+//                if (applications.isEmpty()) {
+//                    break;
+//                }
+//                waitForTitleToBePresent("Licences");
+//                attempts++;
+//            }
+//        }
+//    }
 
     private static void createTunnel() {
         DbURL dbURL = new DbURL();

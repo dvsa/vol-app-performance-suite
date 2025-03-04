@@ -1,6 +1,5 @@
 package simulations;
 
-
 import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.*;
 import static utils.SetUp.*;
@@ -25,7 +24,7 @@ public class CreateApplicationSimulation extends Simulation {
             .silentResources()
             .perUserNameResolution();
 
-    private static PopulationBuilder loginAndCreateApp = null;
+    private static final PopulationBuilder loginAndCreateApp;
 
     static {
         String testType = typeofTest != null ? typeofTest : "load";

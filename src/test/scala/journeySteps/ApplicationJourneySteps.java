@@ -118,9 +118,9 @@ public class ApplicationJourneySteps {
             .formParam("username", "#{Username}")
             .formParam("password", session -> {
                 String password = session.get("Password");
-                String environment = session.getString(env);
-                if ("int".equals(environment)) {
-                    return SecretsManager.getSecretValue("intEnvPassword");
+                if ("int".equals(env)) {
+                    return new Configuration().getConfig().getString("intPassword");
+//                    return SecretsManager.getSecretValue("intEnvPassword");
                 } else {
                     return password;
                 }
@@ -191,9 +191,16 @@ public class ApplicationJourneySteps {
             .headers(getFormHeaders())
             .formParam("data[type]", "org_t_rc")
             .formParam("form-actions[saveAndContinue]", "")
-            .formParam("version", "1")
-            .formParam("security", (Session session) -> session.get("securityToken"))
-            .check(status().in(200, 209, 302, 304));
+            .formParam("version", session -> {
+                if("int".equals(env)) {
+                    return "5";
+                }else {
+                    return "1";
+                }
+            })
+            .formParam("security", (Session session) -> session.get("securityToken"));
+
+
 
     public static HttpRequestActionBuilder getBusinessDetailsPage = http("Show Business Details Page")
             .get("application/#{applicationNumber}/business-details/")
@@ -210,7 +217,6 @@ public class ApplicationJourneySteps {
             .formParam("data[tradingNames][0][version]", "")
             .formParam("data[companyNumber][company_number]", "07104043")
             .formParam("registeredAddress[id]", "")
-            .formParam("registeredAddress[version]", randomInt())
             .formParam("data[natureOfBusiness]", "Performance Testing")
             .formParam("registeredAddress[addressLine1]", "1 Gatling House")
             .formParam("registeredAddress[addressLine2]", "VOL")
@@ -220,7 +226,9 @@ public class ApplicationJourneySteps {
             .formParam("registeredAddress[postcode]", "NG2 3HX")
             .formParam("table[rows]", "0")
             .formParam("form-actions[saveAndContinue]", "")
-            .formParam("version", String.valueOf(randomInt()))
+            .formParam("form-actions[saveAndContinue]", "")
+            .formParam("registeredAddress[version]", "")
+            .formParam("version", "1")
             .formParam("security", (Session session) -> session.get("securityToken"));
 
     public static HttpRequestActionBuilder addresses = http("addresses")
@@ -336,11 +344,9 @@ public class ApplicationJourneySteps {
     public static HttpRequestActionBuilder navigateToAddTransportManagersPage = http("Navigate To Add TM Page")
             .post("application/#{applicationNumber}/transport-managers/add/")
             .headers(Header.getFormHeaders())
-            .disableFollowRedirect()
             .formParam("data[registeredUser]", "")
             .formParam("data[addUser]", "")
-            .formParam("security", (Session session) -> session.get("securityToken"))
-            .check(status().in(200, 209, 302, 304));
+            .formParam("security", (Session session) -> session.get("securityToken"));
 
     public static HttpRequestActionBuilder transportManagersDetails = http("Add Transport Manager Details")
             .post("application/#{applicationNumber}/transport-managers/addNewUser/")
@@ -462,7 +468,7 @@ public class ApplicationJourneySteps {
             .post("application/#{applicationNumber}/financial-history")
             .headers(Header.getFormHeaders())
             .formParam("data[id]", "#{applicationNumber}")
-            .formParam("data[version]", "7")
+            .formParam("data[version]", "6")
             .formParam("data[bankrupt]", "N")
             .formParam("data[liquidation]", "N")
             .formParam("data[receivership]", "N")
@@ -474,6 +480,7 @@ public class ApplicationJourneySteps {
             .formParam("data[file][__messages__]", "")
             .formParam("data[financialHistoryConfirmation][insolvencyConfirmation]", "Y")
             .formParam("data[niFlag]", "N")
+            .formParam(" data[financialHistoryConfirmation][insolvencyConfirmation]", "Y")
             .formParam("form-actions[saveAndContinue]", "")
             .formParam("security", (Session session) -> session.get("securityToken"));
 
@@ -495,13 +502,13 @@ public class ApplicationJourneySteps {
             .formParam("assets[prevPurchasedAssets]", "N")
             .formParam("assets[prevPurchasedAssets-table][rows]", "0")
             .formParam("form-actions[saveAndContinue]", "")
-            .formParam("version", String.valueOf(randomInt()))
+            .formParam("version", "7")
             .formParam("security", (Session session) -> session.get("securityToken"));
 
     public static HttpRequestActionBuilder convictionsAndPenalties = http("convictions penalties")
             .post("application/#{applicationNumber}/convictions-penalties")
             .headers(Header.getFormHeaders())
-            .formParam("data[version]", randomInt())
+            .formParam("data[version]","8")
             .formParam("data[question]", "N")
             .formParam("data[table][rows]", "0")
             .formParam("convictionsConfirmation[convictionsConfirmation]", "Y")
@@ -511,11 +518,10 @@ public class ApplicationJourneySteps {
     public static HttpRequestActionBuilder undertakings = http("undertakings")
             .post("application/#{applicationNumber}/undertakings/")
             .headers(Header.getFormHeaders())
-            .disableFollowRedirect()
             .formParam("declarationsAndUndertakings[signatureOptions]", "N")
             .formParam("interim[goodsApplicationInterim]", "N")
             .formParam("interim[YContent][goodsApplicationInterimReason]", "")
-            .formParam("declarationsAndUndertakings[version]", String.valueOf(randomInt()))
+            .formParam("declarationsAndUndertakings[version]", "9")
             .formParam("declarationsAndUndertakings[id]", "#{applicationNumber}")
             .formParam("form-actions[submitAndPay]", "")
             .formParam("security", (Session session) -> session.get("securityToken"))

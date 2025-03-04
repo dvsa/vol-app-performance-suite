@@ -8,7 +8,7 @@ public class FeederConfig {
 
     public static FeederBuilder<String> getFeeder() {
         if ("int".equalsIgnoreCase(utils.SetUp.env)) {
-            return csv("loginId_int.csv").eager();
+            return csv("loginId_int_.csv").eager();
         } else {
             return csv("loginId.csv").circular();
         }
