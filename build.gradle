@@ -54,11 +54,12 @@ tasks.register('registerUser', JavaExec) {
 
 tasks.register('createApplication', JavaExec) {
     dependsOn testClasses
+    dependsOn("registerUsersViaAPI")
     classpath = sourceSets.test.runtimeClasspath
     mainClass.set("io.gatling.app.Gatling")
 
     doFirst {
-        tasks.named("registerUsersViaAPI").get()
+        println("Executing myTask after registerUsersViaAPI")
     }
 
     description = "Load testing with Gatling"
@@ -109,9 +110,7 @@ tasks.register('registerUsersViaAPI', Test) {
     test {
         useJUnitPlatform()
         filter {
-            println("We are here============================")
             includeTestsMatching("**.mainTest")
-            println("You are leaving ===================")// Use full package name
         }
     }
 }
