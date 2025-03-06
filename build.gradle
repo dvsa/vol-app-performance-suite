@@ -47,36 +47,27 @@ tasks.register('registerUser', JavaExec) {
 
     args = [
             "--simulation", "simulations.RegisterUserSimulation",
-            "--results-folder", file("${buildDir}/gatling-results").absolutePath,
+            "--results-folder", file("${rootDir}/gatling-results").absolutePath,
             "--bodies-folder", file(sourceSets.test.resources.srcDirs.first()).absolutePath
     ]
 }
 
 tasks.register('createApplication', JavaExec) {
-    dependsOn testClasses
     dependsOn("registerUsersViaAPI")
     classpath = sourceSets.test.runtimeClasspath
     mainClass.set("io.gatling.app.Gatling")
 
     doFirst {
-        println("Executing myTask after registerUsersViaAPI")
+        println("Creating users via app")
     }
-
-    description = "Load testing with Gatling"
-    classpath = sourceSets.test.runtimeClasspath
-    mainClass.set("io.gatling.app.Gatling")
 
     args = [
             "--simulation", "simulations.CreateApplicationSimulation",
-            "--results-folder", file("${buildDir}/gatling-results").absolutePath
+            "--results-folder", file("${rootDir}/gatling-results").absolutePath
     ]
-
-    outputs.dir file("${buildDir}/gatling-results")
-
-    doLast {
-        tasks.named("cleanUp").get()
-    }
+    outputs.dir file("${rootDir}/gatling-results")
 }
+
 
 tasks.register('searchOperator', JavaExec) {
     description = "Load testing with Gatling"
@@ -85,7 +76,7 @@ tasks.register('searchOperator', JavaExec) {
 
     args = [
             "--simulation", "simulations.ExternalOperatorSearchSimulation",
-            "--results-folder", file("${buildDir}/gatling-results").absolutePath,
+            "--results-folder", file("${rootDir}/gatling-results").absolutePath,
             "--bodies-folder", file(sourceSets.test.resources.srcDirs.first()).absolutePath
     ]
 }
@@ -97,37 +88,20 @@ tasks.register('internalSearchLicence', JavaExec) {
 
     args = [
             "--simulation", "simulations.InternalLicenceSearchSimulation",
-            "--results-folder", file("${buildDir}/gatling-results").absolutePath,
+            "--results-folder", file("${rootDir}/gatling-results").absolutePath,
             "--bodies-folder", file(sourceSets.test.resources.srcDirs.first()).absolutePath
     ]
 }
 
 tasks.register('registerUsersViaAPI', Test) {
+    useJUnitPlatform()
     description = "Runs SelfServeRegisterUser and mainTest"
     doFirst {
         println "Running API User Registration Tests..."
     }
     test {
-        useJUnitPlatform()
         filter {
-            includeTestsMatching("**.mainTest")
+            includeTestsMatching ("SelfServeRegisterUserTest.registerUserTest")
         }
-    }
-}
-
-tasks.register('cleanUp', Test) {
-    description = "Deletes loginId file after tests"
-
-    doFirst {
-        println("********* Deleting loginId file ************")
-        sleep 2000
-    }
-
-    filter {
-        includeTestsMatching("*.deleteFile")
-    }
-
-    doLast {
-        println("*********** Finished deleting file **********")
     }
 }

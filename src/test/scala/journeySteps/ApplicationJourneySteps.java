@@ -8,7 +8,6 @@ import static utils.Header.getFormHeaders;
 import static utils.SetUp.env;
 
 import activesupport.aws.s3.SecretsManager;
-import activesupport.config.Configuration;
 import io.gatling.javaapi.core.*;
 import io.gatling.javaapi.http.*;
 import utils.Header;
@@ -16,7 +15,7 @@ import utils.SetUp;
 
 
 public class ApplicationJourneySteps {
-    private static final String newPassword = new Configuration().getConfig().getString("password");
+    private static final String newPassword = SecretsManager.getSecretValue("internalNewPassword");
 
     public static HttpRequestActionBuilder getUserStatus = http("do you already have a licence")
             .get("register/")
@@ -119,8 +118,7 @@ public class ApplicationJourneySteps {
             .formParam("password", session -> {
                 String password = session.get("Password");
                 if ("int".equals(env)) {
-                    return new Configuration().getConfig().getString("intPassword");
-//                    return SecretsManager.getSecretValue("intEnvPassword");
+                    return SecretsManager.getSecretValue("intEnvPassword");
                 } else {
                     return password;
                 }

@@ -9,8 +9,8 @@ import org.apache.commons.csv.CSVPrinter;
 import com.jcraft.jsch.Session;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.StaleElementReferenceException;
 
 import javax.naming.ConfigurationException;
 import java.io.*;
@@ -18,8 +18,8 @@ import java.sql.*;
 import java.util.Arrays;
 import java.util.Optional;
 
-public class SelfServeRegisterUserTest {
 
+public class SelfServeRegisterUserTest {
     private static final Logger LOGGER = LogManager.getLogger(SelfServeRegisterUserTest.class);
 
     private static final String LOGIN_CSV_FILE = "src/test/resources/loginId.csv";
@@ -29,6 +29,17 @@ public class SelfServeRegisterUserTest {
     private static final String DB_PASSWORD = System.getProperty("dbPassword");
 
     private final String users = Optional.ofNullable(System.getProperty("users")).orElse("0");
+
+
+    @BeforeAll
+    public static void deleteFile() {
+        File loginDetails = new File(LOGIN_CSV_FILE);
+        if (loginDetails.exists() && loginDetails.delete()) {
+            LOGGER.info("{} has been deleted", loginDetails);
+        } else {
+            LOGGER.warn("{} does not exist", loginDetails);
+        }
+    }
 
     public static void getExternalUsersFromTable() {
         try {
@@ -49,24 +60,12 @@ public class SelfServeRegisterUserTest {
     }
 
     @Test
-    public void mainTest() {
+    public void registerUserTest() {
         String env = System.getProperty("env", "").toLowerCase();
-        if (!"int".equals(env)) {
+        if (!"prep".equals(env)) {
             registerUser();
-        } else {
-            getExternalUsersFromTable();
         }
     }
-
-//    @Test
-//    public void deleteFile() {
-//        File loginDetails = new File(LOGIN_CSV_FILE);
-//        if (loginDetails.exists() && loginDetails.delete()) {
-//            LOGGER.info("{} has been deleted", loginDetails);
-//        } else {
-//            LOGGER.warn("{} does not exist", loginDetails);
-//        }
-//    }
 
     public void registerUser() {
         MailPit mailPit = new MailPit();
@@ -87,38 +86,6 @@ public class SelfServeRegisterUserTest {
             }
         }
     }
-
-//    public void cancelAndWithdrawExistingApplications() {
-//        if (isElementPresent("//table", SelectorType.XPATH)) {
-//            applications = findElements("//table/tbody/tr", SelectorType.XPATH);
-//            int attempts = 0;
-//
-//            while (attempts < applications.size()) {
-//                try {
-//                    //Need to repopulate list after removing values
-//                    applications = findElements("//table/tbody/tr", SelectorType.XPATH);
-//                    String applicationId = applications.get(applications.size() - 1).getText().split(" ")[0];
-//
-//                    if (applications.get(applications.size() - 1).getText().contains("Not Yet Submitted")) {
-//                        clickByLinkText(applicationId);
-//                        waitAndClick("Cancel application", SelectorType.LINKTEXT);
-//                        UniversalActions.clickSubmit();
-//                    } else if (applications.get(applications.size() - 1).getText().contains("Under Consideration")) {
-//                        clickByLinkText(applicationId);
-//                        waitAndClick("Withdraw application", SelectorType.LINKTEXT);
-//                        UniversalActions.clickSubmit();
-//                    }
-//                } catch (StaleElementReferenceException e) {
-//                    LOGGER.error(e.getMessage(), e);
-//                }
-//                if (applications.isEmpty()) {
-//                    break;
-//                }
-//                waitForTitleToBePresent("Licences");
-//                attempts++;
-//            }
-//        }
-//    }
 
     private static void createTunnel() {
         DbURL dbURL = new DbURL();
