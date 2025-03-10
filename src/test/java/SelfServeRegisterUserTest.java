@@ -31,7 +31,7 @@ public class SelfServeRegisterUserTest {
     private final String users = Optional.ofNullable(System.getProperty("users")).orElse("0");
 
 
-//    @BeforeAll
+    @BeforeAll
     public static void deleteFile() {
         File loginDetails = new File(LOGIN_CSV_FILE);
         if (loginDetails.exists() && loginDetails.delete()) {
