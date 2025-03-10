@@ -117,7 +117,7 @@ public class ApplicationJourneySteps {
             .formParam("username", "#{Username}")
             .formParam("password", session -> {
                 String password = session.get("Password");
-                if ("int".equals(env)) {
+                if ("prep".equals(env)) {
                     return SecretsManager.getSecretValue("intEnvPassword");
                 } else {
                     return password;

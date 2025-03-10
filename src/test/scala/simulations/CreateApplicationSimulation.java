@@ -9,6 +9,8 @@ import io.gatling.javaapi.http.*;
 
 import scenarios.CreateApplication;
 
+import java.time.Duration;
+
 
 public class CreateApplicationSimulation extends Simulation {
 
@@ -34,15 +36,15 @@ public class CreateApplicationSimulation extends Simulation {
             case "load":
                 loginAndCreateApp = CreateApplication.selfServiceApplicationRegistration().injectOpen(
                         atOnceUsers(users),
-                        rampUsers(rampUp).during(rampDurationInMin)
+                        rampUsers(rampUp).during(Duration.ofMinutes(rampDurationInMin))
                 );
                 break;
             case "soak":
                 loginAndCreateApp = CreateApplication.selfServiceApplicationRegistration().injectOpen(
-                        rampUsers(users).during(rampUp)
+                        rampUsers(users).during(Duration.ofMinutes(rampDurationInMin))
                 ).throttle(
                         reachRps(3).in(60),
-                        holdFor(rampDurationInMin)
+                        holdFor(Duration.ofMinutes(rampDurationInMin))
                 );
                 break;
             case "stress":
