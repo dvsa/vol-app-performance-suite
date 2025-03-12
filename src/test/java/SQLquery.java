@@ -1,5 +1,3 @@
-package utils;
-
 public class SQLquery {
 
     public static String getUsersSql(String users) {
