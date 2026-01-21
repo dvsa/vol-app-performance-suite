@@ -1,45 +1,45 @@
 # Description
- Performance test for the register new user journey.
+Performance test for the register new user journey.
 
 # Prerequisites
-- Gradle
+- Maven
 
 # How to Build
-`gradle clean build -x test` 
+`mvn clean compile`
 
-## Running Create Application Script 
- 
- In a terminal window, powershell window or cmd paste the below command
+## Running Create Application Script
 
- These are the environments that are currently supported
- `env = qa/da/...`
+In a terminal window, powershell window or cmd paste the below command
+
+These are the environments that are currently supported
+`env = qa/da/...`
 `site = ss/internal`
- `typeOfTest = load,soak,stress`
- 
+`typeOfTest = load,soak,stress`
+
 `profile - load`
-`gradle createApplication -Denv={qa} -Dsite={ss} -Dusers={2} -DrampUp={0} -Dduration={0} -DapplicationType=load'
+`mvn gatling:test -Dgatling.simulationClass=simulations.CreateApplicationSimulation -Denv={qa} -Dsite={ss} -Dusers={2} -DrampUp={0} -Dduration={0} -DapplicationType=load'
 
 `profile - soak`
-`gradle createApplication -Denv=env -Dsite=ss -Dusers=2 -Dduration=xx -DapplicationType=soak'
+`mvn gatling:test -Dgatling.simulationClass=simulations.CreateApplicationSimulation -Denv=env -Dsite=ss -Dusers=2 -Dduration=xx -DapplicationType=soak'
 
- Please remove the braces when running.
- 
- If the number of users is greater than 20, the harness will use an SQL statement to get users
- from the DB. You'll need to pass in the following system prop `-DdbUsername= and -DbPassword=` in addition to the other 
- properties
- 
+Please remove the braces when running.
+
+If the number of users is greater than 20, the harness will use an SQL statement to get users
+from the DB. You'll need to pass in the following system prop `-DdbUsername= and -DbPassword=` in addition to the other
+properties
+
 ## Running Register User Script
- 
-  In a terminal window, powershell window or cmd paste the below command
-  
- `gradle registerUser  -Denv={qa} -Dsite={ss} -Dusers={2} -DrampUp={0} -Dduration={0} -DtypeOfTest=`
+
+In a terminal window, powershell window or cmd paste the below command
+
+`mvn gatling:test -Dgatling.simulationClass=simulations.RegisterUserSimulation -Denv={qa} -Dsite={ss} -Dusers={2} -DrampUp={0} -Dduration={0} -DtypeOfTest=`
 
 
 ## Running External Search Script
- 
-  In a terminal window, powershell window or cmd paste the below command
-  
- `gradle searchOperator  -Denv={qa} -Dsite={ss} -Dusers={2} -DrampUp={0} -Dduration={0} -DtypeOfTest=`
+
+In a terminal window, powershell window or cmd paste the below command
+
+`mvn gatling:test -Dgatling.simulationClass=simulations.ExternalOperatorSearchSimulation -Denv={qa} -Dsite={ss} -Dusers={2} -DrampUp={0} -Dduration={0} -DtypeOfTest=`
 
 ## Injectors
 
@@ -86,6 +86,6 @@ incrementUsersPerSec(5)
 .startingFrom(10)
 )
 ``
- 
+
 ## Reports
- - Reports can be found in build/gatling-results/
+- Reports can be found in target/gatling/
