@@ -1,7 +1,7 @@
 package utils;
 
 import java.util.Optional;
-import org.dvsa.testing.lib.url.webapp.URL;
+import org.dvsa.testing.lib.url.webapp.webAppURL;
 import org.dvsa.testing.lib.url.webapp.utils.ApplicationType;
 
 public class SetUp {
@@ -13,8 +13,8 @@ public class SetUp {
     public static final int users = Optional.ofNullable(Integer.getInteger("users")).orElse(0);
     public static final int rampUp = Optional.ofNullable(Integer.getInteger("rampUp")).orElse(0);
     public static final int rampDurationInMin = Optional.ofNullable(Integer.getInteger("duration")).orElse(0);
-    public static final String externalURL = URL.build(ApplicationType.EXTERNAL, env).toString();
-    public static final String internalURL = URL.build(ApplicationType.INTERNAL, env).toString();
+    public static final String externalURL = webAppURL.build(ApplicationType.EXTERNAL, env).toString();
+    public static final String internalURL = webAppURL.build(ApplicationType.INTERNAL, env).toString();
 
     public static final String baseURL;
     public static final String securityTokenPattern = "id=\"security\" value=\"([^\"]*)&*";
