@@ -11,8 +11,6 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import utils.SQLquery;
 
 import javax.naming.ConfigurationException;
@@ -28,8 +26,8 @@ import java.util.Arrays;
 import java.util.Optional;
 
 
-public class SelfServeRegisterUserTest {
-    private static final Logger LOGGER = LogManager.getLogger(SelfServeRegisterUserTest.class);
+public class TestSetup {
+    private static final Logger LOGGER = LogManager.getLogger(TestSetup.class);
 
     private static final String LOGIN_CSV_FILE = "src/test/resources/loginId.csv";
     private static final String CSV_HEADERS = "Username,Forename,Password";
@@ -37,18 +35,8 @@ public class SelfServeRegisterUserTest {
     private static final String DB_USER = System.getProperty("dbUser");
     private static final String DB_PASSWORD = System.getProperty("dbPassword");
 
-    private final String users = Optional.ofNullable(System.getProperty("users")).orElse("0");
+    private static final String users = Optional.ofNullable(System.getProperty("users")).orElse("0");
 
-
-    @BeforeAll
-    public static void deleteFile() {
-        File loginDetails = new File(LOGIN_CSV_FILE);
-        if (loginDetails.exists() && loginDetails.delete()) {
-            LOGGER.info("{} has been deleted", loginDetails);
-        } else {
-            LOGGER.warn("{} does not exist", loginDetails);
-        }
-    }
 
     public static void getExternalUsersFromTable() {
         try {
@@ -68,15 +56,28 @@ public class SelfServeRegisterUserTest {
         }
     }
 
-    @Test
-    public void registerUserTest() {
-        String env = System.getProperty("env", "").toLowerCase();
-        if (!"prep".equals(env)) {
+    public static void main(String[] args) {
+        try {
+            deleteFile();
             registerUser();
+            System.exit(0);
+        } catch (Exception e) {
+            System.exit(1);
         }
     }
 
-    public void registerUser() {
+    public  static synchronized void deleteFile() {
+        File loginDetails = new File(LOGIN_CSV_FILE);
+        if (loginDetails.exists() && loginDetails.delete()) {
+            LOGGER.info("{} has been deleted", loginDetails);
+        } else {
+            LOGGER.warn("{} does not exist", loginDetails);
+        }
+    }
+
+
+    public  static synchronized void registerUser() {
+        LOGGER.info("user has reg");
         MailPit mailPit = new MailPit();
         QuotedPrintableCodec codec = new QuotedPrintableCodec();
         int userCount = Integer.parseInt(users);
@@ -114,7 +115,7 @@ public class SelfServeRegisterUserTest {
         });
     }
 
-    private void writeToFile(String userId, String forename, String password) {
+    private static void writeToFile(String userId, String forename, String password) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(LOGIN_CSV_FILE, true));
              CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT)) {
 
@@ -127,7 +128,7 @@ public class SelfServeRegisterUserTest {
         }
     }
 
-    private boolean searchForString() {
+    private static boolean searchForString() {
         try {
             File file = new File(LOGIN_CSV_FILE);
             if (file.exists()) {
