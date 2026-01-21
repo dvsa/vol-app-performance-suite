@@ -4,13 +4,13 @@ import activesupport.database.url.DbURL;
 import activesupport.mailPit.MailPit;
 import activesupport.ssh.SSH;
 import apiCalls.actions.RegisterUser;
+import com.jcraft.jsch.Session;
 import org.apache.commons.codec.net.QuotedPrintableCodec;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dvsa.testing.lib.url.utils.EnvironmentType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import utils.SQLquery;
@@ -142,7 +142,7 @@ public class SelfServeRegisterUserTest {
     }
 
     private static int createSSHsession(String username, String pathToSSHKey) throws Exception {
-        com.jcraft.jsch.Session session = SSH.openTunnel(username, "dbam.olcs.int.prod.dvsa.aws", pathToSSHKey);
+        Session session = SSH.openTunnel(username, "dbam.olcs.int.prod.dvsa.aws", pathToSSHKey);
         return SSH.portForwarding(3309, "localhost", 3306, session);
     }
 }
