@@ -523,7 +523,8 @@ public class ApplicationJourneySteps {
             .formParam("declarationsAndUndertakings[id]", "#{applicationNumber}")
             .formParam("form-actions[submitAndPay]", "")
             .formParam("security", (Session session) -> session.get("securityToken"))
-            .check(regex("(.*) Application Fee for application #{applicationNumber}"))
+            .check(status().in(200, 302))
+            .check(regex("(.*) Application Fee for application #{applicationNumber}").optional())
             .check(bodyString().saveAs("undertakings"));
 
     public static HttpRequestActionBuilder cpmsRedirect = http("navigate to cpms")

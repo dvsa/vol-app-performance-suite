@@ -1,8 +1,10 @@
 package utils;
 
-import java.util.Optional;
-import org.dvsa.testing.lib.url.webapp.webAppURL;
 import org.dvsa.testing.lib.url.webapp.utils.ApplicationType;
+import org.dvsa.testing.lib.url.webapp.webAppURL;
+
+import java.util.Optional;
+
 
 public class SetUp {
 
