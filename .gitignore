@@ -17,4 +17,5 @@ gradlew
 gradlew.bat
 .DS_Store
 gatling-results
-.vscode
+.
+.vscode/
