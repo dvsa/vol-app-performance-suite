@@ -11,6 +11,7 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dvsa.testing.lib.url.utils.EnvironmentType;
 import utils.SQLquery;
 
 import javax.naming.ConfigurationException;
@@ -37,6 +38,9 @@ public class TestSetup {
 
     private static final String users = Optional.ofNullable(System.getProperty("users")).orElse("0");
 
+    private static final String env = System.getProperty("env", "qa");
+
+
 
     public static void getExternalUsersFromTable() {
         try {
@@ -58,8 +62,11 @@ public class TestSetup {
 
     public static void main(String[] args) {
         try {
-            deleteFile();
-            registerUser();
+            if (args.length > 0 && "cleanup".equals(args[0])) {
+                deleteFile();
+            } else {
+                registerUser();
+            }
             System.exit(0);
         } catch (Exception e) {
             System.exit(1);
@@ -78,7 +85,9 @@ public class TestSetup {
 
     public  static synchronized void registerUser() {
         LOGGER.info("user has reg");
-        MailPit mailPit = new MailPit();
+        String env = System.getProperty("env", "qa");
+        EnvironmentType envType = EnvironmentType.getEnum(env);
+        MailPit mailPit = new MailPit(envType);
         QuotedPrintableCodec codec = new QuotedPrintableCodec();
         int userCount = Integer.parseInt(users);
 
