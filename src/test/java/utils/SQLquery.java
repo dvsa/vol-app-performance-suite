@@ -71,6 +71,37 @@ public class SQLquery {
                 "WHERE created_at <= NOW();";
     }
 
+    public static String getTradingNames() {
+        return """
+        SELECT name 
+        FROM trading_name 
+        WHERE licence_id IN (
+            SELECT id 
+            FROM licence 
+            WHERE status = 'lsts_valid'
+        )
+        AND deleted_date IS NULL
+        ORDER BY RAND() 
+        LIMIT 100
+        """;
+    }
+
+    public static String getInternalUsers() {
+        return """
+        SELECT login_id 
+        FROM user 
+        WHERE id IN (
+            SELECT user_id 
+            FROM user_role 
+            WHERE role_id IN (23, 24, 33)
+        )
+        AND deleted_date IS NULL 
+        AND created_on < 20161201
+        ORDER BY RAND()
+        LIMIT 100
+        """;
+    }
+
     public static String dropTempPasswordTable() {
         return "DROP TABLE IF EXISTS OLCS_RDS_OLCSDB.temp_user_passwords;";
     }
