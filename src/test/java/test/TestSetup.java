@@ -214,6 +214,58 @@ public class TestSetup {
         return users;
     }
 
+    public static List<Map<String, String>> getTradingNames() {
+        List<Map<String, String>> tradingNames = new ArrayList<>();
+
+        String env = System.getProperty("env", "qa");
+        String currentDbUrl = getDatabaseUrl(env);
+
+        try (Connection con = DriverManager.getConnection(currentDbUrl, dbUsername, dbPassword);
+             PreparedStatement stmt = con.prepareStatement(SQLquery.getTradingNames());
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Map<String, String> company = new HashMap<>();
+                company.put("companyName", rs.getString("name"));  // Changed from "trading_name" to "name"
+                tradingNames.add(company);
+            }
+
+            LOGGER.info("Retrieved {} trading names from database", tradingNames.size());
+        } catch (Exception e) {
+            LOGGER.error("Failed to retrieve trading names", e);
+            tradingNames.add(Map.of("companyName", "Eddie"));
+        }
+
+        return tradingNames;
+    }
+
+    public static List<Map<String, String>> getInternalUsers() {
+        List<Map<String, String>> users = new ArrayList<>();
+
+        String env = System.getProperty("env", "qa");
+        String currentDbUrl = getDatabaseUrl(env);
+        String defaultPassword = SecretsManager.getSecretValue("defaultPassword");
+
+        try (Connection con = DriverManager.getConnection(currentDbUrl, dbUsername, dbPassword);
+             PreparedStatement stmt = con.prepareStatement(SQLquery.getInternalUsers());
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Map<String, String> user = new HashMap<>();
+                user.put("Username", rs.getString("login_id"));
+                user.put("loginId", rs.getString("login_id"));
+                user.put("Password", defaultPassword);
+                users.add(user);
+            }
+
+            LOGGER.info("Retrieved {} internal users from database", users.size());
+        } catch (Exception e) {
+            LOGGER.error("Failed to retrieve internal users", e);
+        }
+
+        return users;
+    }
+
     private static void cleanup() {
         try {
             try (Connection con = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);

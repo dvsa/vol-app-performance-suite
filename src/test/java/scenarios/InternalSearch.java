@@ -1,26 +1,38 @@
 package scenarios;
 
-import io.gatling.javaapi.core.FeederBuilder;
 import io.gatling.javaapi.core.ScenarioBuilder;
+import io.gatling.javaapi.core.FeederBuilder;
+import test.TestSetup;
+import java.util.Map;
 
-import static io.gatling.javaapi.core.CoreDsl.csv;
-import static io.gatling.javaapi.core.CoreDsl.scenario;
+import static io.gatling.javaapi.core.CoreDsl.*;
 import static journeySteps.SearchJourneySteps.*;
 
 public class InternalSearch {
 
-    static FeederBuilder<String> feeder = csv("InternalLoginId.csv").random();
+    private static final FeederBuilder<Object> internalUserFeeder =
+            listFeeder(TestSetup.getInternalUsers().stream()
+                    .map(map -> (Map<String, Object>) (Map<String, ?>) map)
+                    .toList()).circular();
+
+    private static final FeederBuilder<Object> tradingNameFeeder =
+            listFeeder(TestSetup.getTradingNames().stream()
+                    .map(map -> (Map<String, Object>) (Map<String, ?>) map)
+                    .toList()).circular();
 
     public static ScenarioBuilder internalWorkerLogin() {
-        return scenario("Login as an internal case worker")
-                .feed(feeder)
+        return scenario("Internal Worker Login and Search")
+                .feed(internalUserFeeder)
+                .feed(tradingNameFeeder)
                 .exec(getToLogin)
-                .pause(30)
+                .pause(2)
                 .exec(searchAndLogin)
-                .pause(20)
+                .pause(2)
                 .exec(navigateToLandingPage)
-                .pause(30)
-                .exec(search)
-                .pause(20);
+                .pause(2)
+                .exec(getSearchForBusOperatorPage)
+                .pause(2)
+                .exec(searchForBusOperatorPage)
+                .pause(2);
     }
 }
