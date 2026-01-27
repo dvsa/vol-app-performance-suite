@@ -1,158 +1,239 @@
 package test;
 
-import activesupport.database.url.DbURL;
+import activesupport.aws.s3.SecretsManager;
 import activesupport.mailPit.MailPit;
-import activesupport.ssh.SSH;
 import apiCalls.actions.RegisterUser;
-import com.jcraft.jsch.Session;
 import org.apache.commons.codec.net.QuotedPrintableCodec;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dvsa.testing.lib.url.utils.EnvironmentType;
 import utils.SQLquery;
 
-import javax.naming.ConfigurationException;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.Arrays;
-import java.util.Optional;
-
+import java.sql.*;
+import java.util.*;
 
 public class TestSetup {
     private static final Logger LOGGER = LogManager.getLogger(TestSetup.class);
+    private static String dbUrl;
+    private static String dbUsername;
+    private static String dbPassword;
 
-    private static final String LOGIN_CSV_FILE = "src/test/resources/loginId.csv";
-    private static final String CSV_HEADERS = "Username,Forename,Password";
-    private static final String DB_URL = "jdbc:mysql://olcsdb-rds.int.olcs.dvsacloud.uk:3306/OLCS_RDS_OLCSDB?useSSL=FALSE";
-    private static final String DB_USER = System.getProperty("dbUser");
-    private static final String DB_PASSWORD = System.getProperty("dbPassword");
-
-    private static final String users = Optional.ofNullable(System.getProperty("users")).orElse("0");
-
-    private static final String env = System.getProperty("env", "qa");
-
-
-
-    public static void getExternalUsersFromTable() {
+    static {
         try {
-            createTunnel();
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
-            try (Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-                 Statement stmt = con.createStatement();
-                 ResultSet rs = stmt.executeQuery(SQLquery.getUsersSql("10"))) {
-
-                while (rs.next()) {
-                    LOGGER.info("Username: {}, Forename: {}", rs.getString("Username"), rs.getString("Forename"));
-                }
-            }
+            dbUsername = SecretsManager.getSecretValue("dbUsername");
+            dbPassword = SecretsManager.getSecretValue("dbPassword");
+            LOGGER.info("Database credentials loaded from Secrets Manager");
         } catch (Exception e) {
-            LOGGER.error("Error fetching external users", e);
+            LOGGER.error("Failed to get DB credentials", e);
+            dbUsername = "fallback_user";
+            dbPassword = "fallback_password";
         }
     }
 
     public static void main(String[] args) {
         try {
-            if (args.length > 0 && "cleanup".equals(args[0])) {
-                deleteFile();
-            } else {
-                registerUser();
+            String env = System.getProperty("env", "qa");
+            dbUrl = getDatabaseUrl(env);
+            LOGGER.info("Using database URL for environment: {}", env);
+
+            String operation = args.length > 0 ? args[0] : "create";
+
+            switch (operation.toLowerCase()) {
+                case "cleanup" -> cleanup();
+                case "test" -> testDatabaseConnection();
+                default -> {
+                    int userCount = Integer.parseInt(System.getProperty("users", "10"));
+                    createUsersWithTempPasswords(env, userCount);
+                    runGatlingTest();
+                }
             }
             System.exit(0);
         } catch (Exception e) {
+            LOGGER.error("Execution failed", e);
             System.exit(1);
         }
     }
 
-    public  static synchronized void deleteFile() {
-        File loginDetails = new File(LOGIN_CSV_FILE);
-        if (loginDetails.exists() && loginDetails.delete()) {
-            LOGGER.info("{} has been deleted", loginDetails);
-        } else {
-            LOGGER.warn("{} does not exist", loginDetails);
-        }
-    }
+    private static String getDatabaseUrl(String env) {
+        String baseParams = "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
 
-
-    public  static synchronized void registerUser() {
-        LOGGER.info("user has reg");
-        String env = System.getProperty("env", "qa");
-        EnvironmentType envType = EnvironmentType.getEnum(env);
-        MailPit mailPit = new MailPit(envType);
-        QuotedPrintableCodec codec = new QuotedPrintableCodec();
-        int userCount = Integer.parseInt(users);
-
-        for (int i = 0; i < userCount; i++) {
-            try {
-                RegisterUser registerUser = new RegisterUser();
-                registerUser.registerUser();
-
-                String emailAddress = registerUser.getEmailAddress();
-                String password = codec.decode(mailPit.retrieveTempPassword(emailAddress));
-
-                writeToFile(registerUser.getUserName(), registerUser.getForeName(), password);
-            } catch (Exception e) {
-                LOGGER.error("Error registering user", e);
+        return switch (env.toLowerCase()) {
+            case "qa", "qualityassurance" ->
+                    "jdbc:mysql://olcsdb-rds.qa.olcs.dev-dvsacloud.uk:3306/OLCS_RDS_OLCSDB" + baseParams;
+            case "int", "integration" ->
+                    "jdbc:mysql://olcsdb-rds.int.olcs.dev-dvsacloud.uk:3306/OLCS_RDS_OLCSDB" + baseParams;
+            case "prep", "preproduction" ->
+                    "jdbc:mysql://olcsdb-rds.prep.olcs.dev-dvsacloud.uk:3306/OLCS_RDS_OLCSDB" + baseParams;
+            default -> {
+                LOGGER.warn("Unknown environment: {}. Defaulting to QA", env);
+                yield "jdbc:mysql://olcsdb-rds.qa.olcs.dev-dvsacloud.uk:3306/OLCS_RDS_OLCSDB" + baseParams;
             }
-        }
+        };
     }
 
-    private static void createTunnel() {
-        DbURL dbURL = new DbURL();
+    private static void createUsersWithTempPasswords(String env, int userCount) {
+        LOGGER.info("Creating {} users for {}", userCount, env);
 
-        Optional<String> ldapUsername = Optional.ofNullable(System.getProperty("ldapUser"));
-        Optional<String> sshPrivateKeyPath = Optional.ofNullable(System.getProperty("sshPrivateKeyPath"));
+        EnvironmentType environmentType = switch (env.toLowerCase()) {
+            case "qa", "qualityassurance" -> EnvironmentType.QUALITY_ASSURANCE;
+            case "int", "integration" -> EnvironmentType.INTEGRATION;
+            case "prep", "preproduction" -> EnvironmentType.PREPRODUCTION;
+            default -> EnvironmentType.QUALITY_ASSURANCE;
+        };
 
-        System.setProperty("dbUsername", "dbUsername");
-        System.setProperty("dbPassword", "dbPassword");
-
-        ldapUsername.ifPresent(username -> {
-            try {
-                dbURL.setPortNumber(createSSHsession(username, sshPrivateKeyPath.orElseThrow(ConfigurationException::new)));
-            } catch (Exception e) {
-                LOGGER.error("Error creating SSH tunnel", e);
-            }
-        });
-    }
-
-    private static void writeToFile(String userId, String forename, String password) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(LOGIN_CSV_FILE, true));
-             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT)) {
-
-            if (!searchForString()) {
-                csvPrinter.printRecord((Object[]) CSV_HEADERS.split(","));
-            }
-            csvPrinter.printRecord(Arrays.asList(userId, forename, password));
-        } catch (IOException e) {
-            LOGGER.error("Error writing to file", e);
-        }
-    }
-
-    private static boolean searchForString() {
         try {
-            File file = new File(LOGIN_CSV_FILE);
-            if (file.exists()) {
-                String content = FileUtils.readFileToString(file, "UTF-8");
-                return content.contains(CSV_HEADERS);
+            createTempPasswordTable();
+            clearTempPasswords();
+
+            MailPit mailPit = new MailPit(environmentType);
+            QuotedPrintableCodec codec = new QuotedPrintableCodec();
+
+            for (int i = 0; i < userCount; i++) {
+                try {
+                    LOGGER.info("Creating user {}/{}", i + 1, userCount);
+
+                    RegisterUser registerUser = new RegisterUser();
+                    registerUser.registerUser();
+
+                    String username = registerUser.getUserName();
+                    String tempPassword = mailPit.retrieveTempPassword(registerUser.getEmailAddress());
+                    String decodedPassword = codec.decode(tempPassword);
+
+                    storeTempPassword(username, decodedPassword);
+
+                    LOGGER.info("✅ Created: {}", username);
+                    Thread.sleep(200);
+                } catch (Exception e) {
+                    LOGGER.warn("Failed user {}: {}", i + 1, e.getMessage());
+                }
             }
-        } catch (IOException e) {
-            LOGGER.error("Error reading file", e);
+
+            LOGGER.info("✅ Created {} users with temp passwords stored in database", userCount);
+
+        } catch (Exception e) {
+            LOGGER.error("Failed to create users", e);
+            throw new RuntimeException(e);
         }
-        LOGGER.info("File not found or text not found");
-        return false;
     }
 
-    private static int createSSHsession(String username, String pathToSSHKey) throws Exception {
-        Session session = SSH.openTunnel(username, "dbam.olcs.int.prod.dvsa.aws", pathToSSHKey);
-        return SSH.portForwarding(3309, "localhost", 3306, session);
+    private static void createTempPasswordTable() {
+        try (Connection con = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
+             PreparedStatement stmt = con.prepareStatement(SQLquery.createTempPasswordTable())) {
+            stmt.executeUpdate();
+            LOGGER.info("Temp password table ready");
+        } catch (SQLException e) {
+            LOGGER.error("Failed to create temp password table", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void clearTempPasswords() {
+        try (Connection con = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
+             PreparedStatement stmt = con.prepareStatement(SQLquery.clearTempPasswords())) {
+            int deleted = stmt.executeUpdate();
+            LOGGER.info("Cleared {} existing temp passwords", deleted);
+        } catch (SQLException e) {
+            LOGGER.error("Failed to clear temp passwords", e);
+        }
+    }
+
+    private static void storeTempPassword(String username, String tempPassword) {
+        try (Connection con = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
+             PreparedStatement stmt = con.prepareStatement(SQLquery.insertTempPassword())) {
+            stmt.setString(1, username);
+            stmt.setString(2, tempPassword);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.error("Failed to store temp password for user: {}", username, e);
+        }
+    }
+
+    private static void runGatlingTest() {
+        try {
+            LOGGER.info("Running Gatling test...");
+
+            String simulationClass = System.getProperty("gatling.simulationClass", "simulations.CreateApplicationSimulation");
+            String env = System.getProperty("env", "qa");
+            String users = System.getProperty("users", "10");
+
+            ProcessBuilder processBuilder = new ProcessBuilder(
+                    "mvn", "gatling:test",
+                    "-Dgatling.simulationClass=" + simulationClass,
+                    "-Denv=" + env,
+                    "-Dsite=ss",
+                    "-Dusers=" + users,
+                    "-DrampUp=0",
+                    "-Dduration=0",
+                    "-DtypeOfTest=load"
+            );
+
+            processBuilder.inheritIO();
+            Process process = processBuilder.start();
+            int exitCode = process.waitFor();
+
+            if (exitCode == 0) {
+                LOGGER.info("✅ Gatling test completed");
+                cleanup();
+            } else {
+                throw new RuntimeException("Gatling failed with exit code: " + exitCode);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Gatling execution failed", e);
+            throw new RuntimeException("Gatling failed", e);
+        }
+    }
+
+    public static List<Map<String, String>> getAllUsers() {
+        List<Map<String, String>> users = new ArrayList<>();
+
+        // Get current environment and set database URL
+        String env = System.getProperty("env", "qa");
+        String currentDbUrl = getDatabaseUrl(env);
+
+        try (Connection con = DriverManager.getConnection(currentDbUrl, dbUsername, dbPassword);
+             PreparedStatement stmt = con.prepareStatement(SQLquery.getUsersWithTempPasswords());
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Map<String, String> user = new HashMap<>();
+                user.put("Username", rs.getString("Username"));
+                user.put("loginId", rs.getString("Username"));
+                user.put("Forename", rs.getString("Forename"));
+                user.put("familyName", rs.getString("familyName"));
+                user.put("emailAddress", rs.getString("emailAddress"));
+                user.put("Password", rs.getString("Password"));
+                user.put("userId", rs.getString("userId"));
+                users.add(user);
+            }
+
+            LOGGER.info("Retrieved {} users from database", users.size());
+        } catch (Exception e) {
+            LOGGER.error("Failed to retrieve users", e);
+        }
+
+        return users;
+    }
+
+    private static void cleanup() {
+        try {
+            try (Connection con = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
+                 PreparedStatement stmt = con.prepareStatement(SQLquery.clearTempPasswords())) {
+                int deleted = stmt.executeUpdate();
+                LOGGER.info("✅ Cleanup completed - removed {} temp passwords", deleted);
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Cleanup failed", e);
+        }
+    }
+
+    private static void testDatabaseConnection() {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            try (Connection con = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
+                LOGGER.info("✅ Database connection successful to: {}", dbUrl);
+            }
+        } catch (Exception e) {
+            LOGGER.error("❌ Database connection failed", e);
+        }
     }
 }

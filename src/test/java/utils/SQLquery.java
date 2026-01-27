@@ -38,4 +38,40 @@ public class SQLquery {
                 "  order by last_modified_on\n" +
                 String.format("DESC limit %s;", application);
     }
+
+    public static String createTempPasswordTable() {
+        return "CREATE TABLE IF NOT EXISTS OLCS_RDS_OLCSDB.temp_user_passwords (\n" +
+                "    user_id VARCHAR(255) PRIMARY KEY,\n" +
+                "    temp_password VARCHAR(255) NOT NULL,\n" +
+                "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" +
+                "    INDEX idx_created_at (created_at)\n" +
+                ");";
+    }
+
+    public static String insertTempPassword() {
+        return "INSERT INTO OLCS_RDS_OLCSDB.temp_user_passwords (user_id, temp_password) " +
+                "VALUES (?, ?) " +
+                "ON DUPLICATE KEY UPDATE temp_password = VALUES(temp_password), created_at = CURRENT_TIMESTAMP;";
+    }
+
+    public static String getUsersWithTempPasswords() {
+        return "SELECT u.login_id as Username, p.forename as Forename, u.id as userId,\n" +
+                "       cd.email_address as emailAddress, p.family_name as familyName,\n" +
+                "       tmp.temp_password as Password\n" +
+                "FROM OLCS_RDS_OLCSDB.user u\n" +
+                "JOIN OLCS_RDS_OLCSDB.contact_details cd ON u.contact_details_id = cd.id\n" +
+                "JOIN OLCS_RDS_OLCSDB.person p ON cd.person_id = p.id\n" +
+                "JOIN OLCS_RDS_OLCSDB.temp_user_passwords tmp ON u.login_id = tmp.user_id\n" +
+                "WHERE u.account_disabled = 0\n" +
+                "ORDER BY tmp.created_at DESC;";
+    }
+
+    public static String clearTempPasswords() {
+        return "DELETE FROM OLCS_RDS_OLCSDB.temp_user_passwords " +
+                "WHERE created_at <= NOW();";
+    }
+
+    public static String dropTempPasswordTable() {
+        return "DROP TABLE IF EXISTS OLCS_RDS_OLCSDB.temp_user_passwords;";
+    }
 }

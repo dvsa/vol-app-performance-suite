@@ -11,7 +11,6 @@ import scenarios.CreateApplication;
 
 import java.time.Duration;
 
-
 public class CreateApplicationSimulation extends Simulation {
 
     private static final HttpProtocolBuilder httpConfiguration = http
@@ -29,27 +28,35 @@ public class CreateApplicationSimulation extends Simulation {
     private static final PopulationBuilder loginAndCreateApp;
 
     static {
-        String testType = typeofTest != null ? typeofTest : "load";
+        int userCount = Integer.parseInt(System.getProperty("users", "1"));
+        int rampUpUsers = Integer.parseInt(System.getProperty("rampUp", "0"));
+        int rampDurationMinutes = Integer.parseInt(System.getProperty("duration", "1"));
+        String testType = System.getProperty("typeOfTest", "load");
 
-
-        switch (testType) {
+        switch (testType.toLowerCase()) {
             case "load":
-                loginAndCreateApp = CreateApplication.selfServiceApplicationRegistration().injectOpen(
-                        atOnceUsers(users),
-                        rampUsers(rampUp).during(Duration.ofMinutes(rampDurationInMin))
-                );
+                if (rampUpUsers > 0 && rampDurationMinutes > 0) {
+                    loginAndCreateApp = CreateApplication.selfServiceApplicationRegistration().injectOpen(
+                            atOnceUsers(userCount),
+                            rampUsers(rampUpUsers).during(Duration.ofMinutes(rampDurationMinutes))
+                    );
+                } else {
+                    loginAndCreateApp = CreateApplication.selfServiceApplicationRegistration().injectOpen(
+                            atOnceUsers(userCount)
+                    );
+                }
                 break;
             case "soak":
                 loginAndCreateApp = CreateApplication.selfServiceApplicationRegistration().injectOpen(
-                        rampUsers(users).during(Duration.ofMinutes(rampDurationInMin))
+                        rampUsers(userCount).during(Duration.ofMinutes(rampDurationMinutes))
                 ).throttle(
                         reachRps(3).in(60),
-                        holdFor(Duration.ofMinutes(rampDurationInMin))
+                        holdFor(Duration.ofMinutes(rampDurationMinutes))
                 );
                 break;
             case "stress":
                 loginAndCreateApp = CreateApplication.selfServiceApplicationRegistration().injectOpen(
-                        incrementUsersPerSec(users)
+                        incrementUsersPerSec(userCount)
                                 .times(5)
                                 .eachLevelLasting(10)
                                 .separatedByRampsLasting(10)
@@ -58,7 +65,7 @@ public class CreateApplicationSimulation extends Simulation {
                 break;
             default:
                 loginAndCreateApp = CreateApplication.selfServiceApplicationRegistration().injectOpen(
-                        atOnceUsers(users)
+                        atOnceUsers(userCount)
                 );
         }
     }
