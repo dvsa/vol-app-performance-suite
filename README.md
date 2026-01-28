@@ -42,12 +42,17 @@ In a terminal window, powershell window or cmd paste the below command
 `mvn gatling:test -Dgatling.simulationClass=simulations.ExternalOperatorSearchSimulation -Denv={qa} -Dsite={ss} -Dusers={2} -DrampUp={0} -Dduration={0} -DtypeOfTest=`
 
 
-
 ## Running Create Application Script
 
 In a terminal window, powershell window or cmd paste the below command
 
-'mvn test-compile exec:java -Dexec.mainClass="test.TestSetup" -Dexec.classpathScope=test -Denv=qa -Dusers=10 -Dgatling.simulationClass=simulations.CreateApplicationSimulation'
+`mvn test-compile exec:java -Dexec.mainClass="test.TestSetup" -Dexec.classpathScope=test -Denv=qa -Dusers=10 -Dgatling.simulationClass=simulations.CreateApplicationSimulation`
+
+## Running all the Scenarios (Performance simulation )
+
+In a terminal window, powershell window or cmd paste the below command
+
+`mvn test-compile exec:java -Dexec.mainClass="test.TestSetup" -Dexec.classpathScope=test -Denv=qa -Dusers=10 -DrampUp=0 -Dduration=0 -DtypeOfTest= `
 
 ## Injectors
 
