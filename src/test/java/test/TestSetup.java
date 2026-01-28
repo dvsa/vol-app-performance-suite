@@ -152,19 +152,21 @@ public class TestSetup {
         try {
             LOGGER.info("Running Gatling test...");
 
-            String simulationClass = System.getProperty("gatling.simulationClass", "simulations.CreateApplicationSimulation");
             String env = System.getProperty("env", "qa");
+            String site = System.getProperty("site", "ss");
             String users = System.getProperty("users", "10");
+            String rampUp = System.getProperty("rampUp", "0");
+            String duration = System.getProperty("duration", "0");
+            String typeOfTest = System.getProperty("typeOfTest", "load");
 
             ProcessBuilder processBuilder = new ProcessBuilder(
                     "mvn", "gatling:test",
-                    "-Dgatling.simulationClass=" + simulationClass,
                     "-Denv=" + env,
-                    "-Dsite=ss",
+                    "-Dsite=" + site,
                     "-Dusers=" + users,
-                    "-DrampUp=0",
-                    "-Dduration=0",
-                    "-DtypeOfTest=load"
+                    "-DrampUp=" + rampUp,
+                    "-Dduration=" + duration,
+                    "-DtypeOfTest=" + typeOfTest
             );
 
             processBuilder.inheritIO();
