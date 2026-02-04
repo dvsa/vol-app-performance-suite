@@ -43,7 +43,7 @@
             <url>https://repo.maven.apache.org/maven2</url>
         </repository>
         <repository>
-            <id>github-dvsa</id>
+            <id>dvsa-github-packages</id>
             <url>https://maven.pkg.github.com/dvsa/*</url>
         </repository>
     </repositories>
