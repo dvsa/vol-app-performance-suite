@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  get-version:
+    name: Get latest app versions
+    runs-on: ubuntu-latest
+    outputs:
+      vol-app-performance: ${{ steps.vol-app-performance-version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - id: vol-app-performance-version
+        uses: dvsa/.github/.github/actions/get-vol-app-version@main
+
+      - name: Add to summary
+        run: |
+          echo "#### App versions:" >> $GITHUB_STEP_SUMMARY
+          echo "**vol-app-performance**: \`${{ steps.vol-app-performance-version.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
+
+  security:
+    name: Security
+    uses: ./.github/workflows/security.yml
+    secrets: inherit
+
+  build-maven:
+    name: build with Maven
+    uses: ./.github/workflows/maven.yml
+    with:
+      maven-goal: package -DskipTests
+    needs:
+      - security
+      - get-version
+
+  docker:
+    name: Docker
+    needs:
+      - build-maven
+      - get-version
+    strategy:
+      fail-fast: false
+    uses: ./.github/workflows/docker.yml
+    secrets: inherit
+    with:
+      version: ${{ needs.get-version.outputs.vol-app-performance }}
+      push: ${{ contains(github.event.pull_request.labels.*.name, 'test-branch') || false}}
+    permissions:
+      contents: read
+      packages: write
+      id-token: write

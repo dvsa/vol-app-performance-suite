@@ -1,0 +1,52 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  get-version:
+    name: Get version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      is-release: ${{ steps.version.outputs.is-release }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: version
+        run: |
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            # If it's a tag, extract version from tag name (remove 'v' prefix if present)
+            VERSION=${GITHUB_REF#refs/tags/}
+            VERSION=${VERSION#v}
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "is-release=true" >> $GITHUB_OUTPUT
+            echo "Tagged release: $VERSION"
+          else
+            # If it's a push to main, use short commit SHA
+            VERSION=${GITHUB_SHA:0:7}
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "is-release=false" >> $GITHUB_OUTPUT
+            echo "Main branch push: $VERSION"
+          fi
+
+  docker:
+    name: Docker
+    uses: ./.github/workflows/docker.yml
+    secrets: inherit
+    with:
+      version: ${{ needs.get-version.outputs.version }}
+      push: true
+      is-release: ${{ needs.get-version.outputs.is-release == 'true' }}
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+    needs: get-version
