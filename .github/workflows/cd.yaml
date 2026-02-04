@@ -39,7 +39,7 @@ jobs:
 
   docker:
     name: Docker
-    uses: ./.github/workflows/docker.yml
+    uses: ./.github/workflows/docker.yaml
     secrets: inherit
     with:
       version: ${{ needs.get-version.outputs.version }}
