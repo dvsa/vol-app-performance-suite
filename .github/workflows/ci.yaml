@@ -28,7 +28,7 @@ jobs:
 
   security:
     name: Security
-    uses: ./.github/workflows/security.yml
+    uses: ./.github/workflows/security.yaml
     secrets: inherit
 
   build-maven:
