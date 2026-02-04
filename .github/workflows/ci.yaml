@@ -33,7 +33,7 @@ jobs:
 
   build-maven:
     name: build with Maven
-    uses: ./.github/workflows/maven.yml
+    uses: ./.github/workflows/maven.yaml
     with:
       maven-goal: package -DskipTests
     needs:
@@ -47,7 +47,7 @@ jobs:
       - get-version
     strategy:
       fail-fast: false
-    uses: ./.github/workflows/docker.yml
+    uses: ./.github/workflows/docker.yaml
     secrets: inherit
     with:
       version: ${{ needs.get-version.outputs.vol-app-performance }}
