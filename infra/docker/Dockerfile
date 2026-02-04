@@ -20,6 +20,7 @@ RUN mvn -B -Dmaven.repo.local=/build/.m2/repository \
 FROM amazoncorretto:21
 
 # Install only what is strictly necessary
+# hadolint ignore=DL3033
 RUN yum update -y && \
     yum install -y awscli jq shadow-utils bc && \
     yum clean all && \
