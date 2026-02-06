@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.1](https://github.com/dvsa/vol-app-performance-suite/compare/v1.4.0...v1.4.1) (2026-02-06)
+
+
+### Bug Fixes
+
+* trigger cd ([03049d4](https://github.com/dvsa/vol-app-performance-suite/commit/03049d420f72e25d7b5973f5fc5a5c4ddf09d757))
+* trigger cd ([f8f8602](https://github.com/dvsa/vol-app-performance-suite/commit/f8f860265c0c969ce598029eb284424628192c01))
+
 ## [1.4.0](https://github.com/dvsa/vol-app-performance-suite/compare/1.3.0...v1.4.0) (2026-02-06)
 
 
