@@ -4,49 +4,38 @@ on:
   push:
     branches:
       - master
-    tags:
-      - 'v*'
 
 permissions:
   contents: read
 
 jobs:
-  get-version:
-    name: Get version
+  release-please:
+    name: Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     outputs:
-      version: ${{ steps.version.outputs.version }}
-      is-release: ${{ steps.version.outputs.is-release }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      release_created: ${{steps.release.outputs.release_created}}
     steps:
-      - uses: actions/checkout@v4
-
-      - id: version
-        run: |
-          if [[ $GITHUB_REF == refs/tags/* ]]; then
-            # If it's a tag, extract version from tag name (remove 'v' prefix if present)
-            VERSION=${GITHUB_REF#refs/tags/}
-            VERSION=${VERSION#v}
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
-            echo "is-release=true" >> $GITHUB_OUTPUT
-            echo "Tagged release: $VERSION"
-          else
-            # If it's a push to main, use short commit SHA
-            VERSION=${GITHUB_SHA:0:7}
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
-            echo "is-release=false" >> $GITHUB_OUTPUT
-            echo "Main branch push: $VERSION"
-          fi
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          release-type: maven
+          target-branch: ${{ github.ref_name }}
 
   docker:
     name: Docker
-    uses: ./.github/workflows/docker.yaml
+    if: ${{needs.release-please.outputs.release_created}}
+    uses: ./.github/workflows/docker.yml
     secrets: inherit
     with:
-      version: ${{ needs.get-version.outputs.version }}
+      version: ${{ needs.release-please.outputs.tag_name }}
       push: true
-      is-release: ${{ needs.get-version.outputs.is-release == 'true' }}
+      is-release: true
     permissions:
       contents: read
       id-token: write
       packages: write
-    needs: get-version
+    needs: release-please
