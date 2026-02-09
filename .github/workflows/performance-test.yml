@@ -99,7 +99,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.ROLE_ARN }}
-          aws-region: ${{ vars.DVSA_AWS_REGION }}
+          aws-region: ${{ vars.TF_AWS_REGION }}
           role-duration-seconds: 8400
 
       - name: Cache local Maven repository
@@ -113,58 +113,41 @@ jobs:
       - name: Submit AWS Batch Job
         id: submit-job
         run: |
+          CONTAINER_OVERRIDES=$(jq -n \
+            --arg cmd "/usr/local/bin/test-runner.sh" \
+            --arg platform_env "${{ inputs.platform_env }}" \
+            --arg simulation_class "${{ inputs.simulation_class }}" \
+            --arg users "${{ inputs.users }}" \
+            --arg duration "${{ inputs.duration }}" \
+            --arg ramp_time "${{ inputs.ramp_time }}" \
+            --arg build_id "${{ env.JOB_NAME }}" \
+            --arg maven_options "${{ inputs.maven_options }}" \
+            --arg bucket "${{ env.BUCKET_NAME }}" \
+            --arg bucket_path "${{ env.BUCKET_KEY }}" \
+            --arg build_number "${{ github.run_number }}" \
+            '{
+              command: [$cmd],
+              environment: [
+                {name: "PLATFORM_ENV", value: $platform_env},
+                {name: "SIMULATION_CLASS", value: $simulation_class},
+                {name: "USERS", value: $users},
+                {name: "DURATION", value: $duration},
+                {name: "RAMP_TIME", value: $ramp_time},
+                {name: "BUILD_ID", value: $build_id},
+                {name: "MAVEN_OPTIONS", value: $maven_options},
+                {name: "RESULTS_TARGET_BUCKET", value: $bucket},
+                {name: "RESULTS_TARGET_BUCKET_PATH", value: $bucket_path},
+                {name: "RESULTS_BUILD_NUMBER", value: $build_number}
+              ]
+            }')
+
           JOB_ID=$(aws batch submit-job \
             --job-name ${{ env.JOB_NAME }} \
             --job-queue ${{ env.BATCH_JOB_QUEUE }} \
             --job-definition ${{ env.BATCH_JOB_DEFINITION }} \
             --timeout "attemptDurationSeconds=$(( ${{ inputs.batch_timeout_minutes }} * 60 ))" \
-            --container-overrides '{
-              "command": [
-                "/usr/local/bin/test-runner.sh"
-              ],
-              "environment": [
-                {
-                  "name": "PLATFORM_ENV",
-                  "value": "${{ inputs.platform_env }}"
-                },
-                {
-                  "name": "SIMULATION_CLASS",
-                  "value": "${{ inputs.simulation_class }}"
-                },
-                {
-                  "name": "USERS",
-                  "value": "${{ inputs.users }}"
-                },
-                {
-                  "name": "DURATION",
-                  "value": "${{ inputs.duration }}"
-                },
-                {
-                  "name": "RAMP_TIME",
-                  "value": "${{ inputs.ramp_time }}"
-                },
-                {
-                  "name": "BUILD_ID",
-                  "value": "${{ env.JOB_NAME }}"
-                },
-                {
-                  "name": "MAVEN_OPTIONS",
-                  "value": "${{ inputs.maven_options }}"
-                },
-                {
-                  "name": "RESULTS_TARGET_BUCKET",
-                  "value": "${{ env.BUCKET_NAME }}"
-                },
-                {
-                  "name": "RESULTS_TARGET_BUCKET_PATH",
-                  "value": "${{ env.BUCKET_KEY }}"
-                },
-                {
-                  "name": "RESULTS_BUILD_NUMBER",
-                  "value": "${{ github.run_number }}"
-                }
-              ]
-            }')
+            --container-overrides "$CONTAINER_OVERRIDES")
+
           jobId=$(echo $JOB_ID | jq -r '.jobId')
           echo "job_id=$jobId" >> $GITHUB_OUTPUT
 
@@ -206,7 +189,7 @@ jobs:
 
   upload-results:
     name: Upload Results to GitHub
-    needs: [ run-batch, create-job-name ]
+    needs: [run-batch, create-job-name]
     runs-on: ubuntu-latest
     env:
       FOLDER_NAME: ${{ needs.create-job-name.outputs.job_name }}
@@ -218,7 +201,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.ROLE_ARN }}
-          aws-region: ${{ vars.DVSA_AWS_REGION }}
+          aws-region: ${{ vars.TF_AWS_REGION }}
           role-duration-seconds: 8400
 
       - name: Download Gatling Results from S3
@@ -233,9 +216,9 @@ jobs:
 
       - name: Unzip Gatling Results
         run: |
-          mkdir -p ./upload/${{env.FOLDER_NAME }}/gatling-results
-          unzip ./upload/${{env.FOLDER_NAME }}/${{ env.RESULTS_NAME }} -d ./upload/${{env.FOLDER_NAME }}/gatling-results
-          ls -R ./upload/${{env.FOLDER_NAME }}/gatling-results
+          mkdir -p ./upload/${{ env.FOLDER_NAME }}/gatling-results
+          unzip ./upload/${{ env.FOLDER_NAME }}/${{ env.RESULTS_NAME }} -d ./upload/${{ env.FOLDER_NAME }}/gatling-results
+          ls -R ./upload/${{ env.FOLDER_NAME }}/gatling-results
 
       - name: Store Gatling Results
         uses: actions/upload-artifact@v4
@@ -245,7 +228,7 @@ jobs:
 
   report:
     name: Display Performance Report
-    needs: [ upload-results, create-job-name ]
+    needs: [upload-results, create-job-name]
     env:
       REPORT_KEY: ${{ needs.create-job-name.outputs.job_name }}
     runs-on: ubuntu-latest
@@ -261,7 +244,7 @@ jobs:
 
       - name: Console Output Report
         run: |
-          echo "Gatling performance report is available at s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_KEY }}/${{env.REPORT_KEY}}/gatling-results/index.html"
+          echo "Gatling performance report is available at s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_KEY }}/${{ env.REPORT_KEY }}/gatling-results/index.html"
 
       - name: Performance Summary
         run: |
@@ -273,7 +256,7 @@ jobs:
 
   job-succeeded:
     name: Job Succeeded
-    needs: [ report ]
+    needs: [report]
     runs-on: ubuntu-latest
     steps:
       - name: Job Succeeded
