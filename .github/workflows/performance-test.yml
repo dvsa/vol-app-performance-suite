@@ -114,38 +114,38 @@ jobs:
         id: submit-job
         run: |
           CONTAINER_OVERRIDES=$(jq -n \
-            --arg platform_env "${{ inputs.platform_env }}" \
-            --arg simulation_class "${{ inputs.simulation_class }}" \
-            --arg users "${{ inputs.users }}" \
-            --arg duration "${{ inputs.duration }}" \
-            --arg ramp_time "${{ inputs.ramp_time }}" \
-            --arg build_id "${{ env.JOB_NAME }}" \
-            --arg maven_options "${{ inputs.maven_options }}" \
-            --arg bucket "${{ env.BUCKET_NAME }}" \
-            --arg bucket_path "${{ env.BUCKET_KEY }}" \
-            --arg build_number "${{ github.run_number }}" \
-            '{
-              command: ["sh", "-c", "echo === DEBUG INFO ===; whoami; pwd; ls -la /usr/local/bin/; echo === RUNNING TEST ===; /usr/local/bin/test-runner.sh"],
-              environment: [
-                {name: "PLATFORM_ENV", value: $platform_env},
-                {name: "SIMULATION_CLASS", value: $simulation_class},
-                {name: "USERS", value: $users},
-                {name: "DURATION", value: $duration},
-                {name: "RAMP_TIME", value: $ramp_time},
-                {name: "BUILD_ID", value: $build_id},
-                {name: "MAVEN_OPTIONS", value: $maven_options},
-                {name: "RESULTS_TARGET_BUCKET", value: $bucket},
-                {name: "RESULTS_TARGET_BUCKET_PATH", value: $bucket_path},
-                {name: "RESULTS_BUILD_NUMBER", value: $build_number}
-              ]
-            }')
+          --arg platform_env "${{ inputs.platform_env }}" \
+          --arg simulation_class "${{ inputs.simulation_class }}" \
+          --arg users "${{ inputs.users }}" \
+          --arg duration "${{ inputs.duration }}" \
+          --arg ramp_time "${{ inputs.ramp_time }}" \
+          --arg build_id "${{ env.JOB_NAME }}" \
+          --arg maven_options "${{ inputs.maven_options }}" \
+          --arg bucket "${{ env.BUCKET_NAME }}" \
+          --arg bucket_path "${{ env.BUCKET_KEY }}" \
+          --arg build_number "${{ github.run_number }}" \
+          '{
+           command: ["sh", "-c", "cd /opt/project && ./test-runner.sh"],
+           environment: [
+             {name: "PLATFORM_ENV", value: $platform_env},
+             {name: "SIMULATION_CLASS", value: $simulation_class},
+             {name: "USERS", value: $users},
+             {name: "DURATION", value: $duration},
+             {name: "RAMP_TIME", value: $ramp_time},
+             {name: "BUILD_ID", value: $build_id},
+             {name: "MAVEN_OPTIONS", value: $maven_options},
+             {name: "RESULTS_TARGET_BUCKET", value: $bucket},
+             {name: "RESULTS_TARGET_BUCKET_PATH", value: $bucket_path},
+             {name: "RESULTS_BUILD_NUMBER", value: $build_number}
+           ]
+          }')
           
           JOB_ID=$(aws batch submit-job \
-            --job-name ${{ env.JOB_NAME }} \
-            --job-queue ${{ env.BATCH_JOB_QUEUE }} \
-            --job-definition ${{ env.BATCH_JOB_DEFINITION }} \
-            --timeout "attemptDurationSeconds=$(( ${{ inputs.batch_timeout_minutes }} * 60 ))" \
-            --container-overrides "$CONTAINER_OVERRIDES")
+          --job-name ${{ env.JOB_NAME }} \
+          --job-queue ${{ env.BATCH_JOB_QUEUE }} \
+          --job-definition ${{ env.BATCH_JOB_DEFINITION }} \
+          --timeout "attemptDurationSeconds=$(( ${{ inputs.batch_timeout_minutes }} * 60 ))" \
+          --container-overrides "$CONTAINER_OVERRIDES")
           
           jobId=$(echo $JOB_ID | jq -r '.jobId')
           echo "job_id=$jobId" >> $GITHUB_OUTPUT
