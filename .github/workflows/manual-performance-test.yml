@@ -1,8 +1,5 @@
 name: Manual Trigger for Performance Test
 
-permissions:
-  contents: read
-
 on:
   workflow_dispatch:
     inputs:
@@ -45,10 +42,16 @@ on:
         description: "Timeout in minutes for the test execution"
         default: "60"
 
+permissions:
+  contents: write
+  id-token: write
+  checks: write
+
 jobs:
   call-performance-test:
     name: Call Performance Test Workflow
     uses: ./.github/workflows/performance-test.yml
+    secrets: inherit
     with:
       platform_env: ${{ inputs.platform_env }}
       simulation_class: ${{ inputs.simulation_class }}
@@ -62,3 +65,7 @@ jobs:
       bucket_key: ${{ vars.S3_REPORT_BUCKET_KEY }}
       batch_job_queue: ${{ vars.ACCOUNT_NONPROD_BATCH_JOB_QUEUE }}
       batch_job_definition: ${{ vars.ACCOUNT_NONPROD_BATCH_JOB_DEFINITION }}
+    permissions:
+      contents: write
+      id-token: write
+      checks: write
