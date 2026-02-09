@@ -36,7 +36,7 @@ permissions:
 jobs:
   load-test:
     name: Load Test
-    uses: ./.github/workflows/tests/performance-test.yml
+    uses: ./.github/workflows/performance-test.yml
     secrets: inherit
     with:
       platform_env: ${{ inputs.platform_env }}
