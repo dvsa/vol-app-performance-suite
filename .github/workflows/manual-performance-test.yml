@@ -45,7 +45,7 @@ on:
 jobs:
   call-performance-test:
     name: Call Performance Test Workflow
-    uses: ./.github/workflows/tests/performance-test.yml
+    uses: ./.github/workflows/performance-test.yml
     with:
       platform_env: ${{ inputs.platform_env }}
       simulation_class: ${{ inputs.simulation_class }}
