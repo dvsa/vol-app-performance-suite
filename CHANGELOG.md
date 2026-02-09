@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.6.0](https://github.com/dvsa/vol-app-performance-suite/compare/v1.5.0...v1.6.0) (2026-02-09)
+
+
+### Features
+
+* test workflows ([4d93e7f](https://github.com/dvsa/vol-app-performance-suite/commit/4d93e7f5842e4bce43578f0e25db5b8f18505d31))
+* test workflows ([a6cdfe2](https://github.com/dvsa/vol-app-performance-suite/commit/a6cdfe2dc51ef430b557c5b8d6a6065db24c2392))
+
 ## [1.5.0](https://github.com/dvsa/vol-app-performance-suite/compare/v1.4.0...v1.5.0) (2026-02-09)
 
 
