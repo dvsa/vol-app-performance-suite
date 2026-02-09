@@ -1,0 +1,61 @@
+name: Manual Trigger for Performance Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform_env:
+        type: string
+        required: true
+        description: "Environment to test"
+      simulation_class:
+        type: string
+        required: true
+        description: "Gatling simulation class to run"
+        default: "uk.gov.dvsa.vol.CreateApplicationSimulation"
+      users:
+        type: string
+        required: true
+        description: "Number of concurrent users"
+        default: "10"
+      duration:
+        type: string
+        required: true
+        description: "Test duration (e.g., 5m, 300s, 1h)"
+        default: "5m"
+      ramp_time:
+        type: string
+        required: false
+        description: "Ramp up time (e.g., 30s, 2m)"
+        default: "30s"
+      test_type:
+        type: string
+        required: true
+        description: "Type of performance test"
+        default: "load"
+      maven_options:
+        type: string
+        required: false
+        description: "Maven Options"
+      timeout_minutes:
+        type: string
+        required: false
+        description: "Timeout in minutes for the test execution"
+        default: "60"
+
+jobs:
+  call-performance-test:
+    name: Call Performance Test Workflow
+    uses: ./.github/workflows/tests/performance-test.yml
+    with:
+      platform_env: ${{ inputs.platform_env }}
+      simulation_class: ${{ inputs.simulation_class }}
+      users: ${{ fromJson(inputs.users) }}
+      duration: ${{ inputs.duration }}
+      ramp_time: ${{ inputs.ramp_time }}
+      maven_options: ${{ inputs.maven_options }}
+      batch_timeout_minutes: ${{ fromJson(inputs.timeout_minutes) }}
+      aws_role: ${{ vars.ACCOUNT_NONPROD_TEST_OIDC_ROLE }}
+      bucket_name: ${{ vars.ACCOUNT_NONPROD_S3_REPORT_BUCKET }}
+      bucket_key: ${{ vars.S3_REPORT_BUCKET_KEY }}
+      batch_job_queue: ${{ vars.ACCOUNT_NONPROD_BATCH_JOB_QUEUE }}
+      batch_job_definition: ${{ vars.ACCOUNT_NONPROD_BATCH_JOB_DEFINITION }}
