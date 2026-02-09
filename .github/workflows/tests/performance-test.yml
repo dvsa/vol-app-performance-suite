@@ -1,0 +1,281 @@
+name: Performance Test
+
+on:
+  workflow_call:
+    inputs:
+      platform_env:
+        type: string
+        required: true
+      simulation_class:
+        type: string
+        required: true
+        description: "Gatling simulation class to run"
+      users:
+        type: number
+        required: false
+        default: 10
+        description: "Number of concurrent users"
+      duration:
+        type: string
+        required: false
+        default: "5m"
+        description: "Test duration (e.g., 5m, 30s)"
+      ramp_time:
+        type: string
+        required: false
+        default: "30s"
+        description: "Ramp up time"
+      maven_options:
+        type: string
+        required: false
+      batch_timeout_minutes:
+        type: number
+        required: false
+        description: "Timeout in minutes for the AWS Batch job"
+        default: 60
+      aws_role:
+        description: 'AWS IAM Role ARN to assume'
+        required: false
+        type: string
+      bucket_name:
+        description: 'Bucket for performance test results'
+        required: true
+        type: string
+      bucket_key:
+        description: 'Bucket key for results'
+        required: true
+        type: string
+      batch_job_queue:
+        description: 'AWS Batch Job Queue'
+        required: true
+        type: string
+      batch_job_definition:
+        description: 'AWS Batch Job Definition'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  id-token: write
+  checks: write
+
+env:
+  RESULTS_NAME: "gatling_results_${{ github.run_number }}.zip"
+  ROLE_ARN: ${{ inputs.aws_role }}
+  BUCKET_NAME: ${{ inputs.bucket_name }}
+  BUCKET_KEY: ${{ inputs.bucket_key }}
+  BATCH_JOB_QUEUE: ${{ inputs.batch_job_queue }}
+  BATCH_JOB_DEFINITION: ${{ inputs.batch_job_definition }}
+
+jobs:
+  create-job-name:
+    name: Create Job Name
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.platform_env }}
+    outputs:
+      job_name: ${{ steps.set-job-name.outputs.job_name }}
+    steps:
+      - name: Set Job Name
+        id: set-job-name
+        run: |
+          buildtime=$(date +"%Y%m%d%H%M%S")
+          simulation="${{ inputs.simulation_class }}"
+          sanitized_simulation=$(echo "$simulation" | tr -cd 'a-zA-Z0-9-_')
+          echo "job_name=perf-$buildtime-${{ github.run_id }}-$sanitized_simulation" >> $GITHUB_OUTPUT
+
+  run-batch:
+    name: Run Performance Tests on AWS Batch
+    needs: create-job-name
+    runs-on: ubuntu-latest
+    outputs:
+      job_id: ${{ steps.submit-job.outputs.job_id }}
+    env:
+      JOB_NAME: ${{ needs.create-job-name.outputs.job_name }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS with provided credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.ROLE_ARN }}
+          aws-region: ${{ vars.DVSA_AWS_REGION }}
+          role-duration-seconds: 8400
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Submit AWS Batch Job
+        id: submit-job
+        run: |
+          JOB_ID=$(aws batch submit-job \
+            --job-name ${{ env.JOB_NAME }} \
+            --job-queue ${{ env.BATCH_JOB_QUEUE }} \
+            --job-definition ${{ env.BATCH_JOB_DEFINITION }} \
+            --timeout "attemptDurationSeconds=$(( ${{ inputs.batch_timeout_minutes }} * 60 ))" \
+            --container-overrides '{
+              "command": [
+                "/usr/local/bin/test-runner.sh"
+              ],
+              "environment": [
+                {
+                  "name": "PLATFORM_ENV",
+                  "value": "${{ inputs.platform_env }}"
+                },
+                {
+                  "name": "SIMULATION_CLASS",
+                  "value": "${{ inputs.simulation_class }}"
+                },
+                {
+                  "name": "USERS",
+                  "value": "${{ inputs.users }}"
+                },
+                {
+                  "name": "DURATION",
+                  "value": "${{ inputs.duration }}"
+                },
+                {
+                  "name": "RAMP_TIME",
+                  "value": "${{ inputs.ramp_time }}"
+                },
+                {
+                  "name": "BUILD_ID",
+                  "value": "${{ env.JOB_NAME }}"
+                },
+                {
+                  "name": "MAVEN_OPTIONS",
+                  "value": "${{ inputs.maven_options }}"
+                },
+                {
+                  "name": "RESULTS_TARGET_BUCKET",
+                  "value": "${{ env.BUCKET_NAME }}"
+                },
+                {
+                  "name": "RESULTS_TARGET_BUCKET_PATH",
+                  "value": "${{ env.BUCKET_KEY }}"
+                },
+                {
+                  "name": "RESULTS_BUILD_NUMBER",
+                  "value": "${{ github.run_number }}"
+                }
+              ]
+            }')
+          jobId=$(echo $JOB_ID | jq -r '.jobId')
+          echo "job_id=$jobId" >> $GITHUB_OUTPUT
+
+      - name: Wait for Job Completion
+        env:
+          JOB_ID: ${{ steps.submit-job.outputs.job_id }}
+          TIME_OUT: ${{ inputs.batch_timeout_minutes }}
+        run: |
+          TIME_OUT=${{ env.TIME_OUT }}
+          JOB_ID=${{ env.JOB_ID }}
+          count=0
+          trap 'aws batch terminate-job --job-id $JOB_ID --reason "GitHub workflow cancelled"; exit 1' SIGINT SIGTERM
+          while true; do
+            JOB_STATUS=$(aws batch describe-jobs --jobs $JOB_ID --query 'jobs[0].status' --output text)
+            if [ "$JOB_STATUS" == "SUCCEEDED" ] || [ "$JOB_STATUS" == "FAILED" ]; then
+              echo "Final job status: $JOB_STATUS"
+              break
+            fi
+            echo "Job status: $JOB_STATUS"
+            count=$((count + 1))
+            if [ $count -ge $TIME_OUT ]; then
+              echo "Batch JOB with id=${{ env.JOB_ID }} timeout. Exiting."
+              exit 1
+            fi
+            sleep 60
+          done
+          if [ "$JOB_STATUS" == "FAILED" ]; then
+            echo "AWS Batch job failed"
+            exit 1
+          fi
+
+      - name: Cancel AWS Batch Job
+        if: cancelled()
+        env:
+          JOB_ID: ${{ steps.submit-job.outputs.job_id }}
+        run: |
+          echo "Workflow was cancelled, terminating AWS Batch job"
+          aws batch terminate-job --job-id $JOB_ID --reason "GitHub workflow cancelled"
+
+  upload-results:
+    name: Upload Results to GitHub
+    needs: [ run-batch, create-job-name ]
+    runs-on: ubuntu-latest
+    env:
+      FOLDER_NAME: ${{ needs.create-job-name.outputs.job_name }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS with provided credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.ROLE_ARN }}
+          aws-region: ${{ vars.DVSA_AWS_REGION }}
+          role-duration-seconds: 8400
+
+      - name: Download Gatling Results from S3
+        env:
+          JOB_ID: ${{ needs.run-batch.outputs.job_id }}
+        run: |
+          mkdir -p ./upload/${{ env.FOLDER_NAME }}
+          aws s3api get-object \
+            --bucket ${{ env.BUCKET_NAME }} \
+            --key "${{ env.BUCKET_KEY }}/${{ env.FOLDER_NAME }}/${{ env.RESULTS_NAME }}" \
+            "./upload/${{ env.FOLDER_NAME }}/${{ env.RESULTS_NAME }}"
+
+      - name: Unzip Gatling Results
+        run: |
+          mkdir -p ./upload/${{env.FOLDER_NAME }}/gatling-results
+          unzip ./upload/${{env.FOLDER_NAME }}/${{ env.RESULTS_NAME }} -d ./upload/${{env.FOLDER_NAME }}/gatling-results
+          ls -R ./upload/${{env.FOLDER_NAME }}/gatling-results
+
+      - name: Store Gatling Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: perf-${{ needs.create-job-name.outputs.job_name }}
+          path: ./upload/${{ env.FOLDER_NAME }}/gatling-results
+
+  report:
+    name: Display Performance Report
+    needs: [ upload-results, create-job-name ]
+    env:
+      REPORT_KEY: ${{ needs.create-job-name.outputs.job_name }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.platform_env }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Results
+        uses: actions/download-artifact@v4
+        with:
+          name: perf-${{ needs.create-job-name.outputs.job_name }}
+
+      - name: Console Output Report
+        run: |
+          echo "Gatling performance report is available at s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_KEY }}/${{env.REPORT_KEY}}/gatling-results/index.html"
+
+      - name: Performance Summary
+        run: |
+          echo "### Performance Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "- **Simulation**: ${{ inputs.simulation_class }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Users**: ${{ inputs.users }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Duration**: ${{ inputs.duration }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Report**: [View Results](https://${{ env.BUCKET_NAME }}.s3.amazonaws.com/${{ env.BUCKET_KEY }}/${{ env.REPORT_KEY }}/gatling-results/index.html)" >> $GITHUB_STEP_SUMMARY
+
+  job-succeeded:
+    name: Job Succeeded
+    needs: [ report ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Job Succeeded
+        if: success()
+        run: echo "Performance test completed successfully!"
