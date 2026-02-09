@@ -99,7 +99,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.ROLE_ARN }}
-          aws-region: ${{ vars.DVSA_AWS_REGION }}
+          aws-region: ${{ vars.TF_AWS_REGION }}
           role-duration-seconds: 8400
 
       - name: Cache local Maven repository
@@ -206,7 +206,7 @@ jobs:
 
   upload-results:
     name: Upload Results to GitHub
-    needs: [ run-batch, create-job-name ]
+    needs: [run-batch, create-job-name]
     runs-on: ubuntu-latest
     env:
       FOLDER_NAME: ${{ needs.create-job-name.outputs.job_name }}
@@ -218,7 +218,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.ROLE_ARN }}
-          aws-region: ${{ vars.DVSA_AWS_REGION }}
+          aws-region: ${{ vars.TF_AWS_REGION }}
           role-duration-seconds: 8400
 
       - name: Download Gatling Results from S3
@@ -233,9 +233,9 @@ jobs:
 
       - name: Unzip Gatling Results
         run: |
-          mkdir -p ./upload/${{env.FOLDER_NAME }}/gatling-results
-          unzip ./upload/${{env.FOLDER_NAME }}/${{ env.RESULTS_NAME }} -d ./upload/${{env.FOLDER_NAME }}/gatling-results
-          ls -R ./upload/${{env.FOLDER_NAME }}/gatling-results
+          mkdir -p ./upload/${{ env.FOLDER_NAME }}/gatling-results
+          unzip ./upload/${{ env.FOLDER_NAME }}/${{ env.RESULTS_NAME }} -d ./upload/${{ env.FOLDER_NAME }}/gatling-results
+          ls -R ./upload/${{ env.FOLDER_NAME }}/gatling-results
 
       - name: Store Gatling Results
         uses: actions/upload-artifact@v4
@@ -245,7 +245,7 @@ jobs:
 
   report:
     name: Display Performance Report
-    needs: [ upload-results, create-job-name ]
+    needs: [upload-results, create-job-name]
     env:
       REPORT_KEY: ${{ needs.create-job-name.outputs.job_name }}
     runs-on: ubuntu-latest
@@ -261,7 +261,7 @@ jobs:
 
       - name: Console Output Report
         run: |
-          echo "Gatling performance report is available at s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_KEY }}/${{env.REPORT_KEY}}/gatling-results/index.html"
+          echo "Gatling performance report is available at s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_KEY }}/${{ env.REPORT_KEY }}/gatling-results/index.html"
 
       - name: Performance Summary
         run: |
@@ -273,7 +273,7 @@ jobs:
 
   job-succeeded:
     name: Job Succeeded
-    needs: [ report ]
+    needs: [report]
     runs-on: ubuntu-latest
     steps:
       - name: Job Succeeded
