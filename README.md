@@ -1,5 +1,5 @@
 # Description
-Performance test for the register new user journey.
+Performance test for the VOL application 
 
 # Prerequisites
 - Maven
