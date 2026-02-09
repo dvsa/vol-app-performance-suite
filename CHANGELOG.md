@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.7.0](https://github.com/dvsa/vol-app-performance-suite/compare/v1.6.0...v1.7.0) (2026-02-09)
+
+
+### Features
+
+* submit job ([1fe2e40](https://github.com/dvsa/vol-app-performance-suite/commit/1fe2e407df08047c18d685d9556a84af46af5f90))
+* test workflows ([d141029](https://github.com/dvsa/vol-app-performance-suite/commit/d1410290899b1a3321ce7553308c87e78cb2224b))
+* test workflows ([3209cd1](https://github.com/dvsa/vol-app-performance-suite/commit/3209cd19eb2434d47c944fa106b4ac19e3c76d79))
+* test workflows ([4e0387a](https://github.com/dvsa/vol-app-performance-suite/commit/4e0387a0a243f492a1d0a4ed7077cd496fab1340))
+
+
+### Bug Fixes
+
+* dockerfile ([7ac7bcd](https://github.com/dvsa/vol-app-performance-suite/commit/7ac7bcdd93d0806907a6edf2ca9c95e529814c81))
+* dockerfile ([a504c10](https://github.com/dvsa/vol-app-performance-suite/commit/a504c1058e9d6f1ff4e98b85088e7ca74769515e))
+* perms ([1a308b3](https://github.com/dvsa/vol-app-performance-suite/commit/1a308b34d4655836dfe5edbfa2f4f5b73024efea))
+
 ## [1.6.0](https://github.com/dvsa/vol-app-performance-suite/compare/v1.5.0...v1.6.0) (2026-02-09)
 
 
