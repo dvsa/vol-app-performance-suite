@@ -114,7 +114,6 @@ jobs:
         id: submit-job
         run: |
           CONTAINER_OVERRIDES=$(jq -n \
-            --arg cmd "/usr/local/bin/test-runner.sh" \
             --arg platform_env "${{ inputs.platform_env }}" \
             --arg simulation_class "${{ inputs.simulation_class }}" \
             --arg users "${{ inputs.users }}" \
@@ -126,7 +125,7 @@ jobs:
             --arg bucket_path "${{ env.BUCKET_KEY }}" \
             --arg build_number "${{ github.run_number }}" \
             '{
-              command: [$cmd],
+              command: ["sh", "-c", "echo === DEBUG INFO ===; whoami; pwd; ls -la /usr/local/bin/; echo === RUNNING TEST ===; /usr/local/bin/test-runner.sh"],
               environment: [
                 {name: "PLATFORM_ENV", value: $platform_env},
                 {name: "SIMULATION_CLASS", value: $simulation_class},
@@ -140,14 +139,14 @@ jobs:
                 {name: "RESULTS_BUILD_NUMBER", value: $build_number}
               ]
             }')
-
+          
           JOB_ID=$(aws batch submit-job \
             --job-name ${{ env.JOB_NAME }} \
             --job-queue ${{ env.BATCH_JOB_QUEUE }} \
             --job-definition ${{ env.BATCH_JOB_DEFINITION }} \
             --timeout "attemptDurationSeconds=$(( ${{ inputs.batch_timeout_minutes }} * 60 ))" \
             --container-overrides "$CONTAINER_OVERRIDES")
-
+          
           jobId=$(echo $JOB_ID | jq -r '.jobId')
           echo "job_id=$jobId" >> $GITHUB_OUTPUT
 
