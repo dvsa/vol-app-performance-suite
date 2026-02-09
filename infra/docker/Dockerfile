@@ -38,10 +38,6 @@ COPY --from=builder --chown=testrunner:testrunner /build /opt/project
 # Copy runtime Maven settings to testrunner user (from build context root)
 COPY --chown=testrunner:testrunner ./settings-runtime.xml /home/testrunner/.m2/settings.xml
 
-# Copy Scripts with correct ownership and permissions (BEFORE switching user)
-COPY --chown=testrunner:testrunner ./test-runner.sh /usr/local/bin/test-runner.sh
-RUN chmod +x /usr/local/bin/test-runner.sh
-
 # Ensure the workdir is writable by testrunner
 RUN chown -R testrunner:testrunner /opt/project && \
     chmod -R 775 /opt/project
@@ -50,6 +46,10 @@ RUN chown -R testrunner:testrunner /opt/project && \
 ENV MAVEN_HOME=/opt/maven
 ENV PATH=$MAVEN_HOME/bin:$PATH
 ENV MAVEN_OPTS="-Dmaven.repo.local=/home/testrunner/.m2/repository"
+
+# Copy Scripts with correct ownership and permissions
+COPY --chown=testrunner:testrunner ./test-runner.sh /usr/local/bin/test-runner.sh
+RUN chmod +x /usr/local/bin/test-runner.sh
 
 USER testrunner
 ENTRYPOINT ["/usr/local/bin/test-runner.sh"]
