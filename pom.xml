@@ -13,13 +13,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Gatling -->
-        <gatling.version>3.14.4</gatling.version>
-        <gatling-maven-plugin.version>4.15.1</gatling-maven-plugin.version>
+        <gatling.version>3.11.5</gatling.version>
+        <gatling-maven-plugin.version>4.9.6</gatling-maven-plugin.version>
 
         <!-- DVSA Libraries -->
-        <active-support.version>2.11.2</active-support.version>
+        <active-support.version>2.13.0</active-support.version>
         <vol-uri-constructor.version>2.4.0</vol-uri-constructor.version>
-        <vol-api-calls.version>3.2.2</vol-api-calls.version>
+        <vol-api-calls.version>3.3.0</vol-api-calls.version>
 
         <!-- Apache HttpClient -->
         <httpclient.version>4.5.14</httpclient.version>
@@ -68,12 +68,12 @@
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-codec-http</artifactId>
-                <version>4.1.129.Final</version>
+                <version>4.1.112.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-codec-http2</artifactId>
-                <version>4.1.125.Final</version>
+                <version>4.1.112.Final</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

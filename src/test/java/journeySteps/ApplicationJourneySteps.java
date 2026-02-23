@@ -176,7 +176,7 @@ public class ApplicationJourneySteps {
 
     public static HttpRequestActionBuilder showDashboard = http("Show dashboard")
             .get("/")
-            .check(regex("href=\"/application/(.+?)/").find().saveAs("applicationNumber"));
+            .check(regex("href=[\"']?/application/([^/\"']+)/?[\"']?").find().saveAs("applicationNumber"));
 
     public static HttpRequestActionBuilder getBusinessTypePage = http("Show Business Type Page")
             .get("application/#{applicationNumber}/business-type/")
