@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.8.0](https://github.com/dvsa/vol-app-performance-suite/compare/v1.7.0...v1.8.0) (2026-02-24)
+
+
+### Features
+
+* migrate to database utilities ([fc3440c](https://github.com/dvsa/vol-app-performance-suite/commit/fc3440c46fe227953f8f191e37f3907cc69baab6))
+
+
+### Bug Fixes
+
+* dockerfile ([6e8e2b1](https://github.com/dvsa/vol-app-performance-suite/commit/6e8e2b11ba0996639307ec1559125ba7c70a2a6e))
+* run.sh ([9911a23](https://github.com/dvsa/vol-app-performance-suite/commit/9911a23307c809a22e05471fc4f600cca6f0ab7a))
+* run.sh ([3477d77](https://github.com/dvsa/vol-app-performance-suite/commit/3477d77dcd892594816e7e453aa798205f631b5e))
+* use active support db utils ([4dc449d](https://github.com/dvsa/vol-app-performance-suite/commit/4dc449d8e5d09023a69b3e5e279d61ef9af136c5))
+
 ## [1.7.0](https://github.com/dvsa/vol-app-performance-suite/compare/v1.6.0...v1.7.0) (2026-02-09)
 
 
