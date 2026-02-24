@@ -2,7 +2,7 @@ package scenarios;
 
 import io.gatling.javaapi.core.ScenarioBuilder;
 import journeySteps.ApplicationJourneySteps;
-import utils.FeederConfig;
+import test.TestSetup;
 
 
 import static io.gatling.javaapi.core.CoreDsl.*;
@@ -11,7 +11,7 @@ public class CreateApplication extends ApplicationJourneySteps {
 
     public static ScenarioBuilder selfServiceApplicationRegistration() {
         return scenario("Create and submit application")
-                .feed(FeederConfig.getFeeder()) // Assuming the feeder is already defined
+                .feed(TestSetup.getTempPasswordUserFeeder())
                 .exec(getLoginPage)
                 .pause(20)
                 .exec(loginPage)

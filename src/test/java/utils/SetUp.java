@@ -11,7 +11,7 @@ public class SetUp {
     public static final String typeofTest = Optional.ofNullable(System.getProperty("typeOfTest")).orElse("load");
     public static final String site = System.getProperty("site");
     public static final String applicationType = System.getProperty("applicationType");
-    public static final String env = System.getProperty("env").toLowerCase();
+    public static final String env = Optional.ofNullable(System.getProperty("env")).orElse("qa").toLowerCase();
     public static final int users = Optional.ofNullable(Integer.getInteger("users")).orElse(0);
     public static final int rampUp = Optional.ofNullable(Integer.getInteger("rampUp")).orElse(0);
     public static final int rampDurationInMin = Optional.ofNullable(Integer.getInteger("duration")).orElse(0);
