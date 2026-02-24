@@ -1,12 +1,17 @@
 package test;
 
+import activesupport.aws.s3.SecretsManager;
 import activesupport.database.utils.VolDatabaseUtils;
 import activesupport.mailPit.MailPit;
 import apiCalls.actions.RegisterUser;
+import io.gatling.javaapi.core.CoreDsl;
+import io.gatling.javaapi.core.FeederBuilder;
 import org.apache.commons.codec.net.QuotedPrintableCodec;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dvsa.testing.lib.url.utils.EnvironmentType;
+
+import java.util.*;
 
 public class TestSetup {
     private static final Logger LOGGER = LogManager.getLogger(TestSetup.class);
@@ -33,6 +38,99 @@ public class TestSetup {
             System.exit(1);
         }
     }
+
+    // ========================================
+    // GATLING FEEDERS - CENTRALIZED
+    // ========================================
+
+    /**
+     * Creates feeder for users with temporary passwords (for application creation flows)
+     */
+    public static FeederBuilder<Object> getTempPasswordUserFeeder() {
+        String env = System.getProperty("env", "qa");
+        try {
+            List<Map<String, Object>> users = VolDatabaseUtils.getUsersWithTempPasswords(env);
+            
+            if (users.isEmpty()) {
+                throw new RuntimeException("No temp password users available. Run TestSetup first.");
+            }
+
+            List<Map<String, Object>> feederData = users.stream()
+                    .map(user -> {
+                        Map<String, Object> record = new HashMap<>();
+                        record.put("Username", user.get("Username"));
+                        record.put("loginId", user.get("Username"));
+                        record.put("Forename", user.get("Forename"));
+                        record.put("Password", user.get("Password"));
+                        record.put("emailAddress", user.get("emailAddress"));
+                        return record;
+                    })
+                    .toList();
+
+            LOGGER.info("Loaded {} temp password users for Gatling", feederData.size());
+            return CoreDsl.listFeeder(feederData).circular();
+        } catch (Exception e) {
+            LOGGER.error("Failed to load temp password users", e);
+            throw new RuntimeException("Failed to load users", e);
+        }
+    }
+
+    /**
+     * Creates feeder for internal (DVSA) users (for internal search flows)
+     */
+    public static FeederBuilder<Object> getInternalUserFeeder() {
+        String env = System.getProperty("env", "qa");
+        try {
+            List<Map<String, Object>> users = VolDatabaseUtils.getInternalUsers(env);
+            String defaultPassword = SecretsManager.getSecretValue("defaultPassword");
+            
+            List<Map<String, Object>> feederData = users.stream()
+                    .map(user -> {
+                        Map<String, Object> record = new HashMap<>();
+                        String loginId = (String) user.get("login_id");
+                        record.put("Username", loginId);
+                        record.put("loginId", loginId);
+                        record.put("Password", defaultPassword);
+                        return record;
+                    })
+                    .toList();
+            
+            LOGGER.info("Loaded {} internal users for Gatling", feederData.size());
+            return CoreDsl.listFeeder(feederData).circular();
+        } catch (Exception e) {
+            LOGGER.error("Failed to load internal users", e);
+            throw new RuntimeException("Failed to load internal users", e);
+        }
+    }
+
+    /**
+     * Creates feeder for trading names (for search operations)
+     */
+    public static FeederBuilder<Object> getTradingNameFeeder() {
+        String env = System.getProperty("env", "qa");
+        try {
+            List<Map<String, Object>> tradingNames = VolDatabaseUtils.getTradingNames(env);
+            
+            List<Map<String, Object>> feederData = tradingNames.stream()
+                    .map(tradingName -> {
+                        Map<String, Object> record = new HashMap<>();
+                        record.put("companyName", tradingName.get("name"));
+                        return record;
+                    })
+                    .toList();
+            
+            LOGGER.info("Loaded {} trading names for Gatling", feederData.size());
+            return CoreDsl.listFeeder(feederData).circular();
+        } catch (Exception e) {
+            LOGGER.error("Failed to load trading names", e);
+            // Fallback data for external search
+            return CoreDsl.listFeeder(List.of(Map.of("companyName", "Eddie"))).circular();
+        }
+    }
+
+    // ========================================
+    // EXISTING METHODS (UNCHANGED)
+    // ========================================
 
     private static void createUsersWithTempPasswords(String env, int userCount) {
         LOGGER.info("Creating {} users for {}", userCount, env);

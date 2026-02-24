@@ -64,16 +64,11 @@
                 <version>${httpcore.version}</version>
             </dependency>
 
-            <!-- Force secure Netty versions to fix security vulnerabilities -->
+            <!-- Use netty-all to avoid version conflicts between Netty modules -->
             <dependency>
                 <groupId>io.netty</groupId>
-                <artifactId>netty-codec-http</artifactId>
-                <version>4.1.112.Final</version>
-            </dependency>
-            <dependency>
-                <groupId>io.netty</groupId>
-                <artifactId>netty-codec-http2</artifactId>
-                <version>4.1.112.Final</version>
+                <artifactId>netty-all</artifactId>
+                <version>4.2.10.Final</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
