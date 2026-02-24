@@ -39,13 +39,7 @@ public class TestSetup {
         }
     }
 
-    // ========================================
-    // GATLING FEEDERS - CENTRALIZED
-    // ========================================
 
-    /**
-     * Creates feeder for users with temporary passwords (for application creation flows)
-     */
     public static FeederBuilder<Object> getTempPasswordUserFeeder() {
         String env = System.getProperty("env", "qa");
         try {
@@ -75,9 +69,7 @@ public class TestSetup {
         }
     }
 
-    /**
-     * Creates feeder for internal (DVSA) users (for internal search flows)
-     */
+
     public static FeederBuilder<Object> getInternalUserFeeder() {
         String env = System.getProperty("env", "qa");
         try {
@@ -103,9 +95,7 @@ public class TestSetup {
         }
     }
 
-    /**
-     * Creates feeder for trading names (for search operations)
-     */
+
     public static FeederBuilder<Object> getTradingNameFeeder() {
         String env = System.getProperty("env", "qa");
         try {
@@ -127,10 +117,6 @@ public class TestSetup {
             return CoreDsl.listFeeder(List.of(Map.of("companyName", "Eddie"))).circular();
         }
     }
-
-    // ========================================
-    // EXISTING METHODS (UNCHANGED)
-    // ========================================
 
     private static void createUsersWithTempPasswords(String env, int userCount) {
         LOGGER.info("Creating {} users for {}", userCount, env);
