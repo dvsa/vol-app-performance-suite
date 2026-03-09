@@ -16,7 +16,7 @@
         <gatling-maven-plugin.version>4.21.0</gatling-maven-plugin.version>
 
         <!-- DVSA Libraries -->
-        <active-support.version>2.13.1</active-support.version>
+        <active-support.version>2.14.2</active-support.version>
         <vol-api-calls.version>3.3.0</vol-api-calls.version>
 
         <!-- Maven Plugins -->
