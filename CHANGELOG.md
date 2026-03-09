@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.9.0](https://github.com/dvsa/vol-app-performance-suite/compare/v1.8.0...v1.9.0) (2026-03-09)
+
+
+### Features
+
+* bump ([db790e9](https://github.com/dvsa/vol-app-performance-suite/commit/db790e9e69a0868838c82230fc9c854935850c97))
+* bump ([f251df6](https://github.com/dvsa/vol-app-performance-suite/commit/f251df6a24210c4c7b667a42d98d3f9667d77ee7))
+
 ## [1.8.0](https://github.com/dvsa/vol-app-performance-suite/compare/v1.7.0...v1.8.0) (2026-02-24)
 
 
