@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.9.1](https://github.com/dvsa/vol-app-performance-suite/compare/v1.9.0...v1.9.1) (2026-06-01)
+
+
+### Bug Fixes
+
+* upgrade gatling to 3.15.1 and active-support to 2.18.4 ([6738e3c](https://github.com/dvsa/vol-app-performance-suite/commit/6738e3c8994158938498b373f76dc3ae2e21cb45))
+* upgrade gatling to 3.15.1 and active-support to 2.18.4 ([efef2e9](https://github.com/dvsa/vol-app-performance-suite/commit/efef2e9bfda42abe246251e308a160e665a38b90))
+
 ## [1.9.0](https://github.com/dvsa/vol-app-performance-suite/compare/v1.8.0...v1.9.0) (2026-03-09)
 
 
