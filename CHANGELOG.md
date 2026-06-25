@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.9.2](https://github.com/dvsa/vol-app-performance-suite/compare/v1.9.1...v1.9.2) (2026-06-25)
+
+
+### Bug Fixes
+
+* CVE ([1c20194](https://github.com/dvsa/vol-app-performance-suite/commit/1c20194acd2a3c1e987592c43378b14b39c80afd))
+* upgrade active-support to 2.18.6 and patch transitive CVEs ([fc13bc9](https://github.com/dvsa/vol-app-performance-suite/commit/fc13bc9b2a3f65551713a9c829cbd1d7fc0ca53f))
+
 ## [1.9.1](https://github.com/dvsa/vol-app-performance-suite/compare/v1.9.0...v1.9.1) (2026-06-01)
 
 
